@@ -1,0 +1,30 @@
+# dependencies & build
+node_modules/
+dist/
+build/
+.out/
+.next/
+.vercel/
+.cache/
+tmp/
+*.log
+
+# env & secrets
+.env
+.env.*
+*.local
+
+# uploads & large assets (keep out of git)
+uploads/
+public/uploads/
+
+# archives or large bundles
+*.tar
+*.tar.gz
+*.zip
+*.7z
+*.iso
+
+# OS/editor
+.DS_Store
+Thumbs.db
