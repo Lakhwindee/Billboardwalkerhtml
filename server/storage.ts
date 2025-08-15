@@ -560,7 +560,7 @@ export class DatabaseStorage implements IStorage {
   async updatePaymentAccount(id: number, updates: Partial<PaymentAccount>): Promise<PaymentAccount> {
     const [paymentAccount] = await db
       .update(paymentAccounts)
-      .set({ ...updates, updatedAt: new Date() })
+      .set(updates)
       .where(eq(paymentAccounts.id, id))
       .returning();
     return paymentAccount;
