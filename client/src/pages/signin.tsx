@@ -35,8 +35,10 @@ export default function SigninPage() {
 
   const signinMutation = useMutation({
     mutationFn: async (data: SigninForm) => {
+      const apiUrl = import.meta.env.DEV ? "/api/login" : `${window.location.origin}/api/login`;
+      
       try {
-        const response = await fetch("/api/login", {
+        const response = await fetch(apiUrl, {
           method: "POST",
           headers: { 
             "Content-Type": "application/json",
@@ -50,7 +52,8 @@ export default function SigninPage() {
         try {
           result = await response.json();
         } catch (parseError) {
-          throw new Error("Server connection error. Please try again.");
+          console.error("JSON parsing error:", parseError);
+          throw new Error("Server connection error. Please check your connection and try again.");
         }
         
         if (!response.ok) {
@@ -60,6 +63,8 @@ export default function SigninPage() {
             throw new Error("Please fill in all required fields");
           } else if (response.status >= 500) {
             throw new Error("Server error. Please try again later.");
+          } else if (response.status === 0) {
+            throw new Error("Cannot connect to server. Please check if the application is running.");
           } else {
             throw new Error(result.error || result.message || "Sign in failed");
           }
@@ -67,8 +72,9 @@ export default function SigninPage() {
         
         return result;
       } catch (fetchError) {
-        if (fetchError instanceof TypeError) {
-          throw new Error("Network error. Please check your connection.");
+        console.error("Login fetch error:", fetchError);
+        if (fetchError instanceof TypeError && fetchError.message.includes('fetch')) {
+          throw new Error("Network connection error. Please check your internet connection and server availability.");
         }
         throw fetchError;
       }

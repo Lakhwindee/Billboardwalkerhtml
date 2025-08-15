@@ -47,6 +47,8 @@ IamBillBoard is a full-stack web application offering custom bottle advertising 
 - **COMPLETE PROJECT CLEANUP (Aug 15, 2025)**: Removed all unused files including 3D preview system, old documentation files, unused Three.js dependencies - ultra clean production codebase
 - **REPLIT AGENT MIGRATION COMPLETED (Aug 15, 2025)**: Successfully migrated from Replit Agent to standard Replit environment with proper database setup, all packages installed, and application fully functional on port 5000
 - **DATABASE MIGRATION COMPLETED (Aug 15, 2025)**: Fixed PostgreSQL configuration from Neon Database to Replit PostgreSQL, updated import statements, database schema pushed successfully
+- **DEPLOYMENT CONNECTION ISSUES FIXED (Aug 15, 2025)**: Resolved "Server connection error" in production deployments by implementing proper API URL handling for development vs production environments, added CORS headers, and enhanced error handling in signin component
+- **PRODUCTION BUILD OPTIMIZED (Aug 15, 2025)**: Updated login API endpoints to use absolute URLs in production, added comprehensive error handling for network failures, and verified production build functionality
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
