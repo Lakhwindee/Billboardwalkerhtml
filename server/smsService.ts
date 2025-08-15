@@ -227,6 +227,24 @@ Need help? Reply to this SMS or email: support@iambillboard.com
     return await this.sendSMS({ to: userPhone, message });
   }
 
+  // Payment failure SMS
+  async sendPaymentFailureSMS(userPhone: string, paymentData: any): Promise<boolean> {
+    const message = `❌ Payment Failed - IamBillBoard
+
+Order ID: ${paymentData.orderId || 'N/A'}
+Amount: ₹${paymentData.amount?.toLocaleString() || '0'}
+Reason: ${paymentData.failureReason || 'Payment processing failed'}
+
+Please try again with a different payment method or contact support.
+
+Retry: ${process.env.FRONTEND_URL || 'https://iambillboard.com'}/checkout
+Support: support@iambillboard.com
+
+- IamBillBoard Team`;
+
+    return await this.sendSMS({ to: userPhone, message });
+  }
+
   // Test SMS with custom configuration
   async sendTestSMS(testNumber: string, config: any): Promise<boolean> {
     if (!config?.twilioAccountSid || !config?.twilioAuthToken || !config?.twilioFromNumber) {

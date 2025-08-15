@@ -171,15 +171,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Set session
       (req.session as any).userId = user.id;
       
-      // Send welcome SMS to new user
-      if (user.phone) {
-        try {
-          await smsService.sendWelcomeSMS(user.phone, user.username);
-          console.log(`Welcome SMS sent to ${user.phone}`);
-        } catch (smsError) {
-          console.error('Failed to send welcome SMS:', smsError);
-        }
-      }
+      // Welcome SMS will be sent during profile creation when phone is added
       
       res.json({ 
         message: 'Registration successful',
@@ -500,8 +492,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: user.id,
           username: user.username,
           email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName
+          role: user.role
         }
       });
     } catch (error: any) {
@@ -685,10 +676,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: user.id,
           username: user.username,
           email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          isEmailVerified: true,
-          isPhoneVerified: true
+          role: user.role,
+          isEmailVerified: true
         }
       });
     } catch (error: any) {
