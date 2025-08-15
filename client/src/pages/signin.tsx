@@ -37,6 +37,8 @@ export default function SigninPage() {
     mutationFn: async (data: SigninForm) => {
       const apiUrl = import.meta.env.DEV ? "/api/login" : `${window.location.origin}/api/login`;
       
+      console.log("🔐 Login attempt:", { username: data.username, apiUrl });
+      
       try {
         const response = await fetch(apiUrl, {
           method: "POST",
@@ -48,15 +50,21 @@ export default function SigninPage() {
           credentials: "include"
         });
         
+        console.log("🔐 Response status:", response.status);
+        console.log("🔐 Response headers:", Object.fromEntries(response.headers.entries()));
+        
         let result;
         try {
           result = await response.json();
+          console.log("🔐 Response data:", result);
         } catch (parseError) {
           console.error("JSON parsing error:", parseError);
+          console.error("Response text:", await response.text());
           throw new Error("Server connection error. Please check your connection and try again.");
         }
         
         if (!response.ok) {
+          console.error("🔐 Login failed:", { status: response.status, result });
           if (response.status === 401) {
             throw new Error("Invalid username or password");
           } else if (response.status === 400) {
@@ -70,6 +78,7 @@ export default function SigninPage() {
           }
         }
         
+        console.log("🔐 Login successful:", result);
         return result;
       } catch (fetchError) {
         console.error("Login fetch error:", fetchError);
