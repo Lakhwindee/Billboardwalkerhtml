@@ -1,21 +1,7 @@
 // API configuration for different environments
 export const API_BASE_URL = (() => {
-  // In development, use relative URLs (Vite proxy handles it)
-  if (import.meta.env.DEV) {
-    return '';
-  }
-  
-  // In production, check if we're on the deployed domain
-  if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-    
-    // If deployed on Replit or custom domain, use same origin
-    if (hostname.includes('replit.app') || hostname.includes('iambillboard.com')) {
-      return window.location.origin;
-    }
-  }
-  
-  // Fallback to same origin
+  // Always use relative URLs for both development and production
+  // This ensures that API calls work on any domain (Replit, custom domain, etc.)
   return '';
 })();
 
