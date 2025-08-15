@@ -36,7 +36,7 @@ export default function SigninPage() {
   const signinMutation = useMutation({
     mutationFn: async (data: SigninForm) => {
       try {
-        const response = await fetch("/api/signin", {
+        const response = await fetch("/api/login", {
           method: "POST",
           headers: { 
             "Content-Type": "application/json",
