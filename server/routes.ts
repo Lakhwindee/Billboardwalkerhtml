@@ -188,72 +188,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Modern signin endpoint
+  // Legacy signin endpoint - redirect to login
   app.post("/api/signin", async (req, res) => {
-    try {
-      const { username, password } = req.body;
-      
-      if (!username || !password) {
-        return res.status(400).json({ message: 'Username and password are required' });
-      }
-      
-      // Try to find user by username first
-      let user = await storage.getUserByUsername(username.trim());
-      
-      // If not found and input looks like email, try email lookup
-      if (!user && username.includes('@')) {
-        user = await storage.getUserByEmail(username.trim());
-      }
-      
-      if (!user) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-      }
-      
-      // Check if account is banned
-      if (user.isBanned) {
-        return res.status(403).json({ 
-          message: 'Account has been banned',
-          reason: user.banReason 
-        });
-      }
-      
-      const isValid = await bcrypt.compare(password, user.password);
-      if (!isValid) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-      }
-      
-      // For admin accounts (judge), show test OTP in development mode
-      if (user.role === 'admin' && process.env.NODE_ENV === 'development') {
-        const testOtp = Math.floor(100000 + Math.random() * 900000);
-        console.log(`🔐 ADMIN TEST OTP for ${username}: ${testOtp}`);
-        console.log(`📱 For testing purposes - Admin login OTP: ${testOtp}`);
-      }
-      
-      // Set session
-      (req.session as any).userId = user.id;
-      (req.session as any).username = user.username;
-      
-      // Log the signin activity
-      await storage.createUserActivityLog({
-        userId: user.id,
-        action: 'user_login',
-        details: `User signed in: ${user.username}`,
-        ipAddress: req.ip,
-        userAgent: req.get('User-Agent') || ''
-      });
-      
-      return res.json({ 
-        message: 'Signin successful', 
-        user: { 
-          id: user.id, 
-          username: user.username,
-          role: user.role
-        } 
-      });
-    } catch (error) {
-      console.error('Signin error:', error);
-      return res.status(500).json({ message: 'Signin failed' });
-    }
+    // Redirect to the main login endpoint
+    return res.redirect(307, '/api/login');
   });
 
   app.post("/api/login", async (req, res) => {
