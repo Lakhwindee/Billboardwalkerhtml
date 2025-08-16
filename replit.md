@@ -51,7 +51,7 @@ IamBillBoard is a full-stack web application offering custom bottle advertising 
 - **PRODUCTION BUILD OPTIMIZED (Aug 15, 2025)**: Updated login API endpoints to use absolute URLs in production, added comprehensive error handling for network failures, and verified production build functionality
 - **REPLIT DEPLOYMENT READY (Aug 15, 2025)**: Login system completely working in Replit development environment, admin authentication verified with judge/judge1313 credentials, ready for live Replit deployment instead of DigitalOcean
 - **DEPLOYMENT COMPATIBILITY FIXED (Aug 16, 2025)**: Session configuration optimized for production deployment with auto-detect HTTPS, fixed password hash authentication, resolved preview vs deployment environment differences
-- **IN-STORES ADDRESS FIELD ENHANCEMENT (Aug 16, 2025)**: Added complete address input system for in-stores delivery option - when users select city and area, additional address field appears for house delivery address, PIN code, and contact phone with proper validation and Hindi error messages ("कृपया अपना पूरा घर का पता लिखें")
+- **IN-STORES ADDRESS FIELD ENHANCEMENT (Aug 16, 2025)**: Added complete address input system for in-stores delivery option - when users select city and area, additional address field appears for customer's home address to identify nearby shops for delivery, includes PIN code and contact phone with proper validation and Hindi error messages ("कृपया अपना पूरा घर का पता लिखें")
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
