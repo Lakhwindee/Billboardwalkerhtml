@@ -1041,7 +1041,7 @@ function Admin() {
             {/* Mobile Grid Layout - All Tabs */}
             <div className="grid grid-cols-5 sm:hidden gap-1">
               {[
-                { id: "campaigns", label: "Campaign Requests", icon: "📋", shortLabel: "Campaigns" },
+                { id: "campaigns", label: "Campaigns", icon: "📋", shortLabel: "Campaigns" },
                 { id: "contacts", label: "Contact Messages", icon: "📞", shortLabel: "Contact" },
                 { id: "users", label: "Users Management", icon: "👥", shortLabel: "Users" },
                 { id: "pricing", label: "Price Management", icon: "💰", shortLabel: "Price" },
@@ -1080,7 +1080,7 @@ function Admin() {
               {[
                 { id: "website-editor", label: "Website Editor", icon: "🌐" },
                 { id: "logo-manager", label: "Logo Manager", icon: "🖼️" },
-                { id: "campaigns", label: "Campaign Requests", icon: "📋" },
+                { id: "campaigns", label: "Campaigns", icon: "📋" },
                 { id: "contacts", label: "Contact Messages", icon: "📞" },
                 { id: "users", label: "Users Management", icon: "👥" },
                 { id: "activity", label: "Activity Logs", icon: "📊" },
@@ -1319,7 +1319,7 @@ function Admin() {
           <div className="admin-section">
             <div className="admin-card p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4 sm:mb-6">
-                <h2 className="mobile-heading sm:text-2xl font-bold text-white">Campaign Requests</h2>
+                <h2 className="mobile-heading sm:text-2xl font-bold text-white">Campaigns</h2>
                 <div className="text-xs sm:text-sm text-gray-400">
                   {campaigns.length} total campaigns
                 </div>
