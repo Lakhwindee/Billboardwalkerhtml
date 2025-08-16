@@ -86,6 +86,13 @@ export const campaigns = pgTable("campaigns", {
   
   requirements: text("requirements"),
   totalPrice: decimal("total_price", { precision: 10, scale: 2 }),
+  
+  // Customer Contact Information
+  email: text("email"), // Customer email for notifications
+  phone: text("phone"), // Customer phone number
+  customerName: text("customer_name"), // Customer full name
+  businessName: text("business_name"), // Business name if applicable
+  
   status: text("status").default("pending").notNull(), // pending, approved, rejected, in_production, shipped, delivered
   adminNotes: text("admin_notes"),
   rejectionReason: text("rejection_reason"), // Reason for campaign rejection
