@@ -3,11 +3,8 @@ import path from 'path';
 import pg from 'pg';
 import bcrypt from 'bcrypt';
 import session from 'express-session';
-import { fileURLToPath } from 'url';
 
 const { Pool } = pg;
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -53,7 +50,7 @@ app.post('/api/login', async (req, res) => {
     
     // Simple hardcoded check for judge user
     if (username === 'judge' && password === 'judge1313') {
-      (req.session as any).user = {
+      req.session.user = {
         id: 1,
         username: 'judge',
         email: 'admin@iambillboard.com',
@@ -80,8 +77,8 @@ app.post('/api/login', async (req, res) => {
 
 // Check auth
 app.get('/api/auth/check', (req, res) => {
-  if ((req.session as any).user) {
-    res.json({ user: (req.session as any).user });
+  if (req.session.user) {
+    res.json({ user: req.session.user });
   } else {
     res.status(401).json({ error: 'Not authenticated' });
   }
@@ -89,7 +86,7 @@ app.get('/api/auth/check', (req, res) => {
 
 // Logout
 app.post('/api/logout', (req, res) => {
-  req.session.destroy(() => {});
+  req.session.destroy();
   res.json({ message: 'Logged out' });
 });
 
@@ -107,6 +104,10 @@ app.post('/api/visitors/track', (req, res) => {
 });
 
 // Serve static files
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 app.use(express.static(path.join(__dirname, '../dist/public')));
 
 // Handle React routing
