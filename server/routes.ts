@@ -120,13 +120,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       pool: pool,
       tableName: 'sessions'
     }),
-    secret: process.env.SESSION_SECRET || 'iambillboard-secret-key-2025',
+    secret: process.env.SESSION_SECRET || 'iambillboard-secret-key-2025-production',
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: 'auto', // Auto-detect HTTPS for deployment compatibility
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: 'lax' // Better cross-origin compatibility
     }
   }));
 
