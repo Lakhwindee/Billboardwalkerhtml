@@ -1,7 +1,7 @@
 // Production startup script
-const express = require('express');
-const { createServer } = require('http');
-const path = require('path');
+import express from 'express';
+import { createServer } from 'http';
+import path from 'path';
 
 const app = express();
 
