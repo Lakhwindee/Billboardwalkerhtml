@@ -542,7 +542,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section id="home" className="relative min-h-screen flex items-center justify-center pt-32 overflow-hidden bg-gradient-to-br from-orange-50 to-yellow-50">
+      <section id="home" className="relative min-h-screen flex items-center justify-center pt-32 overflow-hidden bg-white">
         <div className="absolute inset-0 z-0">
           <div className="absolute w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ top: '20%', left: '10%', animationDelay: '0.5s' }}></div>
           <div className="absolute w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ top: '40%', left: '80%', animationDelay: '1s' }}></div>
