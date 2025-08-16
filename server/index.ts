@@ -1,27 +1,10 @@
-import express from 'express';
-import path from 'path';
-import pg from 'pg';
-import bcrypt from 'bcrypt';
-import session from 'express-session';
-import { fileURLToPath } from 'url';
-
-const { Pool } = pg;
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import express, { type Request, Response, NextFunction } from "express";
+import { registerRoutes } from "./routes";
+import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
-const port = process.env.PORT || 5000;
 
-// Database connection
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL
-});
-
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// CORS
+// Add CORS headers for production deployment (must be before other middleware)
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -34,87 +17,72 @@ app.use((req, res, next) => {
   }
 });
 
-// Session
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'iambillboard-secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
-}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
-// Login API
-app.post('/api/login', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Username and password required' });
+app.use((req, res, next) => {
+  const start = Date.now();
+  const path = req.path;
+  let capturedJsonResponse: Record<string, any> | undefined = undefined;
+
+  const originalResJson = res.json;
+  res.json = function (bodyJson, ...args) {
+    capturedJsonResponse = bodyJson;
+    return originalResJson.apply(res, [bodyJson, ...args]);
+  };
+
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    if (path.startsWith("/api")) {
+      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
+      if (capturedJsonResponse) {
+        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      }
+
+      if (logLine.length > 80) {
+        logLine = logLine.slice(0, 79) + "…";
+      }
+
+      log(logLine);
     }
-    
-    // Simple hardcoded check for judge user
-    if (username === 'judge' && password === 'judge1313') {
-      (req.session as any).user = {
-        id: 1,
-        username: 'judge',
-        email: 'admin@iambillboard.com',
-        role: 'admin'
-      };
-      
-      return res.json({
-        message: 'Login successful',
-        user: {
-          id: 1,
-          username: 'judge',
-          email: 'admin@iambillboard.com',
-          role: 'admin'
-        }
-      });
-    }
-    
-    res.status(401).json({ error: 'Invalid username or password' });
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
+  });
+
+  next();
 });
 
-// Check auth
-app.get('/api/auth/check', (req, res) => {
-  if ((req.session as any).user) {
-    res.json({ user: (req.session as any).user });
+(async () => {
+  const server = await registerRoutes(app);
+
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+
+    console.error('Server Error:', err);
+    res.status(status).json({ message });
+  });
+
+  // importantly only setup vite in development and after
+  // setting up all the other routes so the catch-all route
+  // doesn't interfere with the other routes
+  if (app.get("env") === "development") {
+    await setupVite(app, server);
   } else {
-    res.status(401).json({ error: 'Not authenticated' });
+    serveStatic(app);
   }
-});
 
-// Logout
-app.post('/api/logout', (req, res) => {
-  req.session.destroy(() => {});
-  res.json({ message: 'Logged out' });
-});
-
-// Basic API endpoints
-app.get('/api/bottle-samples', (req, res) => {
-  res.json([]);
-});
-
-app.get('/api/logo-settings', (req, res) => {
-  res.json([]);
-});
-
-app.post('/api/visitors/track', (req, res) => {
-  res.json({ success: true });
-});
-
-// Serve static files
-app.use(express.static(path.join(__dirname, '../dist/public')));
-
-// Handle React routing
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../dist/public/index.html'));
-});
-
-app.listen(port, '0.0.0.0', () => {
-  console.log(`Server running on port ${port}`);
-  console.log('Environment:', process.env.NODE_ENV || 'production');
-});
+  // ALWAYS serve the app on the port specified in the environment variable PORT
+  // Other ports are firewalled. Default to 5000 if not specified.
+  // this serves both the API and the client.
+  // It is the only port that is not firewalled.
+  const port = parseInt(process.env.PORT || '5000', 10);
+  
+  server.listen({
+    port,
+    host: "0.0.0.0",
+    reusePort: true,
+  }, () => {
+    log(`serving on port ${port}`);
+    log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    log(`API endpoints available at http://0.0.0.0:${port}/api/*`);
+  });
+})();
