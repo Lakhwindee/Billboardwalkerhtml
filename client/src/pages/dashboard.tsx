@@ -1604,7 +1604,7 @@ Example:
                         <svg className="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                         </svg>
-                        Store Delivery Address
+                        House Delivery Address
                       </h4>
                       
                       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
@@ -1615,9 +1615,9 @@ Example:
                             </svg>
                           </div>
                           <div>
-                            <h5 className="text-sm font-semibold text-blue-800 mb-1">Store Distribution Address</h5>
+                            <h5 className="text-sm font-semibold text-blue-800 mb-1">House Delivery Address</h5>
                             <p className="text-sm text-blue-700">
-                              Please provide your store/business address where bottles will be delivered for distribution in <span className="font-medium">{selectedArea}, {selectedCity}</span>
+                              Please provide your house address where bottles will be delivered in <span className="font-medium">{selectedArea}, {selectedCity}</span>
                             </p>
                           </div>
                         </div>
@@ -1626,13 +1626,13 @@ Example:
                       <div className="space-y-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Complete Store Address <span className="text-red-500">*</span>
+                            Complete House Address <span className="text-red-500">*</span>
                           </label>
                           <textarea
                             value={customerDetails.address}
                             onChange={(e) => setCustomerDetails({...customerDetails, address: e.target.value})}
-                            placeholder="Shop/Store Name, Shop No., Building Name, Street Name, Landmark..."
-                            data-testid="input-store-address"
+                            placeholder="House No., Building Name, Street Name, Landmark..."
+                            data-testid="input-house-address"
                             className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none ${
                               showValidationErrors && formErrors.address 
                                 ? 'border-red-500 bg-red-50' 
@@ -1641,7 +1641,7 @@ Example:
                             rows={3}
                           />
                           {showValidationErrors && formErrors.address && (
-                            <p className="text-red-500 text-sm mt-1">कृपया अपना पूरा स्टोर का पता लिखें</p>
+                            <p className="text-red-500 text-sm mt-1">कृपया अपना पूरा घर का पता लिखें</p>
                           )}
                         </div>
                         
@@ -1653,7 +1653,7 @@ Example:
                               value={customerDetails.pincode}
                               onChange={(e) => setCustomerDetails({...customerDetails, pincode: e.target.value})}
                               placeholder="Enter PIN code"
-                              data-testid="input-store-pincode"
+                              data-testid="input-house-pincode"
                               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                                 showValidationErrors && formErrors.address 
                                   ? 'border-red-500 bg-red-50' 
@@ -1667,8 +1667,8 @@ Example:
                               type="tel"
                               value={customerDetails.phone}
                               onChange={(e) => setCustomerDetails({...customerDetails, phone: e.target.value})}
-                              placeholder="Store contact number"
-                              data-testid="input-store-phone"
+                              placeholder="House contact number"
+                              data-testid="input-house-phone"
                               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                                 showValidationErrors && formErrors.address 
                                   ? 'border-red-500 bg-red-50' 
@@ -1699,7 +1699,7 @@ Example:
                         {formErrors.description && <li>• 📝 Write a description about your advertisement purpose (MANDATORY)</li>}
                         {formErrors.design && <li>• Upload your design file (logo/image)</li>}
                         {formErrors.location && <li>• Select both city and area for your campaign location</li>}
-                        {formErrors.address && selectedOption === 'inStores' && <li>• Complete your store address details (address, PIN code, phone)</li>}
+                        {formErrors.address && selectedOption === 'inStores' && <li>• Complete your house address details (address, PIN code, phone)</li>}
                         {formErrors.address && selectedOption === 'atYourLocation' && <li>• Complete your delivery address details</li>}
                         {formErrors.splitLocation && <li>• Complete store location for split distribution</li>}
                         {formErrors.splitAddress && <li>• Complete your address for split distribution</li>}
