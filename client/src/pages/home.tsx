@@ -407,11 +407,13 @@ export default function Home() {
 
 
   return (
-    <div className="vibrant-bg min-h-screen text-gray-900">
+    <div className="billboard-walker-bg"
+      data-testid="home-page"
+    >
 
 
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg">
+      <nav className="fixed top-0 left-0 right-0 z-40 navbar-glass shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-24">
             <div className="flex items-center space-x-4">
@@ -436,10 +438,21 @@ export default function Home() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#home" className="text-black hover:text-red-500 transition-colors font-semibold">Home</a>
-              <a href="/designs" className="text-gray-600 hover:text-black transition-colors font-semibold">Designs</a>
-              <a href="#about" className="text-gray-600 hover:text-black transition-colors font-semibold">About</a>
-              <a href="#contact" className="text-gray-600 hover:text-black transition-colors font-semibold">Contact</a>
+              <a href="#home" className="text-gray-700 hover:text-red-500 transition-colors font-medium flex items-center">
+                <span className="mr-1">🏠</span> Home
+              </a>
+              <a href="#about" className="text-gray-700 hover:text-red-500 transition-colors font-medium flex items-center">
+                <span className="mr-1">ℹ️</span> About
+              </a>
+              <a href="/dashboard" className="text-gray-700 hover:text-red-500 transition-colors font-medium flex items-center">
+                <span className="mr-1">📊</span> Dashboard
+              </a>
+              <a href="#workspace" className="text-gray-700 hover:text-red-500 transition-colors font-medium flex items-center">
+                <span className="mr-1">🎨</span> Workspace
+              </a>
+              <a href="#contact" className="text-gray-700 hover:text-red-500 transition-colors font-medium flex items-center">
+                <span className="mr-1">📞</span> Contact
+              </a>
               
               {isSignedIn && (
                 <a href="/dashboard" className="text-gray-600 hover:text-black transition-colors font-semibold">Dashboard</a>

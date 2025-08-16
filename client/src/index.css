@@ -6,13 +6,13 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(210, 100%, 97%);
+  --background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   --foreground: hsl(240, 10%, 9%);
   --muted: hsl(210, 40%, 94%);
   --muted-foreground: hsl(215, 16%, 47%);
   --popover: hsl(0, 0%, 100%);
   --popover-foreground: hsl(240, 10%, 9%);
-  --card: hsl(0, 0%, 100%);
+  --card: rgba(255, 255, 255, 0.95);
   --card-foreground: hsl(240, 10%, 9%);
   --border: hsl(214, 32%, 91%);
   --input: hsl(214, 32%, 91%);
@@ -77,6 +77,23 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+  
+  .billboard-walker-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+    min-height: 100vh;
+  }
+  
+  .hero-gradient {
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  
+  .navbar-glass {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   }
   
   /* Bottle animation removed - static positioning */
