@@ -35,7 +35,7 @@ export default function SigninPage() {
 
   const signinMutation = useMutation({
     mutationFn: async (data: SigninForm) => {
-      const apiUrl = import.meta.env.DEV ? "/api/login" : `${window.location.origin}/api/login`;
+      const apiUrl = "/api/login";
       
       console.log("🔐 Login attempt:", { username: data.username, apiUrl });
       
