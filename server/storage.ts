@@ -261,6 +261,37 @@ export class DatabaseStorage implements IStorage {
     return campaign;
   }
 
+  // Design reupload methods
+  async requestDesignReupload(campaignId: number, feedback: string, rejectionReason: string): Promise<Campaign> {
+    const [campaign] = await db
+      .update(campaigns)
+      .set({ 
+        reuploadRequired: true,
+        designFeedback: feedback,
+        designRejectionReason: rejectionReason,
+        status: 'design_feedback',
+        updatedAt: new Date()
+      })
+      .where(eq(campaigns.id, campaignId))
+      .returning();
+    return campaign;
+  }
+
+  async submitReuploadedDesign(campaignId: number, designUrl: string, fileName: string): Promise<Campaign> {
+    const [campaign] = await db
+      .update(campaigns)
+      .set({
+        designUrl: designUrl,
+        uploadedDesignFileName: fileName,
+        reuploadRequired: false,
+        status: 'pending', // Back to pending for admin review
+        updatedAt: new Date()
+      })
+      .where(eq(campaigns.id, campaignId))
+      .returning();
+    return campaign;
+  }
+
   // Price settings methods
   async getPriceSettings(): Promise<PriceSetting[]> {
     return await db.select().from(priceSettings);

@@ -949,6 +949,139 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Design reupload system routes
+  app.post("/api/campaigns/:id/request-design-reupload", async (req, res) => {
+    try {
+      const campaignId = parseInt(req.params.id);
+      const { feedback, rejectionReason } = req.body;
+      
+      if (!feedback || !rejectionReason) {
+        return res.status(400).json({ error: 'Feedback and rejection reason are required' });
+      }
+      
+      // Update campaign with reupload request
+      const campaign = await storage.requestDesignReupload(campaignId, feedback, rejectionReason);
+      
+      // Get user details for email notification
+      const user = await storage.getUser(campaign.userId!);
+      
+      if (user) {
+        // Send email notification to user
+        try {
+          const emailSubject = `🎨 Design Reupload Required - Campaign #${campaignId}`;
+          const emailContent = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%); color: white; padding: 20px; border-radius: 15px;">
+              <div style="text-align: center; padding: 20px 0;">
+                <h1 style="color: #ff6b6b; margin: 0 0 10px 0;">🎨 Design Reupload Required</h1>
+                <h2 style="color: white; margin: 0 0 20px 0;">${campaign.title}</h2>
+              </div>
+              
+              <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <h3 style="color: #ffd93d; margin-top: 0;">📝 Admin Feedback:</h3>
+                <p style="color: #ccd6f6; line-height: 1.6; margin: 10px 0;">${feedback}</p>
+              </div>
+              
+              <div style="background: rgba(255, 107, 107, 0.2); padding: 20px; border-radius: 10px; margin: 20px 0; border: 1px solid rgba(255, 107, 107, 0.3);">
+                <h3 style="color: #ff6b6b; margin-top: 0;">❌ Rejection Reason:</h3>
+                <p style="color: #ffcccb; line-height: 1.6; margin: 10px 0;">${rejectionReason}</p>
+              </div>
+              
+              <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <h3 style="color: #ffd93d; margin-top: 0;">📋 Campaign Details:</h3>
+                <p style="color: #ccd6f6; margin: 5px 0;"><strong>Campaign ID:</strong> #${campaign.id}</p>
+                <p style="color: #ccd6f6; margin: 5px 0;"><strong>Quantity:</strong> ${campaign.quantity} bottles</p>
+                <p style="color: #ccd6f6; margin: 5px 0;"><strong>Status:</strong> Pending Reupload</p>
+              </div>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${process.env.FRONTEND_URL || 'https://iambillboard.com'}/dashboard" 
+                   style="display: inline-block; background: linear-gradient(135deg, #ff6b6b, #ffd93d); color: white; padding: 15px 30px; text-decoration: none; border-radius: 10px; font-weight: bold; text-align: center;">
+                  📱 Upload New Design
+                </a>
+              </div>
+              
+              <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 10px; margin: 20px 0;">
+                <p style="color: #ccd6f6; text-align: center; margin: 0; font-size: 14px;">
+                  Please address the feedback and upload a new design. Contact support if you have questions.
+                </p>
+              </div>
+              
+              <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                <p style="color: #888; margin: 0;">© 2025 IamBillBoard - Custom Bottle Advertising</p>
+              </div>
+            </div>
+          `;
+          
+          await emailService.sendEmail({
+            to: user.email,
+            subject: emailSubject,
+            html: emailContent
+          });
+          
+          console.log(`📧 Design reupload email sent to ${user.email} for campaign #${campaignId}`);
+        } catch (emailError) {
+          console.error('Error sending reupload email:', emailError);
+          // Continue even if email fails
+        }
+        
+        // Send SMS notification if user has phone
+        if (user.phone) {
+          try {
+            const smsMessage = `🎨 IamBillBoard: Your campaign "${campaign.title}" needs design reupload. Check email for details. Upload new design at: ${process.env.FRONTEND_URL || 'https://iambillboard.com'}/dashboard`;
+            
+            await smsService.sendSMS(user.phone, smsMessage);
+            console.log(`📱 Design reupload SMS sent to ${user.phone}`);
+          } catch (smsError) {
+            console.error('Error sending reupload SMS:', smsError);
+          }
+        }
+      }
+      
+      res.json({ 
+        success: true, 
+        message: 'Design reupload request sent successfully',
+        campaign 
+      });
+    } catch (error: any) {
+      console.error('Error requesting design reupload:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // User submits reuploaded design
+  app.post("/api/campaigns/:id/reupload-design", upload.single('design'), async (req, res) => {
+    try {
+      const campaignId = parseInt(req.params.id);
+      
+      if (!req.file) {
+        return res.status(400).json({ error: 'Design file is required' });
+      }
+      
+      // Ensure campaign directory exists
+      const campaignDir = './uploads/campaigns';
+      if (!fs.existsSync(campaignDir)) {
+        fs.mkdirSync(campaignDir, { recursive: true });
+      }
+      
+      const designUrl = `/uploads/campaigns/${req.file.filename}`;
+      
+      // Update campaign with new design
+      const campaign = await storage.submitReuploadedDesign(campaignId, designUrl, req.file.filename);
+      
+      console.log(`🎨 Design reuploaded for campaign ${campaignId}: ${req.file.filename}`);
+      
+      res.json({ 
+        success: true, 
+        message: 'Design reuploaded successfully', 
+        campaign,
+        designUrl 
+      });
+    } catch (error: any) {
+      console.error('Error reuploading design:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Design download route - serves original uploaded design files  
   app.get("/api/campaigns/:id/design", async (req, res) => {
     try {

@@ -106,6 +106,12 @@ function Admin() {
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [campaignStatus, setCampaignStatus] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
+  
+  // Design reupload system states
+  const [showReuploadModal, setShowReuploadModal] = useState(false);
+  const [reuploadFeedback, setReuploadFeedback] = useState('');
+  const [reuploadReason, setReuploadReason] = useState('');
+  const [reuploadCampaign, setReuploadCampaign] = useState<Campaign | null>(null);
   const [updatingCampaign, setUpdatingCampaign] = useState(false);
   
   const queryClient = useQueryClient();
@@ -447,6 +453,34 @@ function Admin() {
     },
   });
 
+  // Design reupload mutation
+  const requestReuploadMutation = useMutation({
+    mutationFn: async ({ id, feedback, rejectionReason }: { id: number; feedback: string; rejectionReason: string }) => {
+      return apiRequest("POST", `/api/campaigns/${id}/request-design-reupload`, { 
+        feedback, 
+        rejectionReason
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/campaigns"] });
+      setShowReuploadModal(false);
+      setReuploadCampaign(null);
+      setReuploadFeedback('');
+      setReuploadReason('');
+      toast({
+        title: "Success",
+        description: "Design reupload request sent to user with email notification",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send reupload request",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Price mutations
   const savePriceMutation = useMutation({
     mutationFn: async (priceData: any) => {
@@ -610,6 +644,30 @@ function Admin() {
     setCampaignStatus(campaign.status);
     setRejectionReason(campaign.rejectionReason || '');
     setShowCampaignModal(true);
+  };
+
+  const openReuploadModal = (campaign: Campaign) => {
+    setReuploadCampaign(campaign);
+    setReuploadFeedback('');
+    setReuploadReason('');
+    setShowReuploadModal(true);
+  };
+
+  const handleRequestReupload = () => {
+    if (!reuploadCampaign || !reuploadFeedback.trim() || !reuploadReason.trim()) {
+      toast({
+        title: "Error",
+        description: "Please provide both feedback and rejection reason",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    requestReuploadMutation.mutate({
+      id: reuploadCampaign.id,
+      feedback: reuploadFeedback.trim(),
+      rejectionReason: reuploadReason.trim()
+    });
   };
 
   const handleUpdateCampaign = () => {
@@ -1515,6 +1573,18 @@ function Admin() {
                         </svg>
                         <span>Manage Campaign</span>
                       </button>
+                      
+                      {campaign.status === 'pending' && campaign.designUrl && (
+                        <button
+                          onClick={() => openReuploadModal(campaign)}
+                          className="w-full sm:w-auto px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition-colors flex items-center justify-center space-x-2"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                          </svg>
+                          <span>Request Design Reupload</span>
+                        </button>
+                      )}
                     </div>
 
                     {campaign.adminNotes && (
@@ -4053,6 +4123,91 @@ function Admin() {
             </div>
           </div>
         )}
+
+      {/* Design Reupload Modal */}
+      {showReuploadModal && reuploadCampaign && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 w-full max-w-2xl border border-gray-600 shadow-2xl">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-2">🎨 Request Design Reupload</h3>
+                <p className="text-gray-300">Campaign: {reuploadCampaign.title}</p>
+              </div>
+              <button
+                onClick={() => setShowReuploadModal(false)}
+                className="text-gray-400 hover:text-white text-2xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Feedback Section */}
+              <div>
+                <label className="block text-white font-medium mb-2">
+                  Design Feedback <span className="text-red-400">*</span>
+                </label>
+                <textarea
+                  value={reuploadFeedback}
+                  onChange={(e) => setReuploadFeedback(e.target.value)}
+                  rows={4}
+                  className="w-full px-4 py-3 bg-black/30 text-white border border-gray-600 rounded-lg focus:border-orange-500 focus:outline-none resize-none"
+                  placeholder="Provide specific feedback about what needs to be improved in the design (e.g., image quality, text readability, branding issues, etc.)"
+                />
+                <p className="text-gray-400 text-sm mt-2">
+                  This feedback will help the user understand exactly what needs to be fixed
+                </p>
+              </div>
+
+              {/* Rejection Reason Section */}
+              <div>
+                <label className="block text-white font-medium mb-2">
+                  Rejection Reason <span className="text-red-400">*</span>
+                </label>
+                <textarea
+                  value={reuploadReason}
+                  onChange={(e) => setReuploadReason(e.target.value)}
+                  rows={3}
+                  className="w-full px-4 py-3 bg-black/30 text-white border border-gray-600 rounded-lg focus:border-orange-500 focus:outline-none resize-none"
+                  placeholder="Provide a clear reason for rejecting the design (e.g., does not meet quality standards, brand guidelines violation, etc.)"
+                />
+                <p className="text-gray-400 text-sm mt-2">
+                  This will be included in the email notification to the user
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <button
+                  onClick={() => setShowReuploadModal(false)}
+                  className="w-full sm:w-auto px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleRequestReupload}
+                  disabled={!reuploadFeedback.trim() || !reuploadReason.trim() || requestReuploadMutation.isPending}
+                  className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                >
+                  {requestReuploadMutation.isPending ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <span>Sending Request...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                      </svg>
+                      <span>Send Reupload Request</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       </div>
     </div>
   );

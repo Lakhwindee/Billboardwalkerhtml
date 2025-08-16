@@ -89,6 +89,11 @@ export const campaigns = pgTable("campaigns", {
   status: text("status").default("pending").notNull(), // pending, approved, rejected, in_production, shipped, delivered
   adminNotes: text("admin_notes"),
   rejectionReason: text("rejection_reason"), // Reason for campaign rejection
+  
+  // Design reupload system
+  designFeedback: text("design_feedback"), // Specific feedback about design issues
+  reuploadRequired: boolean("reupload_required").default(false), // Whether design needs to be reuploaded
+  designRejectionReason: text("design_rejection_reason"), // Detailed reason for design rejection
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
