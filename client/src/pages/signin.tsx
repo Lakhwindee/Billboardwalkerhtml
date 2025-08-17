@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,34 +23,15 @@ export default function SigninPage() {
   const [, setLocation] = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [accountType, setAccountType] = useState<'admin' | 'campaign'>('admin');
   const { toast } = useToast();
 
   const form = useForm<SigninForm>({
     resolver: zodResolver(signinSchema),
     defaultValues: {
-      username: "judge",
-      password: "judge1313",
+      username: "",
+      password: "",
     },
   });
-
-  // Set default credentials on page load
-  useEffect(() => {
-    form.setValue('username', 'judge');
-    form.setValue('password', 'judge1313');
-  }, [form]);
-
-  // Update form values when account type changes
-  const handleAccountTypeChange = (type: 'admin' | 'campaign') => {
-    setAccountType(type);
-    if (type === 'admin') {
-      form.setValue('username', 'judge');
-      form.setValue('password', 'judge1313');
-    } else {
-      form.setValue('username', 'campaign');
-      form.setValue('password', 'campaign123');
-    }
-  };
 
   const signinMutation = useMutation({
     mutationFn: async (data: SigninForm) => {
@@ -118,8 +99,6 @@ export default function SigninPage() {
       setTimeout(() => {
         if (data.user?.role === "admin") {
           setLocation("/admin");
-        } else if (data.user?.role === "campaign_manager") {
-          setLocation("/dashboard");
         } else {
           setLocation("/dashboard");
         }
@@ -192,32 +171,6 @@ export default function SigninPage() {
             <CardDescription>
               Enter your credentials to access your account
             </CardDescription>
-            
-            {/* Account Type Selector */}
-            <div className="mt-4 flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
-              <button
-                type="button"
-                onClick={() => handleAccountTypeChange('admin')}
-                className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all text-sm ${
-                  accountType === 'admin' 
-                    ? 'bg-red-500 text-white shadow-md' 
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
-                }`}
-              >
-                👑 Admin Panel
-              </button>
-              <button
-                type="button"
-                onClick={() => handleAccountTypeChange('campaign')}
-                className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all text-sm ${
-                  accountType === 'campaign' 
-                    ? 'bg-blue-500 text-white shadow-md' 
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
-                }`}
-              >
-                🎯 Campaign Manager
-              </button>
-            </div>
           </CardHeader>
           
           <CardContent className="space-y-6">
@@ -241,7 +194,7 @@ export default function SigninPage() {
                           <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                           <Input
                             {...field}
-                            placeholder={accountType === 'admin' ? 'Admin: judge' : 'Campaign Manager: campaign'}
+                            placeholder="Enter username"
                             className="pl-10 h-12 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-purple-500 dark:focus:border-purple-400 transition-colors"
                             autoComplete="username"
                             data-testid="input-username"
@@ -266,7 +219,7 @@ export default function SigninPage() {
                           <Input
                             {...field}
                             type={showPassword ? "text" : "password"}
-                            placeholder={accountType === 'admin' ? 'Admin: judge1313' : 'Campaign Manager: campaign123'}
+                            placeholder="Enter your password"
                             className="pl-10 pr-10 h-12 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-purple-500 dark:focus:border-purple-400 transition-colors"
                             autoComplete="current-password"
                             data-testid="input-password"
