@@ -161,13 +161,42 @@ function CampaignStudioContent() {
                               {getStatusIcon(campaign.status)}
                               <span>{formatStatus(campaign.status)}</span>
                             </div>
+                            {campaign.reuploadRequired && (
+                              <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full border border-orange-200">
+                                🎨 Design Issue Found
+                              </span>
+                            )}
                           </div>
                           <p className="text-gray-600">Customer: {campaign.customerName}</p>
                           <p className="text-gray-500 text-sm mt-1">Submitted: {new Date(campaign.submittedAt).toLocaleDateString()}</p>
+                          {campaign.reuploadRequired && campaign.designFeedback && (
+                            <div className="mt-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                              <p className="text-sm font-medium text-orange-800 mb-1">Admin Feedback:</p>
+                              <p className="text-sm text-orange-700">{campaign.designFeedback}</p>
+                              {campaign.designRejectionReason && (
+                                <p className="text-xs text-orange-600 mt-1">Reason: {campaign.designRejectionReason}</p>
+                              )}
+                            </div>
+                          )}
                         </div>
                         <div className="text-right">
                           <p className="text-2xl font-bold text-gray-900">₹{(campaign.totalAmount || 0).toLocaleString()}</p>
                           <p className="text-sm text-gray-500">{campaign.paymentMethod || 'Not specified'}</p>
+                          {campaign.reuploadRequired && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleReuploadClick(campaign);
+                              }}
+                              className="mt-3 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
+                              data-testid="reupload-design-button"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                              </svg>
+                              <span>Upload New Design</span>
+                            </button>
+                          )}
                         </div>
                       </div>
                       
@@ -413,11 +442,58 @@ export default function Dashboard() {
   const handleLogout = () => {
     logoutMutation.mutate();
   };
+
+  // Handle reupload click
+  const handleReuploadClick = (campaign: any) => {
+    setReuploadCampaign(campaign);
+    setShowReuploadModal(true);
+  };
+
+  // Reupload mutation
+  const reuploadMutation = useMutation({
+    mutationFn: async ({ campaignId, file }: { campaignId: number; file: File }) => {
+      const formData = new FormData();
+      formData.append('designFile', file);
+      
+      return fetch(`/api/campaigns/${campaignId}/reupload-design`, {
+        method: 'PATCH',
+        body: formData,
+      }).then(res => {
+        if (!res.ok) throw new Error('Failed to reupload design');
+        return res.json();
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/campaigns'] });
+      setShowReuploadModal(false);
+      setReuploadCampaign(null);
+      setReuploadFile(null);
+      // Show success message or toast
+    },
+    onError: (error) => {
+      console.error('Reupload error:', error);
+      // Show error message
+    },
+  });
+
+  const handleReuploadSubmit = () => {
+    if (reuploadCampaign && reuploadFile) {
+      reuploadMutation.mutate({ 
+        campaignId: reuploadCampaign.id, 
+        file: reuploadFile 
+      });
+    }
+  };
   
   // Dashboard tab state
   const [dashboardTab, setDashboardTab] = useState('design');
   // Campaign Studio sub-tab state
   const [campaignStudioTab, setCampaignStudioTab] = useState('pending');
+  
+  // Reupload modal state
+  const [showReuploadModal, setShowReuploadModal] = useState(false);
+  const [reuploadCampaign, setReuploadCampaign] = useState<any>(null);
+  const [reuploadFile, setReuploadFile] = useState<File | null>(null);
   
   // Payment modal state
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -3279,6 +3355,74 @@ Your Home Address <span className="text-red-500">*</span>
               
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full animate-pulse" style={{width: '60%'}}></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reupload Modal */}
+      {showReuploadModal && reuploadCampaign && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Reupload Design - {reuploadCampaign.campaignId}
+                </h3>
+                <button
+                  onClick={() => setShowReuploadModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+
+              {reuploadCampaign.designFeedback && (
+                <div className="mb-4 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                  <p className="text-sm font-medium text-orange-800 mb-2">Admin Feedback:</p>
+                  <p className="text-sm text-orange-700">{reuploadCampaign.designFeedback}</p>
+                  {reuploadCampaign.designRejectionReason && (
+                    <p className="text-xs text-orange-600 mt-2">
+                      <strong>Reason:</strong> {reuploadCampaign.designRejectionReason}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select New Design File (A3 size recommended, max 15MB)
+                </label>
+                <input
+                  type="file"
+                  accept="image/*,.pdf"
+                  onChange={(e) => setReuploadFile(e.target.files?.[0] || null)}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+                {reuploadFile && (
+                  <p className="text-sm text-green-600 mt-2">
+                    ✓ Selected: {reuploadFile.name} ({(reuploadFile.size / 1024 / 1024).toFixed(2)} MB)
+                  </p>
+                )}
+              </div>
+
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setShowReuploadModal(false)}
+                  className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleReuploadSubmit}
+                  disabled={!reuploadFile || reuploadMutation.isPending}
+                  className="flex-1 px-4 py-2 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white rounded-lg font-medium transition-colors"
+                >
+                  {reuploadMutation.isPending ? 'Uploading...' : 'Upload New Design'}
+                </button>
               </div>
             </div>
           </div>

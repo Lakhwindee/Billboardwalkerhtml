@@ -1359,6 +1359,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User reupload design endpoint
+  app.patch("/api/campaigns/:id/reupload-design", upload.single('designFile'), async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const file = req.file;
+      
+      if (!file) {
+        return res.status(400).json({ error: 'Design file is required' });
+      }
+      
+      // Get campaign to verify it belongs to current user and needs reupload
+      const campaign = await storage.getCampaign(id);
+      if (!campaign) {
+        return res.status(404).json({ error: 'Campaign not found' });
+      }
+      
+      if (!campaign.reuploadRequired) {
+        return res.status(400).json({ error: 'This campaign does not require reupload' });
+      }
+      
+      // Update campaign with new design file
+      const updateData = {
+        designFile: file.filename,
+        reuploadRequired: false,
+        designFeedback: null,
+        designRejectionReason: null,
+        status: 'pending', // Reset to pending for review
+        updatedAt: new Date()
+      };
+      
+      const updatedCampaign = await storage.updateCampaign(id, updateData);
+      
+      // Create notification for admin about reupload
+      try {
+        const notificationData = {
+          userId: 1, // Admin user ID 
+          title: 'Design Reuploaded',
+          message: `User has reuploaded design for campaign "${campaign.campaignId}". Ready for review.`,
+          type: 'design_reupload_user',
+          actionUrl: `/admin?tab=campaigns&campaign=${campaign.id}`,
+          priority: 'medium'
+        };
+        
+        await storage.createNotification(notificationData);
+        console.log(`Design reupload notification created for admin`);
+      } catch (notificationError) {
+        console.error('Failed to create admin notification:', notificationError);
+      }
+      
+      res.json({ 
+        success: true, 
+        campaign: updatedCampaign,
+        message: 'Design reuploaded successfully. Campaign reset to pending status for review.' 
+      });
+      
+    } catch (error: any) {
+      console.error('Error reuploading design:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Campaign status update endpoint for admin
   app.patch("/api/campaigns/:id/status", async (req, res) => {
     try {
