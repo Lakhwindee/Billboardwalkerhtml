@@ -122,20 +122,15 @@ function Admin() {
     );
   }
 
-  if (currentUser && currentUser.role === 'campaign_manager') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-red-900 flex items-center justify-center">
-        <div className="text-center text-white">
-          <div className="text-6xl mb-4">🚫</div>
-          <h1 className="text-3xl font-bold mb-2">Access Denied</h1>
-          <p className="text-gray-300 mb-6">Campaign managers cannot access the admin panel.</p>
-          <Link href="/dashboard" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg">
-            Go to Campaign Studio
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  // Campaign manager gets restricted admin panel with only campaigns tab
+  const isRestrictedAccess = currentUser && currentUser.role === 'campaign_manager';
+
+  // Set default tab for campaign manager to campaigns only
+  useEffect(() => {
+    if (currentUser?.role === 'campaign_manager') {
+      setActiveTab("campaigns");
+    }
+  }, [currentUser]);
 
   // Campaign Management State
   const [showCampaignModal, setShowCampaignModal] = useState(false);
@@ -1095,7 +1090,14 @@ function Admin() {
                 { id: "payment-gateways", label: "Payment Gateways", icon: "💳", shortLabel: "Gateway", roles: ["admin"] },
                 { id: "site-visitors", label: "Site Visitors", icon: "👥", shortLabel: "Visitors", roles: ["admin"] },
                 { id: "email", label: "Email Setup", icon: "📧", shortLabel: "Email", roles: ["admin"] },
-              ].filter(tab => !currentUser?.role || tab.roles.includes(currentUser.role)).map((tab) => (
+              ].filter(tab => {
+                // If campaign manager, only show campaigns tab
+                if (currentUser?.role === 'campaign_manager') {
+                  return tab.id === 'campaigns';
+                }
+                // For admin, show all applicable tabs
+                return !currentUser?.role || tab.roles.includes(currentUser.role);
+              }).map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
@@ -1135,7 +1137,14 @@ function Admin() {
                 { id: "site-visitors", label: "Site Visitors", icon: "👥", roles: ["admin"] },
                 { id: "email", label: "Email Setup", icon: "📧", roles: ["admin"] },
                 { id: "admin-settings", label: currentUser?.role === 'admin' ? "Admin Settings" : "Account Settings", icon: "⚙️", roles: ["admin", "campaign_manager"] },
-              ].filter(tab => !currentUser?.role || tab.roles.includes(currentUser.role)).map((tab) => (
+              ].filter(tab => {
+                // If campaign manager, only show campaigns tab
+                if (currentUser?.role === 'campaign_manager') {
+                  return tab.id === 'campaigns';
+                }
+                // For admin, show all applicable tabs
+                return !currentUser?.role || tab.roles.includes(currentUser.role);
+              }).map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}

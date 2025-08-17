@@ -100,7 +100,7 @@ export default function SigninPage() {
         if (data.user?.role === "admin") {
           setLocation("/admin");
         } else if (data.user?.role === "campaign_manager") {
-          setLocation("/dashboard"); // Campaign manager gets limited dashboard
+          setLocation("/admin"); // Campaign manager goes to admin panel with limited access
         } else {
           setLocation("/dashboard");
         }
