@@ -1,39 +1,38 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { type Contact, type Campaign, type PriceSetting, type BottleSample, type User, type UserProfile, type UserActivityLog, type LogoSetting, type DesignSample } from "@shared/schema";
+import { type Contact, type Campaign, type PriceSetting } from "@shared/schema";
 import { type User as AuthUser } from "@/types/user";
-import { toast } from "@/hooks/use-toast";
-import PaymentGatewaySettings from '@/components/PaymentGatewaySettings';
 
 function Admin() {
-  // Always call hooks in the same order - no conditional hooks
   const [activeTab, setActiveTab] = useState("campaigns");
-  const [uploadingLogo, setUploadingLogo] = useState(false);
-  const [logoFile, setLogoFile] = useState<File | null>(null);
   const [showPriceModal, setShowPriceModal] = useState(false);
-  const [editingPrice, setEditingPrice] = useState<PriceSetting | null>(null);
   
-  // User data
-  const { data: currentUser, isLoading: userLoading } = useQuery<AuthUser>({
+  const currentUserQuery = useQuery<AuthUser>({
     queryKey: ['/api/current-user'],
     retry: false,
   });
-
-  // All data queries - always call
-  const { data: campaigns = [], isLoading: campaignsLoading } = useQuery<Campaign[]>({
+  
+  const campaignsQuery = useQuery<Campaign[]>({
     queryKey: ["/api/campaigns"]
   });
   
-  const { data: contacts = [] } = useQuery<Contact[]>({
+  const contactsQuery = useQuery<Contact[]>({
     queryKey: ["/api/contacts"]
   });
   
-  const { data: priceSettings = [] } = useQuery<PriceSetting[]>({
+  const priceSettingsQuery = useQuery<PriceSetting[]>({
     queryKey: ["/api/price-settings"]
   });
 
   const queryClient = useQueryClient();
+
+  const currentUser = currentUserQuery.data;
+  const userLoading = currentUserQuery.isLoading;
+  const campaigns = campaignsQuery.data || [];
+  const campaignsLoading = campaignsQuery.isLoading;
+  const contacts = contactsQuery.data || [];
+  const priceSettings = priceSettingsQuery.data || [];
 
   useEffect(() => {
     if (currentUser?.role === 'campaign_manager') {
