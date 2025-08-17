@@ -6,7 +6,6 @@ import connectPgSimple from "connect-pg-simple";
 import { storage } from "./storage";
 // Simple auth middleware for sessions
 const requireAuth = (req: any, res: any, next: any) => {
-  console.log('Session check:', req.session?.user ? 'User found' : 'No user');
   if (req.session?.user) {
     next();
   } else {
@@ -286,19 +285,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         username: user.username,
         role: user.role
       };
-      
-      // Save session synchronously
-      await new Promise<void>((resolve, reject) => {
-        req.session.save((err: any) => {
-          if (err) {
-            console.error('Session save error:', err);
-            reject(err);
-          } else {
-            console.log('Session saved successfully for user:', user.username);
-            resolve();
-          }
-        });
-      });
       
       res.json({ 
         message: 'Login successful',

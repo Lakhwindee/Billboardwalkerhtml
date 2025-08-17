@@ -376,62 +376,7 @@ function CampaignStudioContent() {
   );
 }
 
-// Campaign Studio Only Component for Campaign Manager
-function CampaignStudioOnly() {
-  const { data: currentUser } = useQuery({
-    queryKey: ['/api/current-user'],
-    retry: false
-  });
-
-  if (!currentUser) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-red-900 flex items-center justify-center">
-        <div className="text-white text-lg">Loading Campaign Studio...</div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-red-900">
-      <div className="px-4 py-8 max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold text-white mb-2">Campaign Studio</h1>
-              <p className="text-gray-300">Campaign Manager Dashboard - Track your advertising campaigns</p>
-              <p className="text-sm text-purple-300 mt-1">Welcome, {currentUser.username}</p>
-            </div>
-            <Link href="/signin" className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-all">
-              Logout
-            </Link>
-          </div>
-        </div>
-
-        {/* Campaign Studio Content Only - No other tabs accessible */}
-        <div className="bg-gray-900/50 rounded-xl p-6">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-semibold text-white mb-2">📊 Campaign Tracking Dashboard</h2>
-            <p className="text-gray-300">Monitor and track your advertising campaigns</p>
-          </div>
-          <CampaignStudioContent />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function Dashboard() {
-  const { data: currentUser } = useQuery({
-    queryKey: ['/api/current-user'],
-    retry: false
-  });
-
-  // If campaign manager, show only campaign studio
-  if (currentUser && currentUser.role === 'campaign_manager') {
-    return <CampaignStudioOnly />;
-  }
-
   // Dashboard state (authentication removed)
   
   // Dashboard tab state
