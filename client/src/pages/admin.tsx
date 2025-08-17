@@ -4,9 +4,9 @@ import { apiRequest } from "@/lib/queryClient";
 import { type Contact, type Campaign, type PriceSetting } from "@shared/schema";
 import { type User as AuthUser } from "@/types/user";
 
-function Admin() {
+export default function Admin() {
+  // Always call hooks in the same order
   const [activeTab, setActiveTab] = useState("campaigns");
-  const [showPriceModal, setShowPriceModal] = useState(false);
   
   const currentUserQuery = useQuery<AuthUser>({
     queryKey: ['/api/current-user'],
@@ -40,7 +40,19 @@ function Admin() {
     }
   }, [currentUser]);
 
-  // Loading state
+  // Campaign mutations
+  const updateCampaignMutation = useMutation({
+    mutationFn: async ({ id, status, rejectionReason }: { id: number; status: string; rejectionReason?: string }) => {
+      return apiRequest("PATCH", `/api/campaigns/${id}/status`, { 
+        status, 
+        rejectionReason: rejectionReason || null
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/campaigns"] });
+    },
+  });
+
   if (userLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black text-white flex items-center justify-center">
@@ -52,7 +64,6 @@ function Admin() {
     );
   }
 
-  // Access control
   if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'campaign_manager')) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black text-white flex items-center justify-center">
@@ -81,23 +92,9 @@ function Admin() {
     );
   }
 
-  // Campaign mutations
-  const updateCampaignMutation = useMutation({
-    mutationFn: async ({ id, status, rejectionReason }: { id: number; status: string; rejectionReason?: string }) => {
-      return apiRequest("PATCH", `/api/campaigns/${id}/status`, { 
-        status, 
-        rejectionReason: rejectionReason || null
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/campaigns"] });
-    },
-  });
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black text-white">
       <div className="w-full max-w-7xl mx-auto px-4 py-6">
-        
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between">
@@ -133,7 +130,7 @@ function Admin() {
           <div className="bg-gray-800/50 backdrop-blur-sm p-2 rounded-xl border border-gray-700/50">
             <div className="flex overflow-x-auto scrollbar-hide gap-2 py-1">
               {/* Campaign Manager - Only Campaigns Tab */}
-              {currentUser?.role === 'campaign_manager' && (
+              {currentUser?.role === 'campaign_manager' ? (
                 <button
                   onClick={() => setActiveTab("campaigns")}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg"
@@ -141,40 +138,40 @@ function Admin() {
                   <span className="text-lg">📋</span>
                   <span className="text-sm font-medium">Campaigns</span>
                 </button>
+              ) : (
+                /* Admin - All Tabs */
+                [
+                  { id: "campaigns", label: "Campaigns", icon: "📋" },
+                  { id: "website-editor", label: "Website Editor", icon: "🌐" },
+                  { id: "contacts", label: "Contact Messages", icon: "📞" },
+                  { id: "users", label: "Users Management", icon: "👥" },
+                  { id: "pricing", label: "Price Management", icon: "💰" },
+                  { id: "design-samples", label: "Design Gallery", icon: "🎨" },
+                  { id: "site-visitors", label: "Site Visitors", icon: "👀" },
+                  { id: "admin-settings", label: "Admin Settings", icon: "⚙️" }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`
+                      flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 
+                      whitespace-nowrap flex-shrink-0 
+                      ${activeTab === tab.id
+                        ? "bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg"
+                        : "text-gray-300 hover:text-white hover:bg-gray-700/50"
+                      }
+                    `}
+                  >
+                    <span className="text-lg">{tab.icon}</span>
+                    <span className="text-sm font-medium">{tab.label}</span>
+                  </button>
+                ))
               )}
-              
-              {/* Admin - All Tabs */}
-              {currentUser?.role === 'admin' && [
-                { id: "campaigns", label: "Campaigns", icon: "📋" },
-                { id: "website-editor", label: "Website Editor", icon: "🌐" },
-                { id: "contacts", label: "Contact Messages", icon: "📞" },
-                { id: "users", label: "Users Management", icon: "👥" },
-                { id: "pricing", label: "Price Management", icon: "💰" },
-                { id: "design-samples", label: "Design Gallery", icon: "🎨" },
-                { id: "site-visitors", label: "Site Visitors", icon: "👀" },
-                { id: "admin-settings", label: "Admin Settings", icon: "⚙️" }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`
-                    flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 
-                    whitespace-nowrap flex-shrink-0 
-                    ${activeTab === tab.id
-                      ? "bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg"
-                      : "text-gray-300 hover:text-white hover:bg-gray-700/50"
-                    }
-                  `}
-                >
-                  <span className="text-lg">{tab.icon}</span>
-                  <span className="text-sm font-medium">{tab.label}</span>
-                </button>
-              ))}
             </div>
           </div>
         </div>
 
-        {/* Campaign Management */}
+        {/* Campaign Management Content */}
         {activeTab === "campaigns" && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -310,10 +307,7 @@ function Admin() {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-white">Price Management</h2>
-              <button 
-                onClick={() => setShowPriceModal(true)}
-                className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300"
-              >
+              <button className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300">
                 Add Price Range
               </button>
             </div>
@@ -357,7 +351,7 @@ function Admin() {
           </div>
         )}
 
-        {/* Other Admin Sections Placeholder */}
+        {/* Other Admin Sections - Admin Only */}
         {currentUser?.role === 'admin' && ['website-editor', 'users', 'design-samples', 'site-visitors', 'admin-settings'].includes(activeTab) && (
           <div className="space-y-6">
             <div className="text-center py-12">
@@ -398,5 +392,3 @@ function Admin() {
     </div>
   );
 }
-
-export default Admin;
