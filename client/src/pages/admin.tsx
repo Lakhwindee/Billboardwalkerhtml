@@ -3534,161 +3534,83 @@ function Admin() {
               </div>
             </div>
 
-            {/* Admin Password Change Section - Only for Admin */}
-            {currentUser?.role === 'admin' && (
-              <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                <div className="text-center py-4">
-                  <div className="text-6xl mb-4">🔐</div>
-                  <div className="flex items-center justify-center mb-4">
-                    <h3 className="text-2xl font-bold text-white">Change Admin Password</h3>
-                  </div>
-                  <p className="text-gray-300 mb-6">
-                    Update your admin panel login password for enhanced security
-                  </p>
-                  
-                  {/* Admin Password Change Form */}
-                  <form onSubmit={handleChangePassword} className="space-y-4 max-w-md mx-auto">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Current Admin Password / वर्तमान एडमिन पासवर्ड
-                      </label>
-                      <input
-                        type="password"
-                        value={adminSettings.currentPassword}
-                        onChange={(e) => setAdminSettings(prev => ({
-                          ...prev,
-                          currentPassword: e.target.value
-                        }))}
-                        placeholder="Enter current admin password"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        New Admin Password / नया एडमिन पासवर्ड
-                      </label>
-                      <input
-                        type="password"
-                        value={adminSettings.newPassword}
-                        onChange={(e) => setAdminSettings(prev => ({
-                          ...prev,
-                          newPassword: e.target.value
-                        }))}
-                        placeholder="Enter new admin password"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Confirm New Password / पुष्टि करें
-                      </label>
-                      <input
-                        type="password"
-                        value={adminSettings.confirmPassword}
-                        onChange={(e) => setAdminSettings(prev => ({
-                          ...prev,
-                          confirmPassword: e.target.value
-                        }))}
-                        placeholder="Confirm new admin password"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    
-                    <button
-                      type="submit"
-                      disabled={changingPassword}
-                      className="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 disabled:opacity-50"
-                    >
-                      {changingPassword ? 'Changing Admin Password...' : 'Change Admin Password'}
-                    </button>
-                  </form>
+            {/* Password Change Section */}
+            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+              <div className="text-center py-4">
+                <div className="text-6xl mb-4">🔐</div>
+                <div className="flex items-center justify-center mb-4">
+                  <h3 className="text-2xl font-bold text-white">
+                    {currentUser?.role === 'admin' ? 'Change Admin Password' : 'Change Password'}
+                  </h3>
                 </div>
-              </div>
-            )}
-
-            {/* Campaign Manager Password Change Section - Only for Campaign Manager */}
-            {currentUser?.role === 'campaign_manager' && (
-              <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                <div className="text-center py-4">
-                  <div className="text-6xl mb-4">🔐</div>
-                  <div className="flex items-center justify-center mb-4">
-                    <h3 className="text-2xl font-bold text-white">Change Campaign Manager Password</h3>
+                <p className="text-gray-300 mb-6">
+                  {currentUser?.role === 'admin' 
+                    ? 'Update your admin panel login password for enhanced security'
+                    : 'Update your account password for enhanced security'
+                  }
+                </p>
+                
+                {/* Password Change Form */}
+                <form onSubmit={handleChangePassword} className="space-y-4 max-w-md mx-auto">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Current Password / वर्तमान पासवर्ड
+                    </label>
+                    <input
+                      type="password"
+                      value={adminSettings.currentPassword}
+                      onChange={(e) => setAdminSettings(prev => ({
+                        ...prev,
+                        currentPassword: e.target.value
+                      }))}
+                      placeholder="Enter current password"
+                      className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      required
+                    />
                   </div>
-                  <p className="text-gray-300 mb-6">
-                    Update your campaign manager account password for enhanced security
-                  </p>
                   
-                  {/* Campaign Manager Password Change Form */}
-                  <form onSubmit={handleChangePassword} className="space-y-4 max-w-md mx-auto">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Current Password / वर्तमान पासवर्ड
-                      </label>
-                      <input
-                        type="password"
-                        value={adminSettings.currentPassword}
-                        onChange={(e) => setAdminSettings(prev => ({
-                          ...prev,
-                          currentPassword: e.target.value
-                        }))}
-                        placeholder="Enter current password"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        New Password / नया पासवर्ड
-                      </label>
-                      <input
-                        type="password"
-                        value={adminSettings.newPassword}
-                        onChange={(e) => setAdminSettings(prev => ({
-                          ...prev,
-                          newPassword: e.target.value
-                        }))}
-                        placeholder="Enter new password"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Confirm New Password / पुष्टि करें
-                      </label>
-                      <input
-                        type="password"
-                        value={adminSettings.confirmPassword}
-                        onChange={(e) => setAdminSettings(prev => ({
-                          ...prev,
-                          confirmPassword: e.target.value
-                        }))}
-                        placeholder="Confirm new password"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    
-                    <button
-                      type="submit"
-                      disabled={changingPassword}
-                      className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 disabled:opacity-50"
-                    >
-                      {changingPassword ? 'Changing Password...' : 'Change Campaign Manager Password'}
-                    </button>
-                  </form>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      New Password / नया पासवर्ड
+                    </label>
+                    <input
+                      type="password"
+                      value={adminSettings.newPassword}
+                      onChange={(e) => setAdminSettings(prev => ({
+                        ...prev,
+                        newPassword: e.target.value
+                      }))}
+                      placeholder="Enter new password (minimum 6 characters)"
+                      className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Confirm Password / पासवर्ड की पुष्टि करें
+                    </label>
+                    <input
+                      type="password"
+                      value={adminSettings.confirmPassword}
+                      onChange={(e) => setAdminSettings(prev => ({
+                        ...prev,
+                        confirmPassword: e.target.value
+                      }))}
+                      placeholder="Confirm new password"
+                      className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+                  
+                  <button
+                    type="submit"
+                    disabled={changingPassword}
+                    className="w-full bg-gradient-to-r from-red-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 transition-all duration-200 disabled:opacity-50"
+                  >
+                    {changingPassword ? 'Changing Password...' : 'Change Password / पासवर्ड बदलें'}
+                  </button>
+                </form>
                 
                 {/* Security Info */}
                 <div className="mt-8 p-4 bg-blue-500/20 rounded-lg border border-blue-500/30 text-left">
@@ -3701,7 +3623,7 @@ function Admin() {
                   </ul>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         )}
 
