@@ -1064,7 +1064,7 @@ function Admin() {
                 { id: "website-editor", label: "Website Editor", icon: "🌐", shortLabel: "Website", roles: ["admin"] },
                 { id: "logo-manager", label: "Logo Manager", icon: "🖼️", shortLabel: "Logo", roles: ["admin"] },
                 { id: "bottles", label: "Bottle Samples", icon: "🍼", shortLabel: "Bottles", roles: ["admin"] },
-                { id: "admin-settings", label: "Admin Settings", icon: "⚙️", shortLabel: "Settings", roles: ["admin"] },
+                { id: "admin-settings", label: currentUser?.role === 'admin' ? "Admin Settings" : "Account Settings", icon: "⚙️", shortLabel: "Settings", roles: ["admin", "campaign_manager"] },
                 { id: "activity", label: "Activity Logs", icon: "📊", shortLabel: "Activity", roles: ["admin"] },
                 { id: "design-samples", label: "Design Samples", icon: "🎨", shortLabel: "Designs", roles: ["admin"] },
                 { id: "revenue", label: "Revenue & Transactions", icon: "💰", shortLabel: "Revenue", roles: ["admin"] },
@@ -1111,7 +1111,7 @@ function Admin() {
                 { id: "payment-gateways", label: "Payment Gateways", icon: "💳", roles: ["admin"] },
                 { id: "site-visitors", label: "Site Visitors", icon: "👥", roles: ["admin"] },
                 { id: "email", label: "Email Setup", icon: "📧", roles: ["admin"] },
-                { id: "admin-settings", label: "Admin Settings", icon: "⚙️", roles: ["admin"] },
+                { id: "admin-settings", label: currentUser?.role === 'admin' ? "Admin Settings" : "Account Settings", icon: "⚙️", roles: ["admin", "campaign_manager"] },
               ].filter(tab => !currentUser?.role || tab.roles.includes(currentUser.role)).map((tab) => (
                 <button
                   key={tab.id}
@@ -3523,21 +3523,31 @@ function Admin() {
         {activeTab === "admin-settings" && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-white">Admin Settings</h2>
+              <h2 className="text-2xl font-bold text-white">
+                {currentUser?.role === 'admin' ? 'Admin Settings' : 'Account Settings'}
+              </h2>
               <div className="text-sm text-gray-400">
-                Administrator Panel Configuration
+                {currentUser?.role === 'admin' 
+                  ? 'Administrator Panel Configuration'
+                  : 'Campaign Manager Account Settings'
+                }
               </div>
             </div>
 
             {/* Password Change Section */}
             <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
               <div className="text-center py-4">
-                <div className="text-6xl mb-4">⚙️</div>
+                <div className="text-6xl mb-4">🔐</div>
                 <div className="flex items-center justify-center mb-4">
-                  <h3 className="text-2xl font-bold text-white">Change Admin Password</h3>
+                  <h3 className="text-2xl font-bold text-white">
+                    {currentUser?.role === 'admin' ? 'Change Admin Password' : 'Change Password'}
+                  </h3>
                 </div>
                 <p className="text-gray-300 mb-6">
-                  Update your admin panel login password for enhanced security
+                  {currentUser?.role === 'admin' 
+                    ? 'Update your admin panel login password for enhanced security'
+                    : 'Update your account password for enhanced security'
+                  }
                 </p>
                 
                 {/* Password Change Form */}
