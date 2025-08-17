@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { Eye, Clock, CheckCircle2, XCircle, Package, AlertCircle, Truck, Star } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { validateFile, formatFileSize, A3_INFO } from '@/lib/fileValidation';
@@ -378,11 +378,20 @@ function CampaignStudioContent() {
 }
 
 export default function Dashboard() {
+  const [, setLocation] = useLocation();
+  
   // Get current user data for role checking
   const { data: currentUser } = useQuery({
     queryKey: ['/api/current-user'],
     retry: false,
   });
+
+  // Redirect campaigns role users to admin panel
+  useEffect(() => {
+    if (currentUser?.role === 'campaigns') {
+      setLocation('/admin?tab=campaigns');
+    }
+  }, [currentUser, setLocation]);
 
   const queryClient = useQueryClient();
 

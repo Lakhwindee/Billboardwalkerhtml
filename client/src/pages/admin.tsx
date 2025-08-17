@@ -116,9 +116,26 @@ function Admin() {
   
   const queryClient = useQueryClient();
 
+  // Get current user for role-based access
+  const { data: currentUser } = useQuery({
+    queryKey: ['/api/current-user'],
+    retry: false,
+  });
+
   useEffect(() => {
     loadConfigurations();
-  }, []);
+    
+    // Check URL parameters for tab
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    
+    // Set tab based on URL parameter or user role
+    if (tabParam && getAvailableTabs().some(tab => tab.id === tabParam)) {
+      setActiveTab(tabParam);
+    } else if (currentUser?.role === 'campaigns') {
+      setActiveTab('campaigns');
+    }
+  }, [currentUser]);
 
   const loadConfigurations = () => {
     // Load saved configurations after successful auth
@@ -143,7 +160,34 @@ function Admin() {
     }
   };
 
+  // Define available tabs based on user role
+  const getAvailableTabs = () => {
+    const allTabs = [
+      { id: "campaigns", label: "Campaigns", icon: "📋", shortLabel: "Campaigns" },
+      { id: "contacts", label: "Contact Messages", icon: "📞", shortLabel: "Contact" },
+      { id: "users", label: "Users Management", icon: "👥", shortLabel: "Users" },
+      { id: "pricing", label: "Price Management", icon: "💰", shortLabel: "Price" },
+      { id: "website-editor", label: "Website Editor", icon: "🌐", shortLabel: "Website" },
+      { id: "logo-manager", label: "Logo Manager", icon: "🖼️", shortLabel: "Logo" },
+      { id: "bottles", label: "Bottle Samples", icon: "🍼", shortLabel: "Bottles" },
+      { id: "admin-settings", label: "Admin Settings", icon: "⚙️", shortLabel: "Settings" },
+      { id: "activity", label: "Activity Logs", icon: "📊", shortLabel: "Activity" },
+      { id: "design-samples", label: "Design Samples", icon: "🎨", shortLabel: "Designs" },
+      { id: "revenue", label: "Revenue & Transactions", icon: "💰", shortLabel: "Revenue" },
+      { id: "payment-accounts", label: "Payment Accounts", icon: "🏦", shortLabel: "Accounts" },
+      { id: "payment-gateways", label: "Payment Gateways", icon: "💳", shortLabel: "Gateway" },
+      { id: "site-visitors", label: "Site Visitors", icon: "👥", shortLabel: "Visitors" },
+      { id: "email", label: "Email Setup", icon: "📧", shortLabel: "Email" },
+    ];
 
+    // If user role is 'campaigns', only show campaigns tab
+    if (currentUser?.role === 'campaigns') {
+      return allTabs.filter(tab => tab.id === 'campaigns');
+    }
+
+    // For admin role, show all tabs
+    return allTabs;
+  };
 
   // Fetch data - direct access without authentication
   const { data: contacts = [], isLoading: contactsLoading } = useQuery<Contact[]>({
@@ -1038,25 +1082,9 @@ function Admin() {
         {/* Navigation Tabs - Mobile Responsive */}
         <div className="mb-4 sm:mb-6">
           <div className="bg-gray-800/50 backdrop-blur-sm p-2 rounded-xl border border-gray-700/50">
-            {/* Mobile Grid Layout - All Tabs */}
+            {/* Mobile Grid Layout - Role-Based Tabs */}
             <div className="grid grid-cols-5 sm:hidden gap-1">
-              {[
-                { id: "campaigns", label: "Campaigns", icon: "📋", shortLabel: "Campaigns" },
-                { id: "contacts", label: "Contact Messages", icon: "📞", shortLabel: "Contact" },
-                { id: "users", label: "Users Management", icon: "👥", shortLabel: "Users" },
-                { id: "pricing", label: "Price Management", icon: "💰", shortLabel: "Price" },
-                { id: "website-editor", label: "Website Editor", icon: "🌐", shortLabel: "Website" },
-                { id: "logo-manager", label: "Logo Manager", icon: "🖼️", shortLabel: "Logo" },
-                { id: "bottles", label: "Bottle Samples", icon: "🍼", shortLabel: "Bottles" },
-                { id: "admin-settings", label: "Admin Settings", icon: "⚙️", shortLabel: "Settings" },
-                { id: "activity", label: "Activity Logs", icon: "📊", shortLabel: "Activity" },
-                { id: "design-samples", label: "Design Samples", icon: "🎨", shortLabel: "Designs" },
-                { id: "revenue", label: "Revenue & Transactions", icon: "💰", shortLabel: "Revenue" },
-                { id: "payment-accounts", label: "Payment Accounts", icon: "🏦", shortLabel: "Accounts" },
-                { id: "payment-gateways", label: "Payment Gateways", icon: "💳", shortLabel: "Gateway" },
-                { id: "site-visitors", label: "Site Visitors", icon: "👥", shortLabel: "Visitors" },
-                { id: "email", label: "Email Setup", icon: "📧", shortLabel: "Email" },
-              ].map((tab) => (
+              {getAvailableTabs().map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
@@ -1077,23 +1105,7 @@ function Admin() {
 
             {/* Desktop Horizontal Layout */}
             <div className="hidden sm:flex overflow-x-auto scrollbar-hide gap-2 py-1">
-              {[
-                { id: "website-editor", label: "Website Editor", icon: "🌐" },
-                { id: "logo-manager", label: "Logo Manager", icon: "🖼️" },
-                { id: "campaigns", label: "Campaigns", icon: "📋" },
-                { id: "contacts", label: "Contact Messages", icon: "📞" },
-                { id: "users", label: "Users Management", icon: "👥" },
-                { id: "activity", label: "Activity Logs", icon: "📊" },
-                { id: "pricing", label: "Price Management", icon: "💰" },
-                { id: "bottles", label: "Bottle Samples", icon: "🍼" },
-                { id: "design-samples", label: "Design Samples", icon: "🎨" },
-                { id: "revenue", label: "Revenue & Transactions", icon: "💰" },
-                { id: "payment-accounts", label: "Payment Accounts", icon: "🏦" },
-                { id: "payment-gateways", label: "Payment Gateways", icon: "💳" },
-                { id: "site-visitors", label: "Site Visitors", icon: "👥" },
-                { id: "email", label: "Email Setup", icon: "📧" },
-                { id: "admin-settings", label: "Admin Settings", icon: "⚙️" },
-              ].map((tab) => (
+              {getAvailableTabs().map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
