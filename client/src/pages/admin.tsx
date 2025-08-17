@@ -107,13 +107,14 @@ function Admin() {
     isActive: true
   });
 
-  // Get current user from session for role-based access
+  // All hooks must be called before any conditional returns
+  // activeTab state moved to top to avoid hooks order issues
   const { data: currentUser, isLoading: userLoading } = useQuery({
     queryKey: ['/api/current-user'],
     retry: false,
   });
 
-  // Block campaign manager from accessing admin panel
+  // Block loading state
   if (userLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-red-900 flex items-center justify-center">

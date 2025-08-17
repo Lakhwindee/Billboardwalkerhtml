@@ -6,6 +6,7 @@ import connectPgSimple from "connect-pg-simple";
 import { storage } from "./storage";
 // Simple auth middleware for sessions
 const requireAuth = (req: any, res: any, next: any) => {
+  console.log('Session check:', req.session?.user ? 'User found' : 'No user');
   if (req.session?.user) {
     next();
   } else {
