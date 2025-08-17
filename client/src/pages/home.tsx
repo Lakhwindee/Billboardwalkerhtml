@@ -11,6 +11,12 @@ export default function Home() {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [showSignInModal, setShowSignInModal] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  
+  // Get current user data for session-based authentication
+  const { data: currentUserData } = useQuery({
+    queryKey: ['/api/current-user'],
+    retry: false,
+  });
 
   // Fetch bottle samples from database
   const { data: bottleSamples = [] } = useQuery<BottleSample[]>({
@@ -119,6 +125,15 @@ export default function Home() {
 
   // Check if user is signed in on page load (without automatic redirect)
   useEffect(() => {
+    // Check session-based authentication first
+    if (currentUserData) {
+      setIsSignedIn(true);
+      setCurrentUser(currentUserData.username);
+      setIsJudgeUser(currentUserData.role === 'admin');
+      return;
+    }
+    
+    // Fallback to localStorage for older authentication
     const authStatus = localStorage.getItem('billboardwalker_auth');
     const savedUser = localStorage.getItem('billboardwalker_user');
     if (authStatus === 'true' && savedUser) {
@@ -177,7 +192,7 @@ export default function Home() {
       document.addEventListener('click', handleClickOutside);
       return () => document.removeEventListener('click', handleClickOutside);
     }
-  }, [showMobileMenu]);
+  }, [currentUserData, showMobileMenu]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
