@@ -83,13 +83,7 @@ function Admin() {
     newPassword: '',
     confirmPassword: ''
   });
-  const [campaignManagerSettings, setCampaignManagerSettings] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
   const [changingPassword, setChangingPassword] = useState(false);
-  const [changingCampaignPassword, setChangingCampaignPassword] = useState(false);
 
   // Payment Management State
   const [showPaymentAccountModal, setShowPaymentAccountModal] = useState(false);
@@ -106,19 +100,6 @@ function Admin() {
     category: 'business',
     isActive: true
   });
-
-  // Get current user from session for role-based access
-  const { data: currentUser } = useQuery({
-    queryKey: ['/api/current-user'],
-    retry: false,
-  });
-
-  // Set default tab for campaign managers to campaigns only
-  useEffect(() => {
-    if (currentUser?.role === 'campaign_manager') {
-      setActiveTab("campaigns");
-    }
-  }, [currentUser]);
 
   // Campaign Management State
   const [showCampaignModal, setShowCampaignModal] = useState(false);
@@ -429,7 +410,7 @@ function Admin() {
       }
       
       // Send password change request to backend
-      const response = await apiRequest('/api/change-password', {
+      const response = await apiRequest('/api/change-admin-password', {
         method: 'POST',
         body: {
           currentPassword: adminSettings.currentPassword,
@@ -1057,28 +1038,25 @@ function Admin() {
         {/* Navigation Tabs - Mobile Responsive */}
         <div className="mb-4 sm:mb-6">
           <div className="bg-gray-800/50 backdrop-blur-sm p-2 rounded-xl border border-gray-700/50">
-            {/* Mobile Grid Layout - Role Based Tabs */}
+            {/* Mobile Grid Layout - All Tabs */}
             <div className="grid grid-cols-5 sm:hidden gap-1">
               {[
-                // Campaigns tab - available for both admin and campaign_manager
-                { id: "campaigns", label: "Campaigns", icon: "📋", shortLabel: "Campaigns", roles: ["admin", "campaign_manager"] },
-                
-                // Admin-only tabs
-                { id: "contacts", label: "Contact Messages", icon: "📞", shortLabel: "Contact", roles: ["admin"] },
-                { id: "users", label: "Users Management", icon: "👥", shortLabel: "Users", roles: ["admin"] },
-                { id: "pricing", label: "Price Management", icon: "💰", shortLabel: "Price", roles: ["admin"] },
-                { id: "website-editor", label: "Website Editor", icon: "🌐", shortLabel: "Website", roles: ["admin"] },
-                { id: "logo-manager", label: "Logo Manager", icon: "🖼️", shortLabel: "Logo", roles: ["admin"] },
-                { id: "bottles", label: "Bottle Samples", icon: "🍼", shortLabel: "Bottles", roles: ["admin"] },
-                { id: "admin-settings", label: currentUser?.role === 'admin' ? "Admin Settings" : "Account Settings", icon: "⚙️", shortLabel: "Settings", roles: ["admin", "campaign_manager"] },
-                { id: "activity", label: "Activity Logs", icon: "📊", shortLabel: "Activity", roles: ["admin"] },
-                { id: "design-samples", label: "Design Samples", icon: "🎨", shortLabel: "Designs", roles: ["admin"] },
-                { id: "revenue", label: "Revenue & Transactions", icon: "💰", shortLabel: "Revenue", roles: ["admin"] },
-                { id: "payment-accounts", label: "Payment Accounts", icon: "🏦", shortLabel: "Accounts", roles: ["admin"] },
-                { id: "payment-gateways", label: "Payment Gateways", icon: "💳", shortLabel: "Gateway", roles: ["admin"] },
-                { id: "site-visitors", label: "Site Visitors", icon: "👥", shortLabel: "Visitors", roles: ["admin"] },
-                { id: "email", label: "Email Setup", icon: "📧", shortLabel: "Email", roles: ["admin"] },
-              ].filter(tab => !currentUser?.role || tab.roles.includes(currentUser.role)).map((tab) => (
+                { id: "campaigns", label: "Campaigns", icon: "📋", shortLabel: "Campaigns" },
+                { id: "contacts", label: "Contact Messages", icon: "📞", shortLabel: "Contact" },
+                { id: "users", label: "Users Management", icon: "👥", shortLabel: "Users" },
+                { id: "pricing", label: "Price Management", icon: "💰", shortLabel: "Price" },
+                { id: "website-editor", label: "Website Editor", icon: "🌐", shortLabel: "Website" },
+                { id: "logo-manager", label: "Logo Manager", icon: "🖼️", shortLabel: "Logo" },
+                { id: "bottles", label: "Bottle Samples", icon: "🍼", shortLabel: "Bottles" },
+                { id: "admin-settings", label: "Admin Settings", icon: "⚙️", shortLabel: "Settings" },
+                { id: "activity", label: "Activity Logs", icon: "📊", shortLabel: "Activity" },
+                { id: "design-samples", label: "Design Samples", icon: "🎨", shortLabel: "Designs" },
+                { id: "revenue", label: "Revenue & Transactions", icon: "💰", shortLabel: "Revenue" },
+                { id: "payment-accounts", label: "Payment Accounts", icon: "🏦", shortLabel: "Accounts" },
+                { id: "payment-gateways", label: "Payment Gateways", icon: "💳", shortLabel: "Gateway" },
+                { id: "site-visitors", label: "Site Visitors", icon: "👥", shortLabel: "Visitors" },
+                { id: "email", label: "Email Setup", icon: "📧", shortLabel: "Email" },
+              ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
@@ -1097,28 +1075,25 @@ function Admin() {
               ))}
             </div>
 
-            {/* Desktop Horizontal Layout - Role Based */}
+            {/* Desktop Horizontal Layout */}
             <div className="hidden sm:flex overflow-x-auto scrollbar-hide gap-2 py-1">
               {[
-                // Campaigns tab - available for both admin and campaign_manager
-                { id: "campaigns", label: "Campaigns", icon: "📋", roles: ["admin", "campaign_manager"] },
-                
-                // Admin-only tabs
-                { id: "website-editor", label: "Website Editor", icon: "🌐", roles: ["admin"] },
-                { id: "logo-manager", label: "Logo Manager", icon: "🖼️", roles: ["admin"] },
-                { id: "contacts", label: "Contact Messages", icon: "📞", roles: ["admin"] },
-                { id: "users", label: "Users Management", icon: "👥", roles: ["admin"] },
-                { id: "activity", label: "Activity Logs", icon: "📊", roles: ["admin"] },
-                { id: "pricing", label: "Price Management", icon: "💰", roles: ["admin"] },
-                { id: "bottles", label: "Bottle Samples", icon: "🍼", roles: ["admin"] },
-                { id: "design-samples", label: "Design Samples", icon: "🎨", roles: ["admin"] },
-                { id: "revenue", label: "Revenue & Transactions", icon: "💰", roles: ["admin"] },
-                { id: "payment-accounts", label: "Payment Accounts", icon: "🏦", roles: ["admin"] },
-                { id: "payment-gateways", label: "Payment Gateways", icon: "💳", roles: ["admin"] },
-                { id: "site-visitors", label: "Site Visitors", icon: "👥", roles: ["admin"] },
-                { id: "email", label: "Email Setup", icon: "📧", roles: ["admin"] },
-                { id: "admin-settings", label: currentUser?.role === 'admin' ? "Admin Settings" : "Account Settings", icon: "⚙️", roles: ["admin", "campaign_manager"] },
-              ].filter(tab => !currentUser?.role || tab.roles.includes(currentUser.role)).map((tab) => (
+                { id: "website-editor", label: "Website Editor", icon: "🌐" },
+                { id: "logo-manager", label: "Logo Manager", icon: "🖼️" },
+                { id: "campaigns", label: "Campaigns", icon: "📋" },
+                { id: "contacts", label: "Contact Messages", icon: "📞" },
+                { id: "users", label: "Users Management", icon: "👥" },
+                { id: "activity", label: "Activity Logs", icon: "📊" },
+                { id: "pricing", label: "Price Management", icon: "💰" },
+                { id: "bottles", label: "Bottle Samples", icon: "🍼" },
+                { id: "design-samples", label: "Design Samples", icon: "🎨" },
+                { id: "revenue", label: "Revenue & Transactions", icon: "💰" },
+                { id: "payment-accounts", label: "Payment Accounts", icon: "🏦" },
+                { id: "payment-gateways", label: "Payment Gateways", icon: "💳" },
+                { id: "site-visitors", label: "Site Visitors", icon: "👥" },
+                { id: "email", label: "Email Setup", icon: "📧" },
+                { id: "admin-settings", label: "Admin Settings", icon: "⚙️" },
+              ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
@@ -3529,164 +3504,37 @@ function Admin() {
         {activeTab === "admin-settings" && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-white">
-                {currentUser?.role === 'admin' ? 'Admin Settings' : 'Account Settings'}
-              </h2>
+              <h2 className="text-2xl font-bold text-white">Admin Settings</h2>
               <div className="text-sm text-gray-400">
-                {currentUser?.role === 'admin' 
-                  ? 'Administrator Panel Configuration'
-                  : 'Campaign Manager Account Settings'
-                }
+                Administrator Panel Configuration
               </div>
             </div>
 
-            {/* Admin Password Change Section (Only for Admin) */}
-            {currentUser?.role === 'admin' && (
-              <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                <div className="text-center py-4">
-                  <div className="text-6xl mb-4">👑</div>
-                  <div className="flex items-center justify-center mb-4">
-                    <h3 className="text-2xl font-bold text-white">Change Admin Password</h3>
-                  </div>
-                  <p className="text-gray-300 mb-6">
-                    Update your main admin panel login password for enhanced security
-                  </p>
-                  
-                  {/* Admin Password Change Form */}
-                  <form onSubmit={handleChangePassword} className="space-y-4 max-w-md mx-auto">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Current Admin Password / वर्तमान एडमिन पासवर्ड
-                      </label>
-                      <input
-                        type="password"
-                        value={adminSettings.currentPassword}
-                        onChange={(e) => setAdminSettings(prev => ({
-                          ...prev,
-                          currentPassword: e.target.value
-                        }))}
-                        placeholder="Enter current admin password"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        New Admin Password / नया एडमिन पासवर्ड
-                      </label>
-                      <input
-                        type="password"
-                        value={adminSettings.newPassword}
-                        onChange={(e) => setAdminSettings(prev => ({
-                          ...prev,
-                          newPassword: e.target.value
-                        }))}
-                        placeholder="Enter new admin password (minimum 6 characters)"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Confirm New Password / नया पासवर्ड कन्फर्म करें
-                      </label>
-                      <input
-                        type="password"
-                        value={adminSettings.confirmPassword}
-                        onChange={(e) => setAdminSettings(prev => ({
-                          ...prev,
-                          confirmPassword: e.target.value
-                        }))}
-                        placeholder="Confirm new admin password"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    
-                    <button
-                      type="submit"
-                      disabled={changingPassword}
-                      className="w-full bg-gradient-to-r from-red-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 transition-all duration-200 disabled:opacity-50"
-                    >
-                      {changingPassword ? 'Changing Admin Password...' : 'Change Admin Password / एडमिन पासवर्ड बदलें'}
-                    </button>
-                  </form>
-                </div>
-              </div>
-            )}
-
-            {/* Campaign Manager Password Change Section */}
+            {/* Password Change Section */}
             <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
               <div className="text-center py-4">
-                <div className="text-6xl mb-4">🔐</div>
+                <div className="text-6xl mb-4">⚙️</div>
                 <div className="flex items-center justify-center mb-4">
-                  <h3 className="text-2xl font-bold text-white">
-                    {currentUser?.role === 'admin' ? 'Campaign Manager Password Reset' : 'Change My Password'}
-                  </h3>
+                  <h3 className="text-2xl font-bold text-white">Change Admin Password</h3>
                 </div>
                 <p className="text-gray-300 mb-6">
-                  {currentUser?.role === 'admin' 
-                    ? 'Reset campaign manager account password (campaign/campaign123)' 
-                    : 'Update your campaign manager account password for enhanced security'
-                  }
+                  Update your admin panel login password for enhanced security
                 </p>
                 
-                {/* Campaign Manager Password Change Form */}
-                <form onSubmit={async (e) => {
-                  e.preventDefault();
-                  setChangingCampaignPassword(true);
-                  
-                  try {
-                    if (campaignManagerSettings.newPassword !== campaignManagerSettings.confirmPassword) {
-                      alert('नया पासवर्ड और कन्फर्म पासवर्ड मैच नहीं कर रहे / New password and confirm password do not match');
-                      return;
-                    }
-                    
-                    if (campaignManagerSettings.newPassword.length < 6) {
-                      alert('पासवर्ड कम से कम 6 अक्षर का होना चाहिए / Password must be at least 6 characters long');
-                      return;
-                    }
-                    
-                    const targetUserId = currentUser?.role === 'admin' ? 2 : currentUser?.id; // Campaign manager ID is 2
-                    
-                    const response = await apiRequest('POST', '/api/change-password', {
-                      userId: targetUserId,
-                      currentPassword: campaignManagerSettings.currentPassword,
-                      newPassword: campaignManagerSettings.newPassword
-                    });
-                    
-                    if (response.ok) {
-                      const result = await response.json();
-                      alert(currentUser?.role === 'admin' 
-                        ? '✅ Campaign manager password successfully changed! / कैम्पेन मैनेजर का पासवर्ड सफलतापूर्वक बदल दिया गया!'
-                        : '✅ Your password has been changed successfully! / आपका पासवर्ड सफलतापूर्वक बदल दिया गया!'
-                      );
-                      setCampaignManagerSettings({ currentPassword: '', newPassword: '', confirmPassword: '' });
-                    } else {
-                      const error = await response.json();
-                      alert(`❌ ${error.message || 'Password change failed / पासवर्ड बदलने में विफल'}`);
-                    }
-                  } catch (error) {
-                    console.error('Campaign password change error:', error);
-                    alert('❌ An error occurred while changing password / पासवर्ड बदलते समय एक त्रुटि हुई');
-                  } finally {
-                    setChangingCampaignPassword(false);
-                  }
-                }} className="space-y-4 max-w-md mx-auto">
+                {/* Password Change Form */}
+                <form onSubmit={handleChangePassword} className="space-y-4 max-w-md mx-auto">
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      {currentUser?.role === 'admin' ? 'Current Campaign Manager Password / वर्तमान कैम्पेन मैनेजर पासवर्ड' : 'Current Password / वर्तमान पासवर्ड'}
+                      Current Password / वर्तमान पासवर्ड
                     </label>
                     <input
                       type="password"
-                      value={campaignManagerSettings.currentPassword}
-                      onChange={(e) => setCampaignManagerSettings(prev => ({
+                      value={adminSettings.currentPassword}
+                      onChange={(e) => setAdminSettings(prev => ({
                         ...prev,
                         currentPassword: e.target.value
                       }))}
-                      placeholder={currentUser?.role === 'admin' ? "Enter current campaign password (default: campaign123)" : "Enter current password"}
+                      placeholder="Enter current password"
                       className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       required
                     />
@@ -3694,12 +3542,12 @@ function Admin() {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      {currentUser?.role === 'admin' ? 'New Campaign Manager Password / नया कैम्पेन मैनेजर पासवर्ड' : 'New Password / नया पासवर्ड'}
+                      New Password / नया पासवर्ड
                     </label>
                     <input
                       type="password"
-                      value={campaignManagerSettings.newPassword}
-                      onChange={(e) => setCampaignManagerSettings(prev => ({
+                      value={adminSettings.newPassword}
+                      onChange={(e) => setAdminSettings(prev => ({
                         ...prev,
                         newPassword: e.target.value
                       }))}
@@ -3711,12 +3559,12 @@ function Admin() {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Confirm New Password / नया पासवर्ड की पुष्टि करें
+                      Confirm Password / पासवर्ड की पुष्टि करें
                     </label>
                     <input
                       type="password"
-                      value={campaignManagerSettings.confirmPassword}
-                      onChange={(e) => setCampaignManagerSettings(prev => ({
+                      value={adminSettings.confirmPassword}
+                      onChange={(e) => setAdminSettings(prev => ({
                         ...prev,
                         confirmPassword: e.target.value
                       }))}
@@ -3728,12 +3576,10 @@ function Admin() {
                   
                   <button
                     type="submit"
-                    disabled={changingCampaignPassword}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 focus:ring-4 focus:ring-blue-500/50 transition-all duration-200 disabled:opacity-50"
+                    disabled={changingPassword}
+                    className="w-full bg-gradient-to-r from-red-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 transition-all duration-200 disabled:opacity-50"
                   >
-                    {changingCampaignPassword ? 'Changing Password...' : 
-                      (currentUser?.role === 'admin' ? 'Reset Campaign Manager Password / कैम्पेन मैनेजर पासवर्ड रीसेट करें' : 'Change My Password / मेरा पासवर्ड बदलें')
-                    }
+                    {changingPassword ? 'Changing Password...' : 'Change Password / पासवर्ड बदलें'}
                   </button>
                 </form>
                 
