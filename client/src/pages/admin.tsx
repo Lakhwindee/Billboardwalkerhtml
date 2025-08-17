@@ -132,7 +132,7 @@ function Admin() {
     // Set tab based on URL parameter or user role
     if (tabParam && getAvailableTabs().some(tab => tab.id === tabParam)) {
       setActiveTab(tabParam);
-    } else if (currentUser?.role === 'campaigns') {
+    } else if (currentUser?.role === 'campaigns' || currentUser?.role === 'campaign_manager') {
       setActiveTab('campaigns');
     }
   }, [currentUser]);
@@ -180,8 +180,8 @@ function Admin() {
       { id: "email", label: "Email Setup", icon: "📧", shortLabel: "Email" },
     ];
 
-    // If user role is 'campaigns', only show campaigns tab
-    if (currentUser?.role === 'campaigns') {
+    // If user role is 'campaigns' or 'campaign_manager', only show campaigns tab
+    if (currentUser?.role === 'campaigns' || currentUser?.role === 'campaign_manager') {
       return allTabs.filter(tab => tab.id === 'campaigns');
     }
 
@@ -1127,7 +1127,7 @@ function Admin() {
         </div>
 
         {/* Tab Content */}
-        {activeTab === "website-editor" && (
+        {activeTab === "website-editor" && currentUser?.role === 'admin' && (
           <div className="space-y-4 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
               <h2 className="text-xl sm:text-2xl font-bold text-white">Homepage Content Editor</h2>
@@ -1613,7 +1613,7 @@ function Admin() {
           </div>
         )}
 
-        {activeTab === "orders" && (
+        {activeTab === "orders" && currentUser?.role === 'admin' && (
           <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6 p-4">
             <div className="text-6xl">📋</div>
             <div className="text-center max-w-md">
@@ -1629,7 +1629,7 @@ function Admin() {
           </div>
         )}
 
-        {activeTab === "logo-manager" && (
+        {activeTab === "logo-manager" && currentUser?.role === 'admin' && (
           <div className="space-y-4 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
               <h2 className="text-xl sm:text-2xl font-bold text-white">Logo Management</h2>
@@ -1768,7 +1768,7 @@ function Admin() {
           </div>
         )}
 
-        {activeTab === "contacts" && (
+        {activeTab === "contacts" && currentUser?.role === 'admin' && (
           <div className="space-y-4 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
               <h2 className="text-xl sm:text-2xl font-bold">Contact Messages</h2>
@@ -1861,7 +1861,7 @@ function Admin() {
           </div>
         )}
 
-        {activeTab === "users" && (
+        {activeTab === "users" && currentUser?.role === 'admin' && (
           <div className="space-y-4 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
               <h2 className="text-xl sm:text-2xl font-bold">Users Management</h2>
@@ -2125,7 +2125,7 @@ function Admin() {
           </div>
         )}
 
-        {activeTab === "activity" && (
+        {activeTab === "activity" && currentUser?.role === 'admin' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Activity Logs</h2>
@@ -2226,7 +2226,7 @@ function Admin() {
           </div>
         )}
 
-        {activeTab === "pricing" && (
+        {activeTab === "pricing" && currentUser?.role === 'admin' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Price Management</h2>
@@ -2362,7 +2362,7 @@ function Admin() {
 
 
 
-        {activeTab === "bottles" && (
+        {activeTab === "bottles" && currentUser?.role === 'admin' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Bottle Samples Management</h2>
@@ -2568,7 +2568,7 @@ function Admin() {
         )}
 
         {/* Design Samples Management Tab */}
-        {activeTab === "design-samples" && (
+        {activeTab === "design-samples" && currentUser?.role === 'admin' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Design Samples Management</h2>
@@ -2803,7 +2803,7 @@ function Admin() {
         )}
 
         {/* Revenue & Transactions Tab */}
-        {activeTab === "revenue" && (
+        {activeTab === "revenue" && currentUser?.role === 'admin' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Revenue & Transaction History</h2>
@@ -2939,7 +2939,7 @@ function Admin() {
         )}
 
         {/* Payment Accounts Tab */}
-        {activeTab === "payment-accounts" && (
+        {activeTab === "payment-accounts" && currentUser?.role === 'admin' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Payment Accounts Management</h2>
@@ -3045,7 +3045,7 @@ function Admin() {
         )}
 
         {/* Payment Gateways Tab */}
-        {activeTab === "payment-gateways" && (
+        {activeTab === "payment-gateways" && currentUser?.role === 'admin' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Payment Gateway Configuration</h2>
@@ -3060,7 +3060,7 @@ function Admin() {
         )}
 
         {/* Site Visitors Tab */}
-        {activeTab === "site-visitors" && (
+        {activeTab === "site-visitors" && currentUser?.role === 'admin' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-white">👥 Site Visitors Tracking</h2>
@@ -3198,7 +3198,7 @@ function Admin() {
         )}
 
         {/* Email Configuration Tab */}
-        {activeTab === "email" && (
+        {activeTab === "email" && currentUser?.role === 'admin' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Email Configuration</h2>
@@ -3513,7 +3513,7 @@ function Admin() {
         )}
 
         {/* Admin Settings Tab */}
-        {activeTab === "admin-settings" && (
+        {activeTab === "admin-settings" && currentUser?.role === 'admin' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-white">Admin Settings</h2>

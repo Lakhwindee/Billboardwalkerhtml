@@ -388,7 +388,7 @@ export default function Dashboard() {
 
   // Redirect campaigns role users to admin panel
   useEffect(() => {
-    if (currentUser?.role === 'campaigns') {
+    if (currentUser?.role === 'campaigns' || currentUser?.role === 'campaign_manager') {
       setLocation('/admin?tab=campaigns');
     }
   }, [currentUser, setLocation]);

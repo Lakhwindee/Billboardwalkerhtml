@@ -104,7 +104,7 @@ export default function SigninPage() {
       setTimeout(() => {
         if (data.user?.role === "admin") {
           setLocation("/admin");
-        } else if (data.user?.role === "campaigns") {
+        } else if (data.user?.role === "campaigns" || data.user?.role === "campaign_manager") {
           setLocation("/admin?tab=campaigns");
         } else {
           setLocation("/dashboard");
