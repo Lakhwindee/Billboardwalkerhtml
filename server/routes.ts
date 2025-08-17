@@ -124,7 +124,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: 'auto', // Auto-detect HTTPS for deployment compatibility
+      secure: process.env.NODE_ENV === 'production', // Only secure in production
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
       sameSite: 'lax' // Better cross-origin compatibility
