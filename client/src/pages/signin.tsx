@@ -97,7 +97,7 @@ export default function SigninPage() {
       
       // Redirect based on role with delay for better UX
       setTimeout(() => {
-        if (data.user?.role === "admin") {
+        if (data.user?.role === "admin" || data.user?.role === "campaign_manager") {
           setLocation("/admin");
         } else {
           setLocation("/dashboard");

@@ -1,3 +1,4 @@
+// Clean admin component with three-level authentication
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { type Campaign } from "@shared/schema";
@@ -86,14 +87,12 @@ function Admin() {
               <a 
                 href="/dashboard" 
                 className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300"
-                data-testid="link-dashboard"
               >
                 Dashboard
               </a>
               <a 
                 href="/" 
                 className="bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300"
-                data-testid="link-home"
               >
                 Home
               </a>
@@ -132,7 +131,6 @@ function Admin() {
                       : "text-gray-300 hover:text-white hover:bg-gray-700/50"
                     }
                   `}
-                  data-testid={`button-tab-${tab.id}`}
                 >
                   <span className="text-lg">{tab.icon}</span>
                   <span className="text-sm font-medium">{tab.label}</span>
@@ -147,7 +145,7 @@ function Admin() {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-white">Campaign Management</h2>
-              <div className="text-sm text-gray-300" data-testid="text-campaign-count">
+              <div className="text-sm text-gray-300">
                 Total Campaigns: {campaigns.length}
               </div>
             </div>
@@ -160,14 +158,14 @@ function Admin() {
                   <p className="text-gray-300">Loading campaigns...</p>
                 </div>
               ) : campaigns.length === 0 ? (
-                <div className="text-center py-12" data-testid="empty-campaigns">
+                <div className="text-center py-12">
                   <div className="text-6xl mb-4">📋</div>
                   <h3 className="text-xl font-semibold text-white mb-2">No Campaigns Yet</h3>
                   <p className="text-gray-400">Campaigns will appear here once users start submitting them.</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full" data-testid="table-campaigns">
+                  <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-600">
                         <th className="text-left py-3 px-4 font-semibold text-gray-200">Campaign</th>
@@ -180,39 +178,39 @@ function Admin() {
                     </thead>
                     <tbody>
                       {campaigns.map((campaign) => (
-                        <tr key={campaign.id} className="border-b border-gray-700 hover:bg-gray-700/30" data-testid={`row-campaign-${campaign.id}`}>
+                        <tr key={campaign.id} className="border-b border-gray-700 hover:bg-gray-700/30">
                           <td className="py-3 px-4">
                             <div>
-                              <div className="font-medium text-white" data-testid={`text-title-${campaign.id}`}>{campaign.title}</div>
-                              <div className="text-sm text-gray-400" data-testid={`text-description-${campaign.id}`}>{campaign.description}</div>
+                              <div className="font-medium text-white">{campaign.title}</div>
+                              <div className="text-sm text-gray-400">{campaign.description}</div>
                             </div>
                           </td>
-                          <td className="py-3 px-4 text-gray-300" data-testid={`text-customer-${campaign.id}`}>{campaign.customerName}</td>
+                          <td className="py-3 px-4 text-gray-300">{campaign.customerName}</td>
                           <td className="py-3 px-4">
                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                               campaign.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' :
                               campaign.status === 'approved' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
                               campaign.status === 'rejected' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
                               'bg-gray-500/20 text-gray-400 border border-gray-500/30'
-                            }`} data-testid={`status-${campaign.id}`}>
+                            }`}>
                               {campaign.status?.toUpperCase()}
                             </span>
                           </td>
-                          <td className="py-3 px-4 text-gray-300" data-testid={`text-quantity-${campaign.id}`}>{campaign.quantity?.toLocaleString()} bottles</td>
-                          <td className="py-3 px-4 text-gray-300" data-testid={`text-date-${campaign.id}`}>
+                          <td className="py-3 px-4 text-gray-300">{campaign.quantity?.toLocaleString()} bottles</td>
+                          <td className="py-3 px-4 text-gray-300">
                             {new Date(campaign.createdAt).toLocaleDateString()}
                           </td>
                           <td className="py-3 px-4">
                             <div className="flex space-x-2">
-                              <button className="px-3 py-1 bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 rounded text-xs font-medium transition-colors border border-blue-500/30" data-testid={`button-view-${campaign.id}`}>
+                              <button className="px-3 py-1 bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 rounded text-xs font-medium transition-colors border border-blue-500/30">
                                 View Details
                               </button>
                               {campaign.status === 'pending' && (
                                 <>
-                                  <button className="px-3 py-1 bg-green-500/20 text-green-400 hover:bg-green-500/30 rounded text-xs font-medium transition-colors border border-green-500/30" data-testid={`button-approve-${campaign.id}`}>
+                                  <button className="px-3 py-1 bg-green-500/20 text-green-400 hover:bg-green-500/30 rounded text-xs font-medium transition-colors border border-green-500/30">
                                     Approve
                                   </button>
-                                  <button className="px-3 py-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded text-xs font-medium transition-colors border border-red-500/30" data-testid={`button-reject-${campaign.id}`}>
+                                  <button className="px-3 py-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded text-xs font-medium transition-colors border border-red-500/30">
                                     Reject
                                   </button>
                                 </>
@@ -231,7 +229,7 @@ function Admin() {
 
         {/* Admin-only tabs - Show message if campaign manager tries to access */}
         {currentUser?.role === 'campaign_manager' && activeTab !== "campaigns" && (
-          <div className="text-center py-12" data-testid="access-restricted">
+          <div className="text-center py-12">
             <div className="text-red-500 text-6xl mb-6">🚫</div>
             <h2 className="text-xl font-bold text-white mb-4">Access Restricted</h2>
             <p className="text-gray-300">
@@ -242,7 +240,7 @@ function Admin() {
 
         {/* Other admin tabs placeholder */}
         {currentUser?.role === 'admin' && activeTab !== "campaigns" && (
-          <div className="space-y-6" data-testid="admin-tab-content">
+          <div className="space-y-6">
             <div className="text-center py-12">
               <div className="text-6xl mb-4">{
                 activeTab === 'website-editor' ? '🌐' :
