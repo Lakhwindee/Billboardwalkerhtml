@@ -97,27 +97,27 @@ export default function Admin() {
       <div className="w-full max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center space-x-4">
               <div>
-                <h1 className="text-4xl font-black text-white mb-2">
+                <h1 className="text-2xl sm:text-4xl font-black text-white mb-2">
                   IamBillBoard <span className="bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent">Admin Panel</span>
                 </h1>
-                <p className="text-sm text-gray-300">
+                <p className="text-xs sm:text-sm text-gray-300">
                   Welcome, {currentUser?.username} ({currentUser?.role === 'admin' ? 'Full Admin' : 'Campaign Manager'})
                 </p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
               <a 
                 href="/dashboard" 
-                className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300"
+                className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-3 py-2 sm:px-6 sm:py-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 flex-1 sm:flex-none text-center"
               >
                 Dashboard
               </a>
               <a 
                 href="/" 
-                className="bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300"
+                className="bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white px-3 py-2 sm:px-6 sm:py-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 flex-1 sm:flex-none text-center"
               >
                 Home
               </a>
@@ -128,7 +128,7 @@ export default function Admin() {
         {/* Navigation Tabs - Role Based */}
         <div className="mb-6">
           <div className="bg-gray-800/50 backdrop-blur-sm p-2 rounded-xl border border-gray-700/50">
-            <div className="flex overflow-x-auto scrollbar-hide gap-2 py-1">
+            <div className="flex overflow-x-auto scrollbar-hide gap-1 py-1 px-1">
               {/* Campaign Manager - Only Campaigns Tab */}
               {currentUser?.role === 'campaign_manager' ? (
                 <button
@@ -139,7 +139,7 @@ export default function Admin() {
                   <span className="text-sm font-medium">Campaigns</span>
                 </button>
               ) : (
-                /* Admin - All Tabs */
+                /* Admin - All 16 Tabs */
                 [
                   { id: "campaigns", label: "Campaigns", icon: "📋" },
                   { id: "website-editor", label: "Website Editor", icon: "🌐" },
@@ -148,22 +148,31 @@ export default function Admin() {
                   { id: "pricing", label: "Price Management", icon: "💰" },
                   { id: "design-samples", label: "Design Gallery", icon: "🎨" },
                   { id: "site-visitors", label: "Site Visitors", icon: "👀" },
-                  { id: "admin-settings", label: "Admin Settings", icon: "⚙️" }
+                  { id: "admin-settings", label: "Admin Settings", icon: "⚙️" },
+                  { id: "bottle-samples", label: "Bottle Samples", icon: "🍾" },
+                  { id: "logo-settings", label: "Logo Settings", icon: "🏷️" },
+                  { id: "payment-accounts", label: "Payment Accounts", icon: "💳" },
+                  { id: "transactions", label: "Transactions", icon: "💸" },
+                  { id: "user-profiles", label: "User Profiles", icon: "👤" },
+                  { id: "activity-logs", label: "Activity Logs", icon: "📊" },
+                  { id: "site-settings", label: "Site Settings", icon: "🔧" },
+                  { id: "home-content", label: "Home Content", icon: "🏠" }
                 ].map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`
-                      flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 
-                      whitespace-nowrap flex-shrink-0 
+                      flex items-center gap-1 px-2 py-1.5 rounded-lg transition-all duration-300 
+                      whitespace-nowrap flex-shrink-0 text-xs
                       ${activeTab === tab.id
                         ? "bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg"
                         : "text-gray-300 hover:text-white hover:bg-gray-700/50"
                       }
                     `}
                   >
-                    <span className="text-lg">{tab.icon}</span>
-                    <span className="text-sm font-medium">{tab.label}</span>
+                    <span className="text-sm">{tab.icon}</span>
+                    <span className="text-xs font-medium hidden sm:block">{tab.label}</span>
+                    <span className="text-xs font-medium sm:hidden">{tab.label.split(' ')[0]}</span>
                   </button>
                 ))
               )}
@@ -352,7 +361,7 @@ export default function Admin() {
         )}
 
         {/* Other Admin Sections - Admin Only */}
-        {currentUser?.role === 'admin' && ['website-editor', 'users', 'design-samples', 'site-visitors', 'admin-settings'].includes(activeTab) && (
+        {currentUser?.role === 'admin' && ['website-editor', 'users', 'design-samples', 'site-visitors', 'admin-settings', 'bottle-samples', 'logo-settings', 'payment-accounts', 'transactions', 'user-profiles', 'activity-logs', 'site-settings', 'home-content'].includes(activeTab) && (
           <div className="space-y-6">
             <div className="text-center py-12">
               <div className="text-6xl mb-4">{
@@ -360,7 +369,15 @@ export default function Admin() {
                 activeTab === 'users' ? '👥' :
                 activeTab === 'design-samples' ? '🎨' :
                 activeTab === 'site-visitors' ? '👀' :
-                activeTab === 'admin-settings' ? '⚙️' : '📋'
+                activeTab === 'admin-settings' ? '⚙️' :
+                activeTab === 'bottle-samples' ? '🍾' :
+                activeTab === 'logo-settings' ? '🏷️' :
+                activeTab === 'payment-accounts' ? '💳' :
+                activeTab === 'transactions' ? '💸' :
+                activeTab === 'user-profiles' ? '👤' :
+                activeTab === 'activity-logs' ? '📊' :
+                activeTab === 'site-settings' ? '🔧' :
+                activeTab === 'home-content' ? '🏠' : '📋'
               }</div>
               <h2 className="text-2xl font-bold text-white mb-2">
                 {activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')}
