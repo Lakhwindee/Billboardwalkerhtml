@@ -423,7 +423,7 @@ function Admin() {
       }
       
       // Send password change request to backend
-      const response = await apiRequest('/api/change-admin-password', {
+      const response = await apiRequest('/api/change-password', {
         method: 'POST',
         body: {
           currentPassword: adminSettings.currentPassword,

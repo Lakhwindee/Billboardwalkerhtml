@@ -81,6 +81,7 @@ export interface IStorage {
   getUsers(): Promise<User[]>;
   updateUser(id: number, updates: Partial<User>): Promise<User>;
   updateUserPassword(id: number, hashedPassword: string): Promise<void>;
+  changePassword(userId: number, currentPassword: string, newPassword: string): Promise<boolean>;
   deleteUser(id: number): Promise<void>;
   getUserProfiles(): Promise<UserProfile[]>;
   getUserProfile(userId: number): Promise<UserProfile | undefined>;
@@ -805,6 +806,33 @@ export class DatabaseStorage implements IStorage {
     await db.update(users)
       .set({ password: hashedPassword })
       .where(eq(users.id, userId));
+  }
+
+  async changePassword(userId: number, currentPassword: string, newPassword: string): Promise<boolean> {
+    try {
+      // Get user
+      const user = await this.getUser(userId);
+      if (!user) {
+        return false;
+      }
+
+      // Verify current password
+      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+      if (!isCurrentPasswordValid) {
+        return false;
+      }
+
+      // Hash new password
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+      // Update password
+      await this.updateUserPassword(userId, hashedNewPassword);
+      
+      return true;
+    } catch (error) {
+      console.error('Error changing password:', error);
+      return false;
+    }
   }
 
   // Site visitor tracking methods
