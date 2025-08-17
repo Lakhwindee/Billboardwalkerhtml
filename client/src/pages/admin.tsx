@@ -1026,7 +1026,9 @@ function Admin() {
                 />
                 <div className="min-w-0 flex-1">
                   <h1 className="text-xs font-bold text-white truncate">IamBillBoard</h1>
-                  <p className="text-[10px] text-pink-400 font-medium">Admin</p>
+                  <p className="text-[10px] text-pink-400 font-medium">
+                    {currentUser?.role === 'admin' ? 'Admin' : 'Campaign Manager'}
+                  </p>
                 </div>
               </div>
               <div className="flex-shrink-0">
@@ -1050,21 +1052,31 @@ function Admin() {
                 />
                 <div>
                   <h1 className="text-2xl lg:text-4xl font-black text-white mb-1 lg:mb-2">
-                    IamBillBoard <span className="gradient-text">Admin Panel</span>
+                    IamBillBoard <span className="gradient-text">
+                      {currentUser?.role === 'admin' ? 'Admin Panel' : 'Campaign Manager'}
+                    </span>
                   </h1>
-                  <p className="text-sm text-gray-300">Manage campaigns, pricing, and website settings</p>
+                  <p className="text-sm text-gray-300">
+                    {currentUser?.role === 'admin' 
+                      ? 'Manage campaigns, pricing, and website settings'
+                      : 'Manage and review campaign requests'
+                    }
+                  </p>
                 </div>
               </div>
               <div className="flex items-center space-x-4">
-                <a 
-                  href="/dashboard" 
-                  className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z"></path>
-                  </svg>
-                  <span>Dashboard</span>
-                </a>
+                {/* Hide Dashboard button for campaigns role */}
+                {currentUser?.role === 'admin' && (
+                  <a 
+                    href="/dashboard" 
+                    className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z"></path>
+                    </svg>
+                    <span>Dashboard</span>
+                  </a>
+                )}
                 <a 
                   href="/" 
                   className="bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2"
