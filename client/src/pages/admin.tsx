@@ -101,6 +101,19 @@ function Admin() {
     isActive: true
   });
 
+  // Get current user from session for role-based access
+  const { data: currentUser } = useQuery({
+    queryKey: ['/api/current-user'],
+    retry: false,
+  });
+
+  // Set default tab for campaign managers to campaigns only
+  useEffect(() => {
+    if (currentUser?.role === 'campaign_manager') {
+      setActiveTab("campaigns");
+    }
+  }, [currentUser]);
+
   // Campaign Management State
   const [showCampaignModal, setShowCampaignModal] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
@@ -1038,25 +1051,28 @@ function Admin() {
         {/* Navigation Tabs - Mobile Responsive */}
         <div className="mb-4 sm:mb-6">
           <div className="bg-gray-800/50 backdrop-blur-sm p-2 rounded-xl border border-gray-700/50">
-            {/* Mobile Grid Layout - All Tabs */}
+            {/* Mobile Grid Layout - Role Based Tabs */}
             <div className="grid grid-cols-5 sm:hidden gap-1">
               {[
-                { id: "campaigns", label: "Campaigns", icon: "📋", shortLabel: "Campaigns" },
-                { id: "contacts", label: "Contact Messages", icon: "📞", shortLabel: "Contact" },
-                { id: "users", label: "Users Management", icon: "👥", shortLabel: "Users" },
-                { id: "pricing", label: "Price Management", icon: "💰", shortLabel: "Price" },
-                { id: "website-editor", label: "Website Editor", icon: "🌐", shortLabel: "Website" },
-                { id: "logo-manager", label: "Logo Manager", icon: "🖼️", shortLabel: "Logo" },
-                { id: "bottles", label: "Bottle Samples", icon: "🍼", shortLabel: "Bottles" },
-                { id: "admin-settings", label: "Admin Settings", icon: "⚙️", shortLabel: "Settings" },
-                { id: "activity", label: "Activity Logs", icon: "📊", shortLabel: "Activity" },
-                { id: "design-samples", label: "Design Samples", icon: "🎨", shortLabel: "Designs" },
-                { id: "revenue", label: "Revenue & Transactions", icon: "💰", shortLabel: "Revenue" },
-                { id: "payment-accounts", label: "Payment Accounts", icon: "🏦", shortLabel: "Accounts" },
-                { id: "payment-gateways", label: "Payment Gateways", icon: "💳", shortLabel: "Gateway" },
-                { id: "site-visitors", label: "Site Visitors", icon: "👥", shortLabel: "Visitors" },
-                { id: "email", label: "Email Setup", icon: "📧", shortLabel: "Email" },
-              ].map((tab) => (
+                // Campaigns tab - available for both admin and campaign_manager
+                { id: "campaigns", label: "Campaigns", icon: "📋", shortLabel: "Campaigns", roles: ["admin", "campaign_manager"] },
+                
+                // Admin-only tabs
+                { id: "contacts", label: "Contact Messages", icon: "📞", shortLabel: "Contact", roles: ["admin"] },
+                { id: "users", label: "Users Management", icon: "👥", shortLabel: "Users", roles: ["admin"] },
+                { id: "pricing", label: "Price Management", icon: "💰", shortLabel: "Price", roles: ["admin"] },
+                { id: "website-editor", label: "Website Editor", icon: "🌐", shortLabel: "Website", roles: ["admin"] },
+                { id: "logo-manager", label: "Logo Manager", icon: "🖼️", shortLabel: "Logo", roles: ["admin"] },
+                { id: "bottles", label: "Bottle Samples", icon: "🍼", shortLabel: "Bottles", roles: ["admin"] },
+                { id: "admin-settings", label: "Admin Settings", icon: "⚙️", shortLabel: "Settings", roles: ["admin"] },
+                { id: "activity", label: "Activity Logs", icon: "📊", shortLabel: "Activity", roles: ["admin"] },
+                { id: "design-samples", label: "Design Samples", icon: "🎨", shortLabel: "Designs", roles: ["admin"] },
+                { id: "revenue", label: "Revenue & Transactions", icon: "💰", shortLabel: "Revenue", roles: ["admin"] },
+                { id: "payment-accounts", label: "Payment Accounts", icon: "🏦", shortLabel: "Accounts", roles: ["admin"] },
+                { id: "payment-gateways", label: "Payment Gateways", icon: "💳", shortLabel: "Gateway", roles: ["admin"] },
+                { id: "site-visitors", label: "Site Visitors", icon: "👥", shortLabel: "Visitors", roles: ["admin"] },
+                { id: "email", label: "Email Setup", icon: "📧", shortLabel: "Email", roles: ["admin"] },
+              ].filter(tab => !currentUser?.role || tab.roles.includes(currentUser.role)).map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
@@ -1075,25 +1091,28 @@ function Admin() {
               ))}
             </div>
 
-            {/* Desktop Horizontal Layout */}
+            {/* Desktop Horizontal Layout - Role Based */}
             <div className="hidden sm:flex overflow-x-auto scrollbar-hide gap-2 py-1">
               {[
-                { id: "website-editor", label: "Website Editor", icon: "🌐" },
-                { id: "logo-manager", label: "Logo Manager", icon: "🖼️" },
-                { id: "campaigns", label: "Campaigns", icon: "📋" },
-                { id: "contacts", label: "Contact Messages", icon: "📞" },
-                { id: "users", label: "Users Management", icon: "👥" },
-                { id: "activity", label: "Activity Logs", icon: "📊" },
-                { id: "pricing", label: "Price Management", icon: "💰" },
-                { id: "bottles", label: "Bottle Samples", icon: "🍼" },
-                { id: "design-samples", label: "Design Samples", icon: "🎨" },
-                { id: "revenue", label: "Revenue & Transactions", icon: "💰" },
-                { id: "payment-accounts", label: "Payment Accounts", icon: "🏦" },
-                { id: "payment-gateways", label: "Payment Gateways", icon: "💳" },
-                { id: "site-visitors", label: "Site Visitors", icon: "👥" },
-                { id: "email", label: "Email Setup", icon: "📧" },
-                { id: "admin-settings", label: "Admin Settings", icon: "⚙️" },
-              ].map((tab) => (
+                // Campaigns tab - available for both admin and campaign_manager
+                { id: "campaigns", label: "Campaigns", icon: "📋", roles: ["admin", "campaign_manager"] },
+                
+                // Admin-only tabs
+                { id: "website-editor", label: "Website Editor", icon: "🌐", roles: ["admin"] },
+                { id: "logo-manager", label: "Logo Manager", icon: "🖼️", roles: ["admin"] },
+                { id: "contacts", label: "Contact Messages", icon: "📞", roles: ["admin"] },
+                { id: "users", label: "Users Management", icon: "👥", roles: ["admin"] },
+                { id: "activity", label: "Activity Logs", icon: "📊", roles: ["admin"] },
+                { id: "pricing", label: "Price Management", icon: "💰", roles: ["admin"] },
+                { id: "bottles", label: "Bottle Samples", icon: "🍼", roles: ["admin"] },
+                { id: "design-samples", label: "Design Samples", icon: "🎨", roles: ["admin"] },
+                { id: "revenue", label: "Revenue & Transactions", icon: "💰", roles: ["admin"] },
+                { id: "payment-accounts", label: "Payment Accounts", icon: "🏦", roles: ["admin"] },
+                { id: "payment-gateways", label: "Payment Gateways", icon: "💳", roles: ["admin"] },
+                { id: "site-visitors", label: "Site Visitors", icon: "👥", roles: ["admin"] },
+                { id: "email", label: "Email Setup", icon: "📧", roles: ["admin"] },
+                { id: "admin-settings", label: "Admin Settings", icon: "⚙️", roles: ["admin"] },
+              ].filter(tab => !currentUser?.role || tab.roles.includes(currentUser.role)).map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
