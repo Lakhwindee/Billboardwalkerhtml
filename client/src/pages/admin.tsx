@@ -1058,7 +1058,7 @@ function Admin() {
         <div className="mb-4 sm:mb-6">
           <div className="bg-gray-800/50 backdrop-blur-sm p-2 rounded-xl border border-gray-700/50">
             {/* Mobile Grid Layout - Role Based Tabs */}
-            <div className={`grid ${currentUser?.role === 'campaign_manager' ? 'grid-cols-1' : 'grid-cols-5'} sm:hidden gap-1`}>
+            <div className="grid grid-cols-5 sm:hidden gap-1">
               {[
                 // Campaigns tab - available for both admin and campaign_manager
                 { id: "campaigns", label: "Campaigns", icon: "📋", shortLabel: "Campaigns", roles: ["admin", "campaign_manager"] },
@@ -1078,7 +1078,7 @@ function Admin() {
                 { id: "payment-gateways", label: "Payment Gateways", icon: "💳", shortLabel: "Gateway", roles: ["admin"] },
                 { id: "site-visitors", label: "Site Visitors", icon: "👥", shortLabel: "Visitors", roles: ["admin"] },
                 { id: "email", label: "Email Setup", icon: "📧", shortLabel: "Email", roles: ["admin"] },
-              ].filter(tab => currentUser?.role && tab.roles.includes(currentUser.role)).map((tab) => (
+              ].filter(tab => !currentUser?.role || tab.roles.includes(currentUser.role)).map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
@@ -1118,7 +1118,7 @@ function Admin() {
                 { id: "site-visitors", label: "Site Visitors", icon: "👥", roles: ["admin"] },
                 { id: "email", label: "Email Setup", icon: "📧", roles: ["admin"] },
                 { id: "admin-settings", label: currentUser?.role === 'admin' ? "Admin Settings" : "Account Settings", icon: "⚙️", roles: ["admin", "campaign_manager"] },
-              ].filter(tab => currentUser?.role && tab.roles.includes(currentUser.role)).map((tab) => (
+              ].filter(tab => !currentUser?.role || tab.roles.includes(currentUser.role)).map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
