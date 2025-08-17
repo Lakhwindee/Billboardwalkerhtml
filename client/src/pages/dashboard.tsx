@@ -164,8 +164,8 @@ function CampaignStudioContent() {
                           <p className="text-gray-500 text-sm mt-1">Submitted: {new Date(campaign.submittedAt).toLocaleDateString()}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-2xl font-bold text-gray-900">₹{campaign.totalAmount.toLocaleString()}</p>
-                          <p className="text-sm text-gray-500">{campaign.paymentMethod}</p>
+                          <p className="text-2xl font-bold text-gray-900">₹{(campaign.totalAmount || 0).toLocaleString()}</p>
+                          <p className="text-sm text-gray-500">{campaign.paymentMethod || 'Not specified'}</p>
                         </div>
                       </div>
                       
@@ -215,8 +215,8 @@ function CampaignStudioContent() {
                             <p className="text-gray-500 text-sm mt-1">Approved: {new Date(campaign.submittedAt).toLocaleDateString()}</p>
                           </div>
                           <div className="text-right">
-                            <p className="text-2xl font-bold text-gray-900">₹{campaign.totalAmount.toLocaleString()}</p>
-                            <p className="text-sm text-gray-500">{campaign.paymentMethod}</p>
+                            <p className="text-2xl font-bold text-gray-900">₹{(campaign.totalAmount || 0).toLocaleString()}</p>
+                            <p className="text-sm text-gray-500">{campaign.paymentMethod || 'Not specified'}</p>
                           </div>
                         </div>
                         
@@ -332,8 +332,8 @@ function CampaignStudioContent() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-gray-900">₹{selectedCampaign.totalAmount.toLocaleString()}</p>
-                    <p className="text-sm text-gray-500">{selectedCampaign.paymentMethod}</p>
+                    <p className="text-2xl font-bold text-gray-900">₹{(selectedCampaign.totalAmount || 0).toLocaleString()}</p>
+                    <p className="text-sm text-gray-500">{selectedCampaign.paymentMethod || 'Not specified'}</p>
                   </div>
                 </div>
 
@@ -361,7 +361,7 @@ function CampaignStudioContent() {
                       <div>
                         <h5 className="font-semibold text-orange-900 mb-1">Refund Processing</h5>
                         <p className="text-orange-800 text-sm">
-                          Your campaign has been rejected. A full refund of ₹{selectedCampaign.totalAmount.toLocaleString()} will be processed within 1-6 business days to your original payment method ({selectedCampaign.paymentMethod}).
+                          Your campaign has been rejected. A full refund of ₹{(selectedCampaign.totalAmount || 0).toLocaleString()} will be processed within 1-6 business days to your original payment method ({selectedCampaign.paymentMethod || 'your payment method'}).
                         </p>
                       </div>
                     </div>
