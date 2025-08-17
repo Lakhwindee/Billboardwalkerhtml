@@ -286,6 +286,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         role: user.role
       };
       
+      // Save session explicitly
+      await new Promise((resolve, reject) => {
+        req.session.save((err: any) => {
+          if (err) reject(err);
+          else resolve(true);
+        });
+      });
+      
       res.json({ 
         message: 'Login successful',
         user: {

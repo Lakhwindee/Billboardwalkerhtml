@@ -108,17 +108,34 @@ function Admin() {
   });
 
   // Get current user from session for role-based access
-  const { data: currentUser } = useQuery({
+  const { data: currentUser, isLoading: userLoading } = useQuery({
     queryKey: ['/api/current-user'],
     retry: false,
   });
 
-  // Set default tab for campaign managers to campaigns only
-  useEffect(() => {
-    if (currentUser?.role === 'campaign_manager') {
-      setActiveTab("campaigns");
-    }
-  }, [currentUser]);
+  // Block campaign manager from accessing admin panel
+  if (userLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-red-900 flex items-center justify-center">
+        <div className="text-white text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (currentUser && currentUser.role === 'campaign_manager') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-red-900 flex items-center justify-center">
+        <div className="text-center text-white">
+          <div className="text-6xl mb-4">🚫</div>
+          <h1 className="text-3xl font-bold mb-2">Access Denied</h1>
+          <p className="text-gray-300 mb-6">Campaign managers cannot access the admin panel.</p>
+          <Link href="/dashboard" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg">
+            Go to Campaign Studio
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   // Campaign Management State
   const [showCampaignModal, setShowCampaignModal] = useState(false);

@@ -408,8 +408,14 @@ function CampaignStudioOnly() {
           </div>
         </div>
 
-        {/* Campaign Studio Content Only */}
-        <CampaignStudioContent />
+        {/* Campaign Studio Content Only - No other tabs accessible */}
+        <div className="bg-gray-900/50 rounded-xl p-6">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-semibold text-white mb-2">📊 Campaign Tracking Dashboard</h2>
+            <p className="text-gray-300">Monitor and track your advertising campaigns</p>
+          </div>
+          <CampaignStudioContent />
+        </div>
       </div>
     </div>
   );
