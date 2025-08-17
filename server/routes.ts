@@ -901,6 +901,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Change Campaign Manager Password Route
+  app.post("/api/change-campaign-password", async (req, res) => {
+    try {
+      const { newPassword } = req.body;
+      
+      // Validate input
+      if (!newPassword) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'New password is required' 
+        });
+      }
+      
+      if (newPassword.length < 6) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'New password must be at least 6 characters long' 
+        });
+      }
+      
+      // Get campaigns user from database
+      const campaignsUser = await storage.getUserByUsername('campaigns');
+      if (!campaignsUser) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Campaign Manager user not found' 
+        });
+      }
+      
+      // Hash new password
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+      
+      // Update password in database
+      await storage.updateUserPassword(campaignsUser.id, hashedNewPassword);
+      
+      console.log(`🔑 Campaign Manager password updated by admin`);
+      
+      res.json({ 
+        success: true, 
+        message: 'Campaign Manager password changed successfully' 
+      });
+      
+    } catch (error: any) {
+      console.error('Campaign password change error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Failed to change Campaign Manager password' 
+      });
+    }
+  });
+
   // Contact routes
   app.post("/api/contacts", async (req, res) => {
     try {

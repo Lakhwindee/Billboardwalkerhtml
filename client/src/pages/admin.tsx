@@ -85,6 +85,13 @@ function Admin() {
   });
   const [changingPassword, setChangingPassword] = useState(false);
 
+  // Campaign Manager Password Settings State
+  const [campaignPasswordSettings, setCampaignPasswordSettings] = useState({
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [changingCampaignPassword, setChangingCampaignPassword] = useState(false);
+
   // Payment Management State
   const [showPaymentAccountModal, setShowPaymentAccountModal] = useState(false);
   const [showTransactionModal, setShowTransactionModal] = useState(false);
@@ -477,6 +484,46 @@ function Admin() {
       alert('पासवर्ड बदलने में त्रुटि हुई है!');
     } finally {
       setChangingPassword(false);
+    }
+  };
+
+  const handleChangeCampaignPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setChangingCampaignPassword(true);
+    
+    try {
+      if (campaignPasswordSettings.newPassword !== campaignPasswordSettings.confirmPassword) {
+        alert('नया पासवर्ड और पुष्टि पासवर्ड मेल नहीं खाते!');
+        return;
+      }
+      
+      if (campaignPasswordSettings.newPassword.length < 6) {
+        alert('नया पासवर्ड कम से कम 6 अक्षर का होना चाहिए!');
+        return;
+      }
+      
+      // Send password change request to backend for campaigns user
+      const response = await apiRequest('/api/change-campaign-password', {
+        method: 'POST',
+        body: {
+          newPassword: campaignPasswordSettings.newPassword
+        }
+      });
+      
+      if (response.success) {
+        alert('Campaign Manager का पासवर्ड सफलतापूर्वक बदल दिया गया है!');
+        setCampaignPasswordSettings({
+          newPassword: '',
+          confirmPassword: ''
+        });
+      } else {
+        alert(response.message || 'Campaign Manager पासवर्ड बदलने में त्रुटि हुई है!');
+      }
+    } catch (error) {
+      console.error('Campaign password change error:', error);
+      alert('Campaign Manager पासवर्ड बदलने में त्रुटि हुई है!');
+    } finally {
+      setChangingCampaignPassword(false);
     }
   };
 
@@ -3615,6 +3662,75 @@ function Admin() {
                     <li>Use a strong combination of letters, numbers, and symbols</li>
                     <li>Don't share your admin credentials with anyone</li>
                     <li>Change password regularly for better security</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Campaign Manager Password Change Section */}
+            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+              <div className="text-center py-4">
+                <div className="text-6xl mb-4">👤</div>
+                <div className="flex items-center justify-center mb-4">
+                  <h3 className="text-2xl font-bold text-white">Change Campaign Manager Password</h3>
+                </div>
+                <p className="text-gray-300 mb-6">
+                  Update the password for campaigns user account (campaigns/campaigns123)
+                </p>
+                
+                {/* Campaign Manager Password Change Form */}
+                <form onSubmit={handleChangeCampaignPassword} className="space-y-4 max-w-md mx-auto">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      New Password for Campaign Manager / Campaign Manager का नया पासवर्ड
+                    </label>
+                    <input
+                      type="password"
+                      value={campaignPasswordSettings.newPassword}
+                      onChange={(e) => setCampaignPasswordSettings(prev => ({
+                        ...prev,
+                        newPassword: e.target.value
+                      }))}
+                      placeholder="Enter new password for campaigns user (minimum 6 characters)"
+                      className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Confirm Password / पासवर्ड की पुष्टि करें
+                    </label>
+                    <input
+                      type="password"
+                      value={campaignPasswordSettings.confirmPassword}
+                      onChange={(e) => setCampaignPasswordSettings(prev => ({
+                        ...prev,
+                        confirmPassword: e.target.value
+                      }))}
+                      placeholder="Confirm new password"
+                      className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+                  
+                  <button
+                    type="submit"
+                    disabled={changingCampaignPassword}
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-green-700 hover:to-emerald-700 focus:ring-4 focus:ring-green-500/50 transition-all duration-200 disabled:opacity-50"
+                  >
+                    {changingCampaignPassword ? 'Changing Password...' : 'Update Campaign Manager Password / पासवर्ड बदलें'}
+                  </button>
+                </form>
+                
+                {/* Campaign Manager Info */}
+                <div className="mt-8 p-4 bg-green-500/20 rounded-lg border border-green-500/30 text-left">
+                  <h5 className="text-green-300 font-semibold mb-2">👤 Campaign Manager Account Info</h5>
+                  <ul className="list-disc list-inside space-y-1 text-sm text-gray-300">
+                    <li>Username: campaigns</li>
+                    <li>Role: Campaign Manager (Limited Access)</li>
+                    <li>Access: Only campaigns management tab</li>
+                    <li>Password must be at least 6 characters long</li>
                   </ul>
                 </div>
               </div>
