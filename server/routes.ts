@@ -251,8 +251,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Verify password
-      const isValid = await bcrypt.compare(password, user.password);
+      // Verify password - handle both hashed and plain text for testing
+      let isValid = false;
+      
+      // Check if password is already hashed (starts with $2b$)
+      if (user.password.startsWith('$2b$')) {
+        isValid = await bcrypt.compare(password, user.password);
+      } else {
+        // For testing - compare plain text
+        isValid = password === user.password;
+        
+        // If valid, hash the password and update it in database
+        if (isValid) {
+          const hashedPassword = await bcrypt.hash(password, 10);
+          await storage.updateUserPassword(user.id, hashedPassword);
+          console.log('✅ Password hashed and updated for user:', username);
+        }
+      }
+      
       if (!isValid) {
         console.log('Password verification failed for user:', username);
         return res.status(401).json({ 
