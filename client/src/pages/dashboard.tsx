@@ -2,8 +2,9 @@ import { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Link } from 'wouter';
 import { Eye, Clock, CheckCircle2, XCircle, Package, AlertCircle, Truck, Star } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { validateFile, formatFileSize, A3_INFO } from '@/lib/fileValidation';
+import { apiRequest } from '@/lib/queryClient';
 
 // Campaign Tracking Component
 function CampaignStudioContent() {
@@ -382,6 +383,28 @@ export default function Dashboard() {
     queryKey: ['/api/current-user'],
     retry: false,
   });
+
+  const queryClient = useQueryClient();
+
+  const logoutMutation = useMutation({
+    mutationFn: () => apiRequest('/api/auth/logout', {
+      method: 'POST',
+    }),
+    onSuccess: () => {
+      // Clear all cached data and redirect to home
+      queryClient.clear();
+      window.location.href = '/';
+    },
+    onError: (error) => {
+      console.error('Logout error:', error);
+      // Force redirect even if logout API fails
+      window.location.href = '/';
+    }
+  });
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
   
   // Dashboard tab state
   const [dashboardTab, setDashboardTab] = useState('design');
@@ -669,21 +692,23 @@ export default function Dashboard() {
                   </button>
                 </Link>
               )}
+
+              {/* User Info and Logout */}
+              {currentUser && (
+                <div className="flex items-center space-x-3 pl-4 border-l border-gray-300">
+                  <span className="text-sm text-gray-600">Welcome, {currentUser.username}!</span>
+                  <button
+                    onClick={handleLogout}
+                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg font-medium transition-colors text-sm flex items-center space-x-1"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                    <span>Logout</span>
+                  </button>
+                </div>
+              )}
               
-              {/* User info display */}
-              <div className="flex items-center space-x-3">
-                <div className="text-right">
-                  <div className="text-sm font-medium text-gray-900">
-                    {currentUser?.username || 'User'}
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    {currentUser?.role === 'admin' ? 'Admin' : 'Customer'}
-                  </div>
-                </div>
-                <div className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-xl font-medium text-sm">
-                  Dashboard
-                </div>
-              </div>
             </div>
 
             {/* Mobile Navigation */}
@@ -701,6 +726,17 @@ export default function Dashboard() {
                     ⚙️
                   </button>
                 </Link>
+              )}
+              
+              {/* Mobile logout button */}
+              {currentUser && (
+                <button
+                  onClick={handleLogout}
+                  className="p-1.5 text-red-600 hover:text-red-800 transition-colors" 
+                  title="Logout"
+                >
+                  🚪
+                </button>
               )}
               
               {/* Mobile user info */}

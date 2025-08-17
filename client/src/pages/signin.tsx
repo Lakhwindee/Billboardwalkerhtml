@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
 const signinSchema = z.object({
@@ -24,6 +24,7 @@ export default function SigninPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const form = useForm<SigninForm>({
     resolver: zodResolver(signinSchema),
@@ -90,6 +91,10 @@ export default function SigninPage() {
     },
     onSuccess: (data) => {
       setError("");
+      
+      // Invalidate current user query to refresh authentication state
+      queryClient.invalidateQueries({ queryKey: ['/api/current-user'] });
+      
       toast({
         title: "Welcome back!",
         description: "Successfully signed in to IamBillBoard",
