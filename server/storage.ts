@@ -1,6 +1,6 @@
 import { 
   users, contacts, orders, campaigns, priceSettings, siteSettings, homeImages, bottleSamples, designSamples,
-  userActivityLogs, userProfiles, orderCampaigns, emailVerifications, phoneOtps, passwordResetOtps, paymentAccounts, transactions, paymentSettings, paymentGatewaySettings, logoSettings, sessions, siteVisitors,
+  userActivityLogs, userProfiles, orderCampaigns, emailVerifications, phoneOtps, passwordResetOtps, paymentAccounts, transactions, paymentSettings, paymentGatewaySettings, logoSettings, sessions, siteVisitors, notifications,
   type User, type InsertUser, 
   type Contact, type InsertContact, 
   type Order, type InsertOrder,
@@ -20,7 +20,8 @@ import {
   type PaymentSetting, type InsertPaymentSetting,
   type PaymentGatewaySetting, type InsertPaymentGatewaySetting,
   type LogoSetting, type InsertLogoSetting,
-  type SiteVisitor, type InsertSiteVisitor
+  type SiteVisitor, type InsertSiteVisitor,
+  type Notification, type InsertNotification
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, desc } from "drizzle-orm";
@@ -166,6 +167,14 @@ export interface IStorage {
     totalVisitorsThisMonth: number;
   }>;
   updateUserPassword(userId: number, hashedPassword: string): Promise<void>;
+  
+  // Notification methods
+  getNotifications(userId: number): Promise<Notification[]>;
+  getUnreadNotifications(userId: number): Promise<Notification[]>;
+  createNotification(notification: InsertNotification): Promise<Notification>;
+  markNotificationAsRead(id: number): Promise<void>;
+  markAllNotificationsAsRead(userId: number): Promise<void>;
+  deleteNotification(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -866,6 +875,42 @@ export class DatabaseStorage implements IStorage {
       totalVisitorsThisWeek: weekVisitors[0]?.count || 0,
       totalVisitorsThisMonth: monthVisitors[0]?.count || 0,
     };
+  }
+
+  // Notification methods
+  async getNotifications(userId: number): Promise<Notification[]> {
+    return await db.select()
+      .from(notifications)
+      .where(eq(notifications.userId, userId))
+      .orderBy(desc(notifications.createdAt));
+  }
+
+  async getUnreadNotifications(userId: number): Promise<Notification[]> {
+    return await db.select()
+      .from(notifications)
+      .where(sql`user_id = ${userId} AND is_read = false`)
+      .orderBy(desc(notifications.createdAt));
+  }
+
+  async createNotification(notification: InsertNotification): Promise<Notification> {
+    const [newNotification] = await db.insert(notifications).values(notification).returning();
+    return newNotification;
+  }
+
+  async markNotificationAsRead(id: number): Promise<void> {
+    await db.update(notifications)
+      .set({ isRead: true, readAt: new Date() })
+      .where(eq(notifications.id, id));
+  }
+
+  async markAllNotificationsAsRead(userId: number): Promise<void> {
+    await db.update(notifications)
+      .set({ isRead: true, readAt: new Date() })
+      .where(eq(notifications.userId, userId));
+  }
+
+  async deleteNotification(id: number): Promise<void> {
+    await db.delete(notifications).where(eq(notifications.id, id));
   }
 }
 

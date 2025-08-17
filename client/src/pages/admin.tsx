@@ -547,9 +547,9 @@ function Admin() {
   // Design reupload mutation
   const requestReuploadMutation = useMutation({
     mutationFn: async ({ id, feedback, rejectionReason }: { id: number; feedback: string; rejectionReason: string }) => {
-      return apiRequest("POST", `/api/campaigns/${id}/request-design-reupload`, { 
-        feedback, 
-        rejectionReason
+      return apiRequest("PATCH", `/api/campaigns/${id}/request-reupload`, { 
+        designFeedback: feedback, 
+        designRejectionReason: rejectionReason
       });
     },
     onSuccess: () => {
@@ -560,7 +560,7 @@ function Admin() {
       setReuploadReason('');
       toast({
         title: "Success",
-        description: "Design reupload request sent to user with email notification",
+        description: "Design reupload request sent successfully. User has been notified via email, SMS and in-app notification.",
       });
     },
     onError: (error: any) => {

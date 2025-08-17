@@ -292,6 +292,28 @@ If you didn't request this, please ignore this message.
       message
     });
   }
+
+  // Design reupload request SMS
+  async sendDesignReuploadSMS(userPhone: string, campaignData: any): Promise<boolean> {
+    const message = `🎨 Design Update Required
+
+Campaign ID: ${campaignData.campaignId}
+Status: Design Reupload Needed
+
+Admin Feedback: ${campaignData.designFeedback || 'Please upload an improved design'}
+
+Action Required:
+• Upload revised design
+• Address feedback points
+• Ensure high-resolution files
+
+Upload Now: ${campaignData.actionUrl || process.env.FRONTEND_URL + '/dashboard?tab=campaigns'}
+
+Questions? support@iambillboard.com
+- IamBillBoard Team`;
+
+    return await this.sendSMS({ to: userPhone, message });
+  }
 }
 
 export const smsService = new SMSService();

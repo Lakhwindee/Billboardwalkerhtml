@@ -1269,6 +1269,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Design reupload request endpoint for admin
+  app.patch("/api/campaigns/:id/request-reupload", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { designFeedback, designRejectionReason } = req.body;
+      
+      if (!designFeedback?.trim()) {
+        return res.status(400).json({ error: 'Design feedback is required' });
+      }
+      
+      // Update campaign with reupload requirements
+      const updateData = {
+        reuploadRequired: true,
+        designFeedback: designFeedback.trim(),
+        designRejectionReason: designRejectionReason?.trim() || '',
+        status: 'pending' // Reset to pending for reupload
+      };
+      
+      const campaign = await storage.updateCampaign(id, updateData);
+      
+      if (!campaign) {
+        return res.status(404).json({ error: 'Campaign not found' });
+      }
+      
+      // Create in-app notification for user
+      if (campaign.userId) {
+        try {
+          const notificationData = {
+            userId: campaign.userId,
+            title: 'Design Reupload Required',
+            message: `Your design for campaign "${campaign.title}" needs to be reuploaded. Admin feedback: ${designFeedback}`,
+            type: 'design_reupload',
+            actionUrl: `/dashboard?tab=campaigns&campaign=${campaign.id}`,
+            priority: 'high'
+          };
+          
+          await storage.createNotification(notificationData);
+          console.log(`Design reupload notification created for user ${campaign.userId}`);
+          
+          // Send email and SMS notifications
+          const user = await storage.getUser(campaign.userId);
+          if (user && user.email) {
+            const campaignEmailData = {
+              campaignId: `CAMP-${campaign.id}`,
+              customerName: user.username,
+              bottleType: campaign.bottleType || 'Standard Bottle',
+              quantity: campaign.quantity || 1000,
+              designFeedback: designFeedback,
+              designRejectionReason: designRejectionReason || '',
+              actionUrl: `${req.protocol}://${req.get('host')}/dashboard?tab=campaigns&campaign=${campaign.id}`
+            };
+            
+            // Get user's phone number for SMS
+            const userPhone = campaign.phone || user.phone;
+            
+            // Send email notification
+            try {
+              await emailService.sendDesignReuploadEmail(user.email, campaignEmailData);
+              console.log(`Design reupload email sent to ${user.email}`);
+            } catch (emailError) {
+              console.error('Failed to send design reupload email:', emailError);
+            }
+            
+            // Send SMS notification
+            if (userPhone) {
+              try {
+                await smsService.sendDesignReuploadSMS(userPhone, campaignEmailData);
+                console.log(`Design reupload SMS sent to ${userPhone}`);
+              } catch (smsError) {
+                console.error('Failed to send design reupload SMS:', smsError);
+              }
+            }
+          }
+        } catch (notificationError) {
+          console.error('Failed to create notification:', notificationError);
+        }
+      }
+      
+      res.json({ 
+        success: true, 
+        campaign,
+        message: 'Design reupload request sent successfully. User has been notified via email, SMS and in-app notification.' 
+      });
+      
+    } catch (error: any) {
+      console.error('Error requesting design reupload:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Campaign status update endpoint for admin
   app.patch("/api/campaigns/:id/status", async (req, res) => {
     try {
@@ -1389,6 +1479,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
     } catch (error: any) {
       console.error('Error updating campaign status:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Notification routes
+  app.get("/api/notifications", async (req, res) => {
+    try {
+      if (!req.session?.user?.id) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
+      
+      const notifications = await storage.getNotifications(req.session.user.id);
+      res.json(notifications);
+    } catch (error: any) {
+      console.error('Error fetching notifications:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/notifications/unread", async (req, res) => {
+    try {
+      if (!req.session?.user?.id) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
+      
+      const unreadNotifications = await storage.getUnreadNotifications(req.session.user.id);
+      res.json(unreadNotifications);
+    } catch (error: any) {
+      console.error('Error fetching unread notifications:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/notifications/:id/read", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.markNotificationAsRead(id);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('Error marking notification as read:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/notifications/mark-all-read", async (req, res) => {
+    try {
+      if (!req.session?.user?.id) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
+      
+      await storage.markAllNotificationsAsRead(req.session.user.id);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('Error marking all notifications as read:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/notifications/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteNotification(id);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('Error deleting notification:', error);
       res.status(500).json({ error: error.message });
     }
   });

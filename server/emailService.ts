@@ -465,6 +465,83 @@ class EmailService {
 
     return this.sendEmail({ to: email, subject, html });
   }
+
+  // Design reupload notification email
+  async sendDesignReuploadEmail(userEmail: string, campaignData: any): Promise<boolean> {
+    const subject = `🎨 Design Update Required - ${campaignData.campaignId}`;
+    
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #f97316 0%, #d97706 100%); color: white;">
+        <div style="padding: 40px 30px; text-align: center;">
+          <h1 style="margin: 0; font-size: 32px; font-weight: bold;">🎨 Design Update Needed</h1>
+          <p style="margin: 10px 0 0 0; font-size: 18px; opacity: 0.9;">Your Campaign Design Requires Attention</p>
+        </div>
+        
+        <div style="background: white; color: #333; padding: 30px; border-radius: 10px 10px 0 0;">
+          <h2 style="color: #f97316; margin: 0 0 20px 0;">Please Re-upload Your Design 🎨</h2>
+          
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+            Hi ${campaignData.customerName}, your recent design submission for campaign <strong>${campaignData.campaignId}</strong> needs to be updated.
+          </p>
+          
+          ${campaignData.designFeedback ? `
+          <div style="background: #fff7ed; padding: 20px; border-radius: 8px; border-left: 4px solid #f97316; margin: 20px 0;">
+            <h3 style="margin: 0 0 15px 0; color: #f97316;">📝 Feedback from Our Team</h3>
+            <p style="margin: 0; font-size: 16px; line-height: 1.6;">${campaignData.designFeedback}</p>
+          </div>
+          ` : ''}
+          
+          ${campaignData.designRejectionReason ? `
+          <div style="background: #fef2f2; padding: 20px; border-radius: 8px; border-left: 4px solid #ef4444; margin: 20px 0;">
+            <h3 style="margin: 0 0 15px 0; color: #ef4444;">⚠️ Additional Notes</h3>
+            <p style="margin: 0; font-size: 16px; line-height: 1.6;">${campaignData.designRejectionReason}</p>
+          </div>
+          ` : ''}
+          
+          <div style="background: #fffafb; padding: 20px; border-radius: 8px; border-left: 4px solid #f43f5e; margin: 20px 0;">
+            <h3 style="margin: 0 0 15px 0; color: #f43f5e;">🚀 Action Required</h3>
+            <p style="font-size: 16px; line-height: 1.6; margin: 0 0 15px 0;">Please upload a revised design that addresses the feedback above:</p>
+            <ul style="margin: 0; padding-left: 20px; line-height: 1.8; color: #7f1d1d;">
+              <li>Ensure all logos and text are high-resolution (300 DPI minimum)</li>
+              <li>Check color contrast for readability</li>
+              <li>Confirm design elements fit within the bottle label dimensions</li>
+              <li>Review spelling and grammar in all text elements</li>
+            </ul>
+          </div>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <p style="margin: 0 0 15px 0; font-size: 16px;">Upload your updated design here:</p>
+            <a href="${campaignData.actionUrl || process.env.FRONTEND_URL + '/dashboard?tab=campaigns'}" 
+               style="display: inline-block; background: linear-gradient(135deg, #f97316 0%, #d97706 100%); 
+                      color: white; padding: 12px 25px; text-decoration: none; border-radius: 25px; 
+                      font-weight: bold; margin: 10px;">
+              Upload New Design ⬆️
+            </a>
+          </div>
+          
+          <div style="background: #f8f9ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="margin: 0 0 15px 0; color: #1e40af;">📋 Campaign Details</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr><td style="padding: 5px 0; font-weight: bold;">Campaign ID:</td><td style="padding: 5px 0;">${campaignData.campaignId}</td></tr>
+              <tr><td style="padding: 5px 0; font-weight: bold;">Bottle Type:</td><td style="padding: 5px 0;">${campaignData.bottleType}</td></tr>
+              <tr><td style="padding: 5px 0; font-weight: bold;">Quantity:</td><td style="padding: 5px 0;">${campaignData.quantity} bottles</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div style="background: #fef7f7; padding: 20px 30px; text-align: center; border-radius: 0 0 10px 10px;">
+          <p style="margin: 0; color: #7f1d1d; font-size: 14px;">
+            Questions? Reply to this email or contact us at <strong>support@iambillboard.com</strong>
+          </p>
+          <p style="margin: 10px 0 0 0; color: #fca5a5; font-size: 12px;">
+            © 2025 IamBillBoard. All rights reserved.
+          </p>
+        </div>
+      </div>
+    `;
+
+    return await this.sendEmail({ to: userEmail, subject, html });
+  }
 }
 
 export const emailService = new EmailService();

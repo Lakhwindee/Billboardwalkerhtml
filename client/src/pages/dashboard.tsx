@@ -5,6 +5,7 @@ import { Eye, Clock, CheckCircle2, XCircle, Package, AlertCircle, Truck, Star } 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { validateFile, formatFileSize, A3_INFO } from '@/lib/fileValidation';
 import { apiRequest } from '@/lib/queryClient';
+import { NotificationCenter } from '@/components/NotificationCenter';
 
 // Campaign Tracking Component
 function CampaignStudioContent() {
@@ -388,7 +389,7 @@ export default function Dashboard() {
 
   // Redirect campaigns role users to admin panel
   useEffect(() => {
-    if (currentUser?.role === 'campaigns' || currentUser?.role === 'campaign_manager') {
+    if ((currentUser as any)?.role === 'campaigns' || (currentUser as any)?.role === 'campaign_manager') {
       setLocation('/admin?tab=campaigns');
     }
   }, [currentUser, setLocation]);
@@ -396,9 +397,7 @@ export default function Dashboard() {
   const queryClient = useQueryClient();
 
   const logoutMutation = useMutation({
-    mutationFn: () => apiRequest('/api/auth/logout', {
-      method: 'POST',
-    }),
+    mutationFn: () => apiRequest('POST', '/api/auth/logout'),
     onSuccess: () => {
       // Clear all cached data and redirect to home
       queryClient.clear();
@@ -690,7 +689,7 @@ export default function Dashboard() {
               </Link>
               
               {/* Show Admin Panel button only for admin role */}
-              {currentUser?.role === 'admin' && (
+              {(currentUser as any)?.role === 'admin' && (
                 <Link href="/admin">
                   <button className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors flex items-center space-x-2">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -702,10 +701,11 @@ export default function Dashboard() {
                 </Link>
               )}
 
-              {/* User Info and Logout */}
+              {/* Notifications and User Info */}
               {currentUser && (
                 <div className="flex items-center space-x-3 pl-4 border-l border-gray-300">
-                  <span className="text-sm text-gray-600">Welcome, {currentUser.username}!</span>
+                  <NotificationCenter />
+                  <span className="text-sm text-gray-600">Welcome, {(currentUser as any)?.username}!</span>
                   <button
                     onClick={handleLogout}
                     className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg font-medium transition-colors text-sm flex items-center space-x-1"
@@ -722,6 +722,11 @@ export default function Dashboard() {
 
             {/* Mobile Navigation */}
             <div className="flex sm:hidden items-center space-x-1">
+              {/* Mobile notifications */}
+              {currentUser && (
+                <NotificationCenter />
+              )}
+              
               <Link href="/">
                 <button className="p-1.5 text-gray-600 hover:text-gray-800 transition-colors" title="Home">
                   🏠
@@ -729,7 +734,7 @@ export default function Dashboard() {
               </Link>
               
               {/* Show Admin Panel button only for admin role */}
-              {currentUser?.role === 'admin' && (
+              {(currentUser as any)?.role === 'admin' && (
                 <Link href="/admin">
                   <button className="p-1.5 text-gray-600 hover:text-gray-800 transition-colors" title="Admin">
                     ⚙️
@@ -751,7 +756,7 @@ export default function Dashboard() {
               {/* Mobile user info */}
               <div className="flex items-center space-x-2">
                 <div className="text-xs font-medium text-gray-900">
-                  {currentUser?.username || 'User'}
+                  {(currentUser as any)?.username || 'User'}
                 </div>
                 <div className="px-2 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg text-xs font-medium">
                   Dashboard
