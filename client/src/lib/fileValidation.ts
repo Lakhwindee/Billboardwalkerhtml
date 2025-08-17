@@ -24,7 +24,7 @@ export function getFileSizeError(file: File): string | null {
   if (!isFileSizeValid(file)) {
     const fileSize = formatFileSize(file.size);
     const maxSize = formatFileSize(A3_MAX_SIZE);
-    return `File बहुत बड़ी है! Size: ${fileSize}। कृपया A3 size (${maxSize}) से छोटी file upload करें।`;
+    return `File too large! Size: ${fileSize}. Please upload a file smaller than A3 size (${maxSize}).`;
   }
   return null;
 }
@@ -38,7 +38,7 @@ export function isFileTypeValid(file: File): boolean {
 // Get file type validation error message
 export function getFileTypeError(file: File): string | null {
   if (!isFileTypeValid(file)) {
-    return 'केवल image files की अनुमति है! (JPEG, PNG, GIF, WebP)';
+    return 'Only image files are allowed! (JPEG, PNG, GIF, WebP)';
   }
   return null;
 }

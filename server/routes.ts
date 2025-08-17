@@ -83,14 +83,14 @@ const upload = multer({
     
     if (!mimetype || !extname) {
       console.log(`❌ Invalid file type: ${file.mimetype}`);
-      return cb(new Error('केवल image files की अनुमति है! (JPEG, PNG, GIF, WebP)'));
+      return cb(new Error('Only image files are allowed! (JPEG, PNG, GIF, WebP)'));
     }
     
     // Additional size check with user-friendly message
     if (file.size && file.size > A3_MAX_SIZE) {
       const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
       console.log(`❌ File too large: ${fileSizeMB}MB (limit: 15MB)`);
-      return cb(new Error(`File बहुत बड़ी है! Size: ${fileSizeMB}MB। कृपया A3 size (15MB) से छोटी file upload करें।`));
+      return cb(new Error(`File too large! Size: ${fileSizeMB}MB. Please upload a file smaller than A3 size (15MB).`));
     }
     
     console.log(`✅ File accepted: ${file.originalname}`);
@@ -1610,14 +1610,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!file.mimetype.startsWith('image/')) {
         console.log(`❌ Invalid bottle sample file type: ${file.mimetype}`);
-        return cb(new Error('केवल image files की अनुमति है! (JPEG, PNG, GIF, WebP)'));
+        return cb(new Error('Only image files are allowed! (JPEG, PNG, GIF, WebP)'));
       }
       
       // A3 size check for bottle samples
       if (file.size && file.size > A3_MAX_SIZE) {
         const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
         console.log(`❌ Bottle sample too large: ${fileSizeMB}MB (A3 limit: 15MB)`);
-        return cb(new Error(`Bottle sample बहुत बड़ी है! Size: ${fileSizeMB}MB। कृपया A3 size (15MB) से छोटी file upload करें।`));
+        return cb(new Error(`Bottle sample too large! Size: ${fileSizeMB}MB. Please upload a file smaller than A3 size (15MB).`));
       }
       
       console.log(`✅ Bottle sample accepted: ${file.originalname}`);

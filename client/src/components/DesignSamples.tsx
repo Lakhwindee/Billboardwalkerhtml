@@ -23,11 +23,11 @@ export default function DesignSamples() {
 
   // Category display names
   const categoryDisplayNames: { [key: string]: string } = {
-    all: "सभी डिज़ाइन",
-    business: "व्यावसायिक",
-    event: "कार्यक्रम", 
-    personal: "व्यक्तिगत",
-    brand: "ब्रांड"
+    all: "All Designs",
+    business: "Business",
+    event: "Events", 
+    personal: "Personal",
+    brand: "Brand"
   };
 
   return (
@@ -35,14 +35,14 @@ export default function DesignSamples() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <div className="inline-block bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-semibold mb-4">
-            ✨ डिज़ाइन प्रेरणा
+            ✨ Design Inspiration
           </div>
           <h2 className="text-4xl lg:text-5xl font-black text-gray-900 mb-6">
-            प्रमोशन डिज़ाइन <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">नमूने</span>
+            Promotion Design <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">Samples</span>
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            देखिए कि आपके प्रमोशन बोतलों पर कैसे दिखेंगे। यहाँ विभिन्न प्रकार के डिज़ाइन नमूने हैं जो आपको अपने 
-            ब्रांड के लिए सही विकल्प चुनने में मदद करेंगे।
+            See how your promotions will look on bottles. Here are various design samples that will help you 
+            choose the right option for your brand.
           </p>
         </div>
 
@@ -125,10 +125,10 @@ export default function DesignSamples() {
               <div className="text-center py-20">
                 <div className="text-gray-400 text-6xl mb-6">🎨</div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  कोई डिज़ाइन नमूने नहीं मिले
+                  No Design Samples Found
                 </h3>
                 <p className="text-gray-600 max-w-md mx-auto">
-                  इस श्रेणी में अभी तक कोई डिज़ाइन नमूने उपलब्ध नहीं हैं। कृपया अन्य श्रेणियां देखें।
+                  No design samples are available in this category yet. Please check other categories.
                 </p>
               </div>
             )}
@@ -140,17 +140,17 @@ export default function DesignSamples() {
           <div className="text-center">
             <div className="bg-white rounded-2xl p-8 shadow-lg inline-block">
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                अपना डिज़ाइन तैयार करने के लिए तैयार हैं?
+                Ready to Create Your Design?
               </h3>
               <p className="text-gray-600 mb-6 max-w-md">
-                इन नमूनों से प्रेरणा लेकर अपना अनूठा प्रमोशन डिज़ाइन बनाएं
+                Get inspired by these samples and create your unique promotion design
               </p>
               <a
                 href="#contact"
                 className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-4 rounded-full font-semibold hover:shadow-lg transition-all duration-300 inline-block transform hover:scale-105"
                 data-testid="button-start-creating"
               >
-                अभी शुरू करें 🚀
+                Start Now 🚀
               </a>
             </div>
           </div>

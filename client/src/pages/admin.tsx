@@ -451,12 +451,12 @@ function Admin() {
     
     try {
       if (adminSettings.newPassword !== adminSettings.confirmPassword) {
-        alert('नया पासवर्ड और पुष्टि पासवर्ड मेल नहीं खाते!');
+        alert('New password and confirm password do not match!');
         return;
       }
       
       if (adminSettings.newPassword.length < 6) {
-        alert('नया पासवर्ड कम से कम 6 अक्षर का होना चाहिए!');
+        alert('New password must be at least 6 characters long!');
         return;
       }
       
@@ -470,18 +470,18 @@ function Admin() {
       });
       
       if (response.success) {
-        alert('पासवर्ड सफलतापूर्वक बदल दिया गया है!');
+        alert('Password changed successfully!');
         setAdminSettings({
           currentPassword: '',
           newPassword: '',
           confirmPassword: ''
         });
       } else {
-        alert(response.message || 'पासवर्ड बदलने में त्रुटि हुई है!');
+        alert(response.message || 'Error changing password!');
       }
     } catch (error) {
       console.error('Password change error:', error);
-      alert('पासवर्ड बदलने में त्रुटि हुई है!');
+      alert('Error changing password!');
     } finally {
       setChangingPassword(false);
     }
@@ -493,12 +493,12 @@ function Admin() {
     
     try {
       if (campaignPasswordSettings.newPassword !== campaignPasswordSettings.confirmPassword) {
-        alert('नया पासवर्ड और पुष्टि पासवर्ड मेल नहीं खाते!');
+        alert('New password and confirm password do not match!');
         return;
       }
       
       if (campaignPasswordSettings.newPassword.length < 6) {
-        alert('नया पासवर्ड कम से कम 6 अक्षर का होना चाहिए!');
+        alert('New password must be at least 6 characters long!');
         return;
       }
       
@@ -511,17 +511,17 @@ function Admin() {
       });
       
       if (response.success) {
-        alert('Campaign Manager का पासवर्ड सफलतापूर्वक बदल दिया गया है!');
+        alert('Campaign Manager password changed successfully!');
         setCampaignPasswordSettings({
           newPassword: '',
           confirmPassword: ''
         });
       } else {
-        alert(response.message || 'Campaign Manager पासवर्ड बदलने में त्रुटि हुई है!');
+        alert(response.message || 'Error changing Campaign Manager password!');
       }
     } catch (error) {
       console.error('Campaign password change error:', error);
-      alert('Campaign Manager पासवर्ड बदलने में त्रुटि हुई है!');
+      alert('Error changing Campaign Manager password!');
     } finally {
       setChangingCampaignPassword(false);
     }
@@ -3596,7 +3596,7 @@ function Admin() {
                 <form onSubmit={handleChangePassword} className="space-y-4 max-w-md mx-auto">
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Current Password / वर्तमान पासवर्ड
+                      Current Password
                     </label>
                     <input
                       type="password"
@@ -3613,7 +3613,7 @@ function Admin() {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      New Password / नया पासवर्ड
+                      New Password
                     </label>
                     <input
                       type="password"
@@ -3630,7 +3630,7 @@ function Admin() {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Confirm Password / पासवर्ड की पुष्टि करें
+                      Confirm Password
                     </label>
                     <input
                       type="password"
@@ -3650,7 +3650,7 @@ function Admin() {
                     disabled={changingPassword}
                     className="w-full bg-gradient-to-r from-red-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 transition-all duration-200 disabled:opacity-50"
                   >
-                    {changingPassword ? 'Changing Password...' : 'Change Password / पासवर्ड बदलें'}
+                    {changingPassword ? 'Changing Password...' : 'Change Password'}
                   </button>
                 </form>
                 
@@ -3682,7 +3682,7 @@ function Admin() {
                 <form onSubmit={handleChangeCampaignPassword} className="space-y-4 max-w-md mx-auto">
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      New Password for Campaign Manager / Campaign Manager का नया पासवर्ड
+                      New Password for Campaign Manager
                     </label>
                     <input
                       type="password"
@@ -3699,7 +3699,7 @@ function Admin() {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Confirm Password / पासवर्ड की पुष्टि करें
+                      Confirm Password
                     </label>
                     <input
                       type="password"
@@ -3719,7 +3719,7 @@ function Admin() {
                     disabled={changingCampaignPassword}
                     className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-green-700 hover:to-emerald-700 focus:ring-4 focus:ring-green-500/50 transition-all duration-200 disabled:opacity-50"
                   >
-                    {changingCampaignPassword ? 'Changing Password...' : 'Update Campaign Manager Password / पासवर्ड बदलें'}
+                    {changingCampaignPassword ? 'Changing Password...' : 'Update Campaign Manager Password'}
                   </button>
                 </form>
                 
