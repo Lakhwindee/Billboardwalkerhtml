@@ -986,8 +986,7 @@ function Admin() {
   };
 
   return (
-    <>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black text-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black text-white">
         <div className="w-full max-w-7xl mx-auto px-1 sm:px-6 lg:px-8 py-2 sm:py-6">
         {/* Header - Mobile Responsive */}
         <div className="mb-4 sm:mb-6">
@@ -4290,9 +4289,9 @@ function Admin() {
           </div>
         )}
 
-      {/* Design Reupload Modal */}
-      {showReuploadModal && reuploadCampaign && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        {/* Design Reupload Modal */}
+        {showReuploadModal && reuploadCampaign && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 w-full max-w-2xl border border-gray-600 shadow-2xl">
             <div className="flex items-center justify-between mb-6">
               <div>
@@ -4373,10 +4372,9 @@ function Admin() {
             </div>
           </div>
         </div>
-      )}
+        )}
       </div>
     </div>
-    </>
   );
 }
 
