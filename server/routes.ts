@@ -320,7 +320,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-
+  // Get current user endpoint for role checking
+  app.get("/api/current-user", (req, res) => {
+    const session = req.session as any;
+    if (session?.user) {
+      res.json(session.user);
+    } else {
+      res.status(401).json({ error: 'Not authenticated' });
+    }
+  });
 
   app.post("/api/auth/logout", requireAuth, async (req, res) => {
     try {
