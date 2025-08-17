@@ -8,7 +8,11 @@ import { apiRequest } from '@/lib/queryClient';
 import { NotificationCenter } from '@/components/NotificationCenter';
 
 // Campaign Tracking Component
-function CampaignStudioContent() {
+function CampaignStudioContent({ 
+  handleReuploadClick 
+}: { 
+  handleReuploadClick: (campaign: any) => void; 
+}) {
   const [selectedTab, setSelectedTab] = useState('pending');
   const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
 
@@ -156,7 +160,7 @@ function CampaignStudioContent() {
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
                           <div className="flex items-center space-x-3 mb-2">
-                            <h3 className="text-xl font-semibold text-gray-900">{campaign.campaignId}</h3>
+                            <h3 className="text-xl font-semibold text-gray-900">{campaign.title || `Campaign #${campaign.id}`}</h3>
                             <div className={`px-3 py-1 rounded-full text-xs font-medium border flex items-center space-x-1 ${getStatusColor(campaign.status)}`}>
                               {getStatusIcon(campaign.status)}
                               <span>{formatStatus(campaign.status)}</span>
@@ -167,8 +171,8 @@ function CampaignStudioContent() {
                               </span>
                             )}
                           </div>
-                          <p className="text-gray-600">Customer: {campaign.customerName}</p>
-                          <p className="text-gray-500 text-sm mt-1">Submitted: {new Date(campaign.submittedAt).toLocaleDateString()}</p>
+                          <p className="text-gray-600">Customer: {campaign.customerName || campaign.customer_name}</p>
+                          <p className="text-gray-500 text-sm mt-1">Submitted: {new Date(campaign.createdAt || campaign.submittedAt).toLocaleDateString()}</p>
                           {campaign.reuploadRequired && campaign.designFeedback && (
                             <div className="mt-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
                               <p className="text-sm font-medium text-orange-800 mb-1">Admin Feedback:</p>
@@ -179,16 +183,16 @@ function CampaignStudioContent() {
                             </div>
                           )}
                         </div>
-                        <div className="text-right">
-                          <p className="text-2xl font-bold text-gray-900">₹{(campaign.totalAmount || 0).toLocaleString()}</p>
-                          <p className="text-sm text-gray-500">{campaign.paymentMethod || 'Not specified'}</p>
+                        <div className="text-right flex flex-col items-end">
+                          <p className="text-2xl font-bold text-gray-900">₹{(campaign.totalPrice || campaign.totalAmount || 0).toLocaleString()}</p>
+                          <p className="text-sm text-gray-500 mb-3">Pending Review</p>
                           {campaign.reuploadRequired && (
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleReuploadClick(campaign);
                               }}
-                              className="mt-3 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
+                              className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
                               data-testid="reupload-design-button"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2205,7 +2209,9 @@ Your Home Address <span className="text-red-500">*</span>
           {/* Campaign Studio Tab */}
           {dashboardTab === 'studio' && (
             <div className="space-y-6">
-              <CampaignStudioContent />
+              <CampaignStudioContent 
+                handleReuploadClick={handleReuploadClick}
+              />
             </div>
           )}
         </div>
