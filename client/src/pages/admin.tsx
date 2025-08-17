@@ -83,7 +83,13 @@ function Admin() {
     newPassword: '',
     confirmPassword: ''
   });
+  const [campaignManagerSettings, setCampaignManagerSettings] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
   const [changingPassword, setChangingPassword] = useState(false);
+  const [changingCampaignPassword, setChangingCampaignPassword] = useState(false);
 
   // Payment Management State
   const [showPaymentAccountModal, setShowPaymentAccountModal] = useState(false);
@@ -3534,36 +3540,153 @@ function Admin() {
               </div>
             </div>
 
-            {/* Password Change Section */}
+            {/* Admin Password Change Section (Only for Admin) */}
+            {currentUser?.role === 'admin' && (
+              <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                <div className="text-center py-4">
+                  <div className="text-6xl mb-4">👑</div>
+                  <div className="flex items-center justify-center mb-4">
+                    <h3 className="text-2xl font-bold text-white">Change Admin Password</h3>
+                  </div>
+                  <p className="text-gray-300 mb-6">
+                    Update your main admin panel login password for enhanced security
+                  </p>
+                  
+                  {/* Admin Password Change Form */}
+                  <form onSubmit={handleChangePassword} className="space-y-4 max-w-md mx-auto">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Current Admin Password / वर्तमान एडमिन पासवर्ड
+                      </label>
+                      <input
+                        type="password"
+                        value={adminSettings.currentPassword}
+                        onChange={(e) => setAdminSettings(prev => ({
+                          ...prev,
+                          currentPassword: e.target.value
+                        }))}
+                        placeholder="Enter current admin password"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        New Admin Password / नया एडमिन पासवर्ड
+                      </label>
+                      <input
+                        type="password"
+                        value={adminSettings.newPassword}
+                        onChange={(e) => setAdminSettings(prev => ({
+                          ...prev,
+                          newPassword: e.target.value
+                        }))}
+                        placeholder="Enter new admin password (minimum 6 characters)"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Confirm New Password / नया पासवर्ड कन्फर्म करें
+                      </label>
+                      <input
+                        type="password"
+                        value={adminSettings.confirmPassword}
+                        onChange={(e) => setAdminSettings(prev => ({
+                          ...prev,
+                          confirmPassword: e.target.value
+                        }))}
+                        placeholder="Confirm new admin password"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <button
+                      type="submit"
+                      disabled={changingPassword}
+                      className="w-full bg-gradient-to-r from-red-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 transition-all duration-200 disabled:opacity-50"
+                    >
+                      {changingPassword ? 'Changing Admin Password...' : 'Change Admin Password / एडमिन पासवर्ड बदलें'}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* Campaign Manager Password Change Section */}
             <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
               <div className="text-center py-4">
                 <div className="text-6xl mb-4">🔐</div>
                 <div className="flex items-center justify-center mb-4">
                   <h3 className="text-2xl font-bold text-white">
-                    {currentUser?.role === 'admin' ? 'Change Admin Password' : 'Change Password'}
+                    {currentUser?.role === 'admin' ? 'Campaign Manager Password Reset' : 'Change My Password'}
                   </h3>
                 </div>
                 <p className="text-gray-300 mb-6">
                   {currentUser?.role === 'admin' 
-                    ? 'Update your admin panel login password for enhanced security'
-                    : 'Update your account password for enhanced security'
+                    ? 'Reset campaign manager account password (campaign/campaign123)' 
+                    : 'Update your campaign manager account password for enhanced security'
                   }
                 </p>
                 
-                {/* Password Change Form */}
-                <form onSubmit={handleChangePassword} className="space-y-4 max-w-md mx-auto">
+                {/* Campaign Manager Password Change Form */}
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  setChangingCampaignPassword(true);
+                  
+                  try {
+                    if (campaignManagerSettings.newPassword !== campaignManagerSettings.confirmPassword) {
+                      alert('नया पासवर्ड और कन्फर्म पासवर्ड मैच नहीं कर रहे / New password and confirm password do not match');
+                      return;
+                    }
+                    
+                    if (campaignManagerSettings.newPassword.length < 6) {
+                      alert('पासवर्ड कम से कम 6 अक्षर का होना चाहिए / Password must be at least 6 characters long');
+                      return;
+                    }
+                    
+                    const targetUserId = currentUser?.role === 'admin' ? 2 : currentUser?.id; // Campaign manager ID is 2
+                    
+                    const response = await apiRequest('POST', '/api/change-password', {
+                      userId: targetUserId,
+                      currentPassword: campaignManagerSettings.currentPassword,
+                      newPassword: campaignManagerSettings.newPassword
+                    });
+                    
+                    if (response.ok) {
+                      const result = await response.json();
+                      alert(currentUser?.role === 'admin' 
+                        ? '✅ Campaign manager password successfully changed! / कैम्पेन मैनेजर का पासवर्ड सफलतापूर्वक बदल दिया गया!'
+                        : '✅ Your password has been changed successfully! / आपका पासवर्ड सफलतापूर्वक बदल दिया गया!'
+                      );
+                      setCampaignManagerSettings({ currentPassword: '', newPassword: '', confirmPassword: '' });
+                    } else {
+                      const error = await response.json();
+                      alert(`❌ ${error.message || 'Password change failed / पासवर्ड बदलने में विफल'}`);
+                    }
+                  } catch (error) {
+                    console.error('Campaign password change error:', error);
+                    alert('❌ An error occurred while changing password / पासवर्ड बदलते समय एक त्रुटि हुई');
+                  } finally {
+                    setChangingCampaignPassword(false);
+                  }
+                }} className="space-y-4 max-w-md mx-auto">
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Current Password / वर्तमान पासवर्ड
+                      {currentUser?.role === 'admin' ? 'Current Campaign Manager Password / वर्तमान कैम्पेन मैनेजर पासवर्ड' : 'Current Password / वर्तमान पासवर्ड'}
                     </label>
                     <input
                       type="password"
-                      value={adminSettings.currentPassword}
-                      onChange={(e) => setAdminSettings(prev => ({
+                      value={campaignManagerSettings.currentPassword}
+                      onChange={(e) => setCampaignManagerSettings(prev => ({
                         ...prev,
                         currentPassword: e.target.value
                       }))}
-                      placeholder="Enter current password"
+                      placeholder={currentUser?.role === 'admin' ? "Enter current campaign password (default: campaign123)" : "Enter current password"}
                       className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       required
                     />
@@ -3571,12 +3694,12 @@ function Admin() {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      New Password / नया पासवर्ड
+                      {currentUser?.role === 'admin' ? 'New Campaign Manager Password / नया कैम्पेन मैनेजर पासवर्ड' : 'New Password / नया पासवर्ड'}
                     </label>
                     <input
                       type="password"
-                      value={adminSettings.newPassword}
-                      onChange={(e) => setAdminSettings(prev => ({
+                      value={campaignManagerSettings.newPassword}
+                      onChange={(e) => setCampaignManagerSettings(prev => ({
                         ...prev,
                         newPassword: e.target.value
                       }))}
@@ -3588,12 +3711,12 @@ function Admin() {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Confirm Password / पासवर्ड की पुष्टि करें
+                      Confirm New Password / नया पासवर्ड की पुष्टि करें
                     </label>
                     <input
                       type="password"
-                      value={adminSettings.confirmPassword}
-                      onChange={(e) => setAdminSettings(prev => ({
+                      value={campaignManagerSettings.confirmPassword}
+                      onChange={(e) => setCampaignManagerSettings(prev => ({
                         ...prev,
                         confirmPassword: e.target.value
                       }))}
@@ -3605,10 +3728,12 @@ function Admin() {
                   
                   <button
                     type="submit"
-                    disabled={changingPassword}
-                    className="w-full bg-gradient-to-r from-red-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 transition-all duration-200 disabled:opacity-50"
+                    disabled={changingCampaignPassword}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 focus:ring-4 focus:ring-blue-500/50 transition-all duration-200 disabled:opacity-50"
                   >
-                    {changingPassword ? 'Changing Password...' : 'Change Password / पासवर्ड बदलें'}
+                    {changingCampaignPassword ? 'Changing Password...' : 
+                      (currentUser?.role === 'admin' ? 'Reset Campaign Manager Password / कैम्पेन मैनेजर पासवर्ड रीसेट करें' : 'Change My Password / मेरा पासवर्ड बदलें')
+                    }
                   </button>
                 </form>
                 
