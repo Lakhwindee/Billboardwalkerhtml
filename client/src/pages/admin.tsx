@@ -205,9 +205,9 @@ function Admin() {
       { id: "email", label: "Email Setup", icon: "📧", shortLabel: "Email" },
     ];
 
-    // If user role is 'campaigns' or 'campaign_manager', only show campaigns tab
+    // If user role is 'campaigns' or 'campaign_manager', show campaigns and contacts tabs
     if (currentUser?.role === 'campaigns' || currentUser?.role === 'campaign_manager') {
-      return allTabs.filter(tab => tab.id === 'campaigns');
+      return allTabs.filter(tab => tab.id === 'campaigns' || tab.id === 'contacts');
     }
 
     // For admin role, show all tabs
@@ -1160,7 +1160,9 @@ function Admin() {
         <div className="mb-4 sm:mb-6">
           <div className="bg-gray-800/50 backdrop-blur-sm p-2 rounded-xl border border-gray-700/50">
             {/* Mobile Grid Layout - Role-Based Tabs */}
-            <div className="grid grid-cols-5 sm:hidden gap-1">
+            <div className={`grid sm:hidden gap-1 ${
+              getAvailableTabs().length <= 2 ? 'grid-cols-2' : 'grid-cols-5'
+            }`}>
               {getAvailableTabs().map((tab) => (
                 <button
                   key={tab.id}
