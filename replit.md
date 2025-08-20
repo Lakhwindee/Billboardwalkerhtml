@@ -9,6 +9,9 @@ Target deployment: DigitalOcean hosting with full Node.js backend support.
 Requirements: Clean essential files only, working authentication system, admin panel access.
 Zero tolerance for unused/backup files - user demands "exdum clean files chahiye".
 
+## Recent Issues & Fixes
+**Deployment Session Contamination (Aug 20, 2025)**: Fixed critical deployment issue where admin credentials (judge/judge1313) were showing campaign manager interface after deployment. Implemented session regeneration, enhanced cookie clearing, and comprehensive logout mechanism. Also fixed Contact Messages access for campaign managers.
+
 ## System Architecture
 
 ### Frontend

@@ -123,11 +123,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     secret: process.env.SESSION_SECRET || 'iambillboard-secret-key-2025-production',
     resave: false,
     saveUninitialized: false,
+    name: 'iambb.sid', // Custom session name for deployment
     cookie: {
-      secure: process.env.NODE_ENV === 'production', // Only secure in production
+      secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      sameSite: 'lax' // Better cross-origin compatibility
+      sameSite: 'lax',
+      domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost' // Auto-detect domain in production
     }
   }));
 
@@ -295,31 +297,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userAgent: req.get('User-Agent') || 'unknown'
       });
       
-      // Set session and save explicitly
-      (req.session as any).user = {
-        id: user.id,
-        username: user.username,
-        role: user.role
-      };
-      
-      // Save session explicitly to ensure persistence
-      req.session.save((err) => {
+      // Clear any existing session to prevent contamination
+      req.session.regenerate((err) => {
         if (err) {
-          console.error('Session save error:', err);
+          console.error('Session regeneration error:', err);
           return res.status(500).json({ 
-            error: 'Session save failed',
+            error: 'Session creation failed',
             type: 'session_error'
           });
         }
         
-        res.json({ 
-          message: 'Login successful',
-          user: {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            role: user.role
+        // Set session with fresh data
+        (req.session as any).user = {
+          id: user.id,
+          username: user.username,
+          role: user.role
+        };
+        
+        // Save session explicitly to ensure persistence
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            console.error('Session save error:', saveErr);
+            return res.status(500).json({ 
+              error: 'Session save failed',
+              type: 'session_error'
+            });
           }
+          
+          res.json({ 
+            message: 'Login successful',
+            user: {
+              id: user.id,
+              username: user.username,
+              email: user.email,
+              role: user.role
+            }
+          });
         });
       });
     } catch (error: any) {
@@ -362,12 +375,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.error('Session destroy error:', err);
           return res.status(500).json({ error: 'Logout failed' });
         }
+        // Clear all possible session cookies for deployment compatibility
         res.clearCookie('connect.sid');
+        res.clearCookie('iambb.sid');
+        res.clearCookie('connect.sid', { path: '/' });
+        res.clearCookie('iambb.sid', { path: '/' });
+        // Clear with domain options for production
+        if (process.env.NODE_ENV === 'production') {
+          const hostname = req.get('host')?.split(':')[0];
+          if (hostname) {
+            res.clearCookie('connect.sid', { domain: hostname });
+            res.clearCookie('iambb.sid', { domain: hostname });
+          }
+        }
         res.json({ message: 'Logout successful' });
       });
     } catch (error: any) {
       console.error('Logout error:', error);
       res.status(500).json({ error: 'Logout failed' });
+    }
+  });
+
+  // Debug endpoint to clear all sessions (admin only)
+  app.post("/api/clear-sessions", async (req, res) => {
+    try {
+      const session = req.session as any;
+      if (!session?.user || session.user.role !== 'admin') {
+        return res.status(403).json({ error: 'Admin access required' });
+      }
+      
+      // Clear all sessions from database
+      await pool.query('DELETE FROM sessions');
+      
+      res.json({ message: 'All sessions cleared' });
+    } catch (error: any) {
+      console.error('Clear sessions error:', error);
+      res.status(500).json({ error: 'Failed to clear sessions' });
     }
   });
 

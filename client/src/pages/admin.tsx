@@ -152,13 +152,19 @@ function Admin() {
       });
       
       if (response.ok) {
-        // Redirect to home page after successful logout
-        window.location.href = '/';
+        // Clear any local storage/session storage
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Force complete page reload to clear any cached data
+        window.location.replace('/');
       }
     } catch (error) {
       console.error('Logout error:', error);
-      // Fallback: redirect anyway
-      window.location.href = '/';
+      // Fallback: clear and redirect anyway
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.replace('/');
     }
   };
 
