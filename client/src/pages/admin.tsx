@@ -8,7 +8,7 @@ import PaymentGatewaySettings from '@/components/PaymentGatewaySettings';
 
 
 function Admin() {
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeTab, setActiveTab] = useState("campaigns");
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [showPriceModal, setShowPriceModal] = useState(false);
@@ -124,7 +124,7 @@ function Admin() {
   const queryClient = useQueryClient();
 
   // Get current user for role-based access
-  const { data: currentUser } = useQuery<{id: number; role: string; username: string}>({
+  const { data: currentUser } = useQuery({
     queryKey: ['/api/current-user'],
     retry: false,
   });
@@ -136,16 +136,11 @@ function Admin() {
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
     
-    // Only set tab based on user role if no URL parameter and user is loaded
-    if (currentUser) {
-      const availableTabs = getAvailableTabs();
-      if (tabParam && availableTabs.some(tab => tab.id === tabParam)) {
-        setActiveTab(tabParam);
-      } else if (currentUser.role === 'campaign_manager') {
-        setActiveTab('campaigns');
-      } else if (currentUser.role === 'admin') {
-        setActiveTab('dashboard');
-      }
+    // Set tab based on URL parameter or user role
+    if (tabParam && getAvailableTabs().some(tab => tab.id === tabParam)) {
+      setActiveTab(tabParam);
+    } else if (currentUser?.role === 'campaigns' || currentUser?.role === 'campaign_manager') {
+      setActiveTab('campaigns');
     }
   }, [currentUser]);
 
@@ -193,7 +188,6 @@ function Admin() {
   // Define available tabs based on user role
   const getAvailableTabs = () => {
     const allTabs = [
-      { id: "dashboard", label: "Dashboard", icon: "🏠", shortLabel: "Dashboard" },
       { id: "campaigns", label: "Campaigns", icon: "📋", shortLabel: "Campaigns" },
       { id: "contacts", label: "Contact Messages", icon: "📞", shortLabel: "Contact" },
       { id: "users", label: "Users Management", icon: "👥", shortLabel: "Users" },
@@ -485,20 +479,15 @@ function Admin() {
       }
       
       // Send password change request to backend
-      const response = await fetch('/api/change-admin-password', {
+      const response = await apiRequest('/api/change-admin-password', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+        body: {
           currentPassword: adminSettings.currentPassword,
           newPassword: adminSettings.newPassword
-        }),
-        credentials: 'include'
+        }
       });
       
-      const result = await response.json();
-      if (result.success) {
+      if (response.success) {
         alert('Password changed successfully!');
         setAdminSettings({
           currentPassword: '',
@@ -506,7 +495,7 @@ function Admin() {
           confirmPassword: ''
         });
       } else {
-        alert(result.message || 'Error changing password!');
+        alert(response.message || 'Error changing password!');
       }
     } catch (error) {
       console.error('Password change error:', error);
@@ -532,26 +521,21 @@ function Admin() {
       }
       
       // Send password change request to backend for campaigns user
-      const response = await fetch('/api/change-campaign-password', {
+      const response = await apiRequest('/api/change-campaign-password', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+        body: {
           newPassword: campaignPasswordSettings.newPassword
-        }),
-        credentials: 'include'
+        }
       });
       
-      const result = await response.json();
-      if (result.success) {
+      if (response.success) {
         alert('Campaign Manager password changed successfully!');
         setCampaignPasswordSettings({
           newPassword: '',
           confirmPassword: ''
         });
       } else {
-        alert(result.message || 'Error changing Campaign Manager password!');
+        alert(response.message || 'Error changing Campaign Manager password!');
       }
     } catch (error) {
       console.error('Campaign password change error:', error);
@@ -1037,7 +1021,7 @@ function Admin() {
       title: sample.title,
       description: sample.description || '',
       category: sample.category,
-      isActive: sample.isActive ?? true
+      isActive: sample.isActive
     });
     setShowDesignSampleModal(true);
   };
@@ -1244,110 +1228,6 @@ function Admin() {
         </div>
 
         {/* Tab Content */}
-        {activeTab === "dashboard" && currentUser?.role === 'admin' && (
-          <div className="space-y-4 sm:space-y-6">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-              <h2 className="text-xl sm:text-2xl font-bold text-white">Admin Dashboard</h2>
-              <div className="text-sm text-gray-400">
-                Overview of all system activities
-              </div>
-            </div>
-
-            {/* Dashboard Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              {/* Campaign Stats */}
-              <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-xl p-4 sm:p-6 border border-blue-500/30">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-2xl">📋</div>
-                  <div className="text-xs text-blue-300">Campaigns</div>
-                </div>
-                <div className="text-xl sm:text-2xl font-bold text-white">{campaigns.length}</div>
-                <div className="text-xs text-blue-200">Total Campaigns</div>
-              </div>
-
-              {/* Contact Messages Stats */}
-              <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 rounded-xl p-4 sm:p-6 border border-green-500/30">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-2xl">📞</div>
-                  <div className="text-xs text-green-300">Messages</div>
-                </div>
-                <div className="text-xl sm:text-2xl font-bold text-white">{contacts.length}</div>
-                <div className="text-xs text-green-200">Contact Messages</div>
-              </div>
-
-              {/* User Stats */}
-              <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 rounded-xl p-4 sm:p-6 border border-purple-500/30">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-2xl">👥</div>
-                  <div className="text-xs text-purple-300">Users</div>
-                </div>
-                <div className="text-xl sm:text-2xl font-bold text-white">{users.length}</div>
-                <div className="text-xs text-purple-200">Registered Users</div>
-              </div>
-
-              {/* Visitors Stats */}
-              <div className="bg-gradient-to-br from-red-500/20 to-red-600/20 rounded-xl p-4 sm:p-6 border border-red-500/30">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-2xl">🌐</div>
-                  <div className="text-xs text-red-300">Visitors</div>
-                </div>
-                <div className="text-xl sm:text-2xl font-bold text-white">{visitorStats?.totalActiveVisitors || '0'}</div>
-                <div className="text-xs text-red-200">Active Visitors</div>
-              </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="bg-white/10 rounded-xl p-4 sm:p-6 border border-white/20 glass-effect">
-              <h3 className="text-lg font-bold text-white mb-4">🚀 Quick Actions</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                <button
-                  onClick={() => setActiveTab('campaigns')}
-                  className="flex items-center gap-3 p-3 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg border border-blue-500/30 transition-colors"
-                >
-                  <span className="text-xl">📋</span>
-                  <div className="text-left">
-                    <div className="text-sm font-medium text-white">Manage Campaigns</div>
-                    <div className="text-xs text-blue-200">Review & approve</div>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('users')}
-                  className="flex items-center gap-3 p-3 bg-green-500/20 hover:bg-green-500/30 rounded-lg border border-green-500/30 transition-colors"
-                >
-                  <span className="text-xl">👥</span>
-                  <div className="text-left">
-                    <div className="text-sm font-medium text-white">User Management</div>
-                    <div className="text-xs text-green-200">Ban/unban users</div>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('pricing')}
-                  className="flex items-center gap-3 p-3 bg-purple-500/20 hover:bg-purple-500/30 rounded-lg border border-purple-500/30 transition-colors"
-                >
-                  <span className="text-xl">💰</span>
-                  <div className="text-left">
-                    <div className="text-sm font-medium text-white">Price Settings</div>
-                    <div className="text-xs text-purple-200">Update pricing</div>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('website-editor')}
-                  className="flex items-center gap-3 p-3 bg-red-500/20 hover:bg-red-500/30 rounded-lg border border-red-500/30 transition-colors"
-                >
-                  <span className="text-xl">🌐</span>
-                  <div className="text-left">
-                    <div className="text-sm font-medium text-white">Website Editor</div>
-                    <div className="text-xs text-red-200">Edit homepage</div>
-                  </div>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
         {activeTab === "website-editor" && currentUser?.role === 'admin' && (
           <div className="space-y-4 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
@@ -2879,7 +2759,7 @@ function Admin() {
                           Edit
                         </button>
                         <button
-                          onClick={() => handleToggleDesignSampleStatus(sample.id, sample.isActive ?? false)}
+                          onClick={() => handleToggleDesignSampleStatus(sample.id, sample.isActive)}
                           className={`flex-1 px-3 py-1 rounded text-xs font-medium transition-colors ${
                             sample.isActive
                               ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
