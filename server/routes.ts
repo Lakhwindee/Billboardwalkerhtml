@@ -123,7 +123,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     secret: process.env.SESSION_SECRET || 'iambillboard-secret-key-2025-production',
     resave: false,
     saveUninitialized: false,
-    name: process.env.NODE_ENV === 'production' ? 'iambb.sid' : 'connect.sid',
+    name: 'connect.sid',
     cookie: {
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
