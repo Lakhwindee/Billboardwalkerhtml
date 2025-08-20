@@ -120,17 +120,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       pool: pool,
       tableName: 'sessions'
     }),
-    secret: process.env.SESSION_SECRET || 'iambillboard-secret-key-2025-production',
+    secret: 'iambillboard-secret-2025-consistent',
     resave: false,
     saveUninitialized: false,
-    name: 'connect.sid',
+    name: 'iambb-session',
+    rolling: true, // Refresh session on each request
     cookie: {
-      secure: false, // Disabled for development/preview environments
+      secure: false,
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      sameSite: 'lax',
-      path: '/',
-      domain: undefined // Let browser auto-detect for all subdomains/contexts
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: 'lax'
     }
   }));
 
@@ -365,13 +364,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.error('Session destroy error:', err);
           return res.status(500).json({ error: 'Logout failed' });
         }
-        // Clear session cookies for all contexts (side panel + new tab)
-        res.clearCookie('connect.sid', { 
+        // Clear session cookies for all contexts
+        res.clearCookie('iambb-session', { 
           path: '/',
           httpOnly: true,
           sameSite: 'lax',
           secure: false
         });
+        res.clearCookie('connect.sid'); // Also clear old cookie name
         res.json({ message: 'Logout successful' });
       });
     } catch (error: any) {
