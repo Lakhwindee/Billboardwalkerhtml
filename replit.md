@@ -39,7 +39,7 @@ Zero tolerance for unused/backup files - user demands "exdum clean files chahiye
 - **Access**: Restricted to 'judge' account (judge/judge1313 credentials). 'Campaign manager' role (campaign/campaign123) has access to campaigns and contact messages tabs.
 - **Features**: Campaign approval, dynamic price management, contact management, user management (ban/unban, activity logs), website content editing (homepage GUI editor), bottle samples management (upload, live preview), payment account/transaction management, and visitor analytics.
 - **Authentication**: Secure session-based authentication with protected API routes and multi-step signup verification (email and phone OTP).
-- **Navigation**: Desktop interface includes Dashboard and Home buttons (admin only), and Sign Out button (all users). Mobile interface shows Home icon (admin only) and Sign Out icon (all users). Campaign managers have access to Campaigns and Contact Messages tabs.
+- **Navigation**: Desktop interface includes Dashboard and Home buttons (admin only), and Sign Out button (all users). Mobile interface shows Home icon (admin only) and Sign Out icon (all users). Campaign managers have full access to Campaigns and Contact Messages content including message details, sender information, and contact actions.
 - **In-stores Delivery**: Enhanced address input system for in-stores delivery with PIN code and contact phone validation.
 
 ## External Dependencies

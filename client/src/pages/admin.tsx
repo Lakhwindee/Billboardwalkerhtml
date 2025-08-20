@@ -1869,7 +1869,7 @@ function Admin() {
           </div>
         )}
 
-        {activeTab === "contacts" && currentUser?.role === 'admin' && (
+        {activeTab === "contacts" && (currentUser?.role === 'admin' || currentUser?.role === 'campaign_manager') && (
           <div className="space-y-4 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
               <h2 className="text-xl sm:text-2xl font-bold">Contact Messages</h2>
