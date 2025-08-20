@@ -114,20 +114,19 @@ const registerSchema = z.object({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Session setup - simplified for immediate persistence
+  // Session setup - back to standard configuration
   app.use(session({
     store: new PgSession({
       pool: pool,
       tableName: 'sessions'
     }),
     secret: 'iambillboard-secret-2025-consistent',
-    resave: true, // Force session save on each request
-    saveUninitialized: true, // Create session immediately
-    name: 'iambb-session',
-    rolling: false, // Keep original session
+    resave: false,
+    saveUninitialized: false,
+    name: 'connect.sid', // Standard session name
     cookie: {
       secure: false,
-      httpOnly: false, // Allow JavaScript access for debugging
+      httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
       sameSite: 'lax'
     }
@@ -297,7 +296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userAgent: req.get('User-Agent') || 'unknown'
       });
       
-      // Set session with fresh data - simple approach
+      // Set session with fresh data - explicit approach
       (req.session as any).user = {
         id: user.id,
         username: user.username,
@@ -364,14 +363,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.error('Session destroy error:', err);
           return res.status(500).json({ error: 'Logout failed' });
         }
-        // Clear session cookies for all contexts
-        res.clearCookie('iambb-session', { 
+        // Clear session cookies
+        res.clearCookie('connect.sid', { 
           path: '/',
           httpOnly: true,
           sameSite: 'lax',
           secure: false
         });
-        res.clearCookie('connect.sid'); // Also clear old cookie name
         res.json({ message: 'Logout successful' });
       });
     } catch (error: any) {
