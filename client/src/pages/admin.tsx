@@ -144,6 +144,24 @@ function Admin() {
     }
   }, [currentUser]);
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        // Redirect to home page after successful logout
+        window.location.href = '/';
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Fallback: redirect anyway
+      window.location.href = '/';
+    }
+  };
+
   const loadConfigurations = () => {
     // Load saved configurations after successful auth
     const savedEmailConfig = localStorage.getItem('billboardwalker_email_config');
@@ -1079,13 +1097,13 @@ function Admin() {
                 </div>
               </div>
               <div className="flex-shrink-0">
-                <a 
-                  href="/" 
-                  className="home-button bg-green-500 hover:bg-green-600 text-white px-1 py-1 rounded text-xs transition-colors"
-                  title="Home"
+                <button 
+                  onClick={handleLogout}
+                  className="logout-button bg-red-500 hover:bg-red-600 text-white px-1 py-1 rounded text-xs transition-colors"
+                  title="Sign Out"
                 >
-                  🏠
-                </a>
+                  🚪
+                </button>
               </div>
             </div>
 
@@ -1124,15 +1142,15 @@ function Admin() {
                     <span>Dashboard</span>
                   </a>
                 )}
-                <a 
-                  href="/" 
-                  className="bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2"
+                <button 
+                  onClick={handleLogout}
+                  className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                   </svg>
-                  <span>Home</span>
-                </a>
+                  <span>Sign Out</span>
+                </button>
               </div>
             </div>
           </div>

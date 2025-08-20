@@ -341,6 +341,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Logout endpoint - simple version for any user
+  app.post("/api/logout", async (req, res) => {
+    try {
+      const session = req.session as any;
+      
+      // Log the logout if user is authenticated
+      if (session?.user) {
+        await storage.createUserActivityLog({
+          userId: session.user.id,
+          action: 'logout',
+          details: 'User logged out',
+          ipAddress: req.ip || 'unknown',
+          userAgent: req.get('User-Agent') || 'unknown'
+        });
+      }
+      
+      req.session.destroy((err) => {
+        if (err) {
+          console.error('Session destroy error:', err);
+          return res.status(500).json({ error: 'Logout failed' });
+        }
+        res.clearCookie('connect.sid');
+        res.json({ message: 'Logout successful' });
+      });
+    } catch (error: any) {
+      console.error('Logout error:', error);
+      res.status(500).json({ error: 'Logout failed' });
+    }
+  });
+
   app.post("/api/auth/logout", requireAuth, async (req, res) => {
     try {
       const authReq = req as any;
