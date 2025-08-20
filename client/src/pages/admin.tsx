@@ -124,7 +124,7 @@ function Admin() {
   const queryClient = useQueryClient();
 
   // Get current user for role-based access
-  const { data: currentUser } = useQuery({
+  const { data: currentUser } = useQuery<{id: number; role: string; username: string}>({
     queryKey: ['/api/current-user'],
     retry: false,
   });
@@ -482,15 +482,20 @@ function Admin() {
       }
       
       // Send password change request to backend
-      const response = await apiRequest('/api/change-admin-password', {
+      const response = await fetch('/api/change-admin-password', {
         method: 'POST',
-        body: {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           currentPassword: adminSettings.currentPassword,
           newPassword: adminSettings.newPassword
-        }
+        }),
+        credentials: 'include'
       });
       
-      if (response.success) {
+      const result = await response.json();
+      if (result.success) {
         alert('Password changed successfully!');
         setAdminSettings({
           currentPassword: '',
@@ -498,7 +503,7 @@ function Admin() {
           confirmPassword: ''
         });
       } else {
-        alert(response.message || 'Error changing password!');
+        alert(result.message || 'Error changing password!');
       }
     } catch (error) {
       console.error('Password change error:', error);
@@ -524,21 +529,26 @@ function Admin() {
       }
       
       // Send password change request to backend for campaigns user
-      const response = await apiRequest('/api/change-campaign-password', {
+      const response = await fetch('/api/change-campaign-password', {
         method: 'POST',
-        body: {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           newPassword: campaignPasswordSettings.newPassword
-        }
+        }),
+        credentials: 'include'
       });
       
-      if (response.success) {
+      const result = await response.json();
+      if (result.success) {
         alert('Campaign Manager password changed successfully!');
         setCampaignPasswordSettings({
           newPassword: '',
           confirmPassword: ''
         });
       } else {
-        alert(response.message || 'Error changing Campaign Manager password!');
+        alert(result.message || 'Error changing Campaign Manager password!');
       }
     } catch (error) {
       console.error('Campaign password change error:', error);
@@ -1024,7 +1034,7 @@ function Admin() {
       title: sample.title,
       description: sample.description || '',
       category: sample.category,
-      isActive: sample.isActive
+      isActive: sample.isActive ?? true
     });
     setShowDesignSampleModal(true);
   };
@@ -1278,7 +1288,7 @@ function Admin() {
                   <div className="text-2xl">🌐</div>
                   <div className="text-xs text-red-300">Visitors</div>
                 </div>
-                <div className="text-xl sm:text-2xl font-bold text-white">{visitorsData?.totalActiveVisitors || '0'}</div>
+                <div className="text-xl sm:text-2xl font-bold text-white">{visitorStats?.totalActiveVisitors || '0'}</div>
                 <div className="text-xs text-red-200">Active Visitors</div>
               </div>
             </div>
@@ -2866,7 +2876,7 @@ function Admin() {
                           Edit
                         </button>
                         <button
-                          onClick={() => handleToggleDesignSampleStatus(sample.id, sample.isActive)}
+                          onClick={() => handleToggleDesignSampleStatus(sample.id, sample.isActive ?? false)}
                           className={`flex-1 px-3 py-1 rounded text-xs font-medium transition-colors ${
                             sample.isActive
                               ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
