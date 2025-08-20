@@ -123,13 +123,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     secret: process.env.SESSION_SECRET || 'iambillboard-secret-key-2025-production',
     resave: false,
     saveUninitialized: false,
-    name: 'iambb.sid', // Custom session name for deployment
+    name: process.env.NODE_ENV === 'production' ? 'iambb.sid' : 'connect.sid',
     cookie: {
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      sameSite: 'lax',
-      domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost' // Auto-detect domain in production
+      sameSite: 'lax'
+      // Don't set domain to let it auto-detect
     }
   }));
 
@@ -297,42 +297,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userAgent: req.get('User-Agent') || 'unknown'
       });
       
-      // Clear any existing session to prevent contamination
-      req.session.regenerate((err) => {
-        if (err) {
-          console.error('Session regeneration error:', err);
+      // Set session with fresh data - simple approach
+      (req.session as any).user = {
+        id: user.id,
+        username: user.username,
+        role: user.role
+      };
+      
+      // Save session explicitly to ensure persistence
+      req.session.save((saveErr) => {
+        if (saveErr) {
+          console.error('Session save error:', saveErr);
           return res.status(500).json({ 
-            error: 'Session creation failed',
+            error: 'Session save failed',
             type: 'session_error'
           });
         }
         
-        // Set session with fresh data
-        (req.session as any).user = {
-          id: user.id,
-          username: user.username,
-          role: user.role
-        };
-        
-        // Save session explicitly to ensure persistence
-        req.session.save((saveErr) => {
-          if (saveErr) {
-            console.error('Session save error:', saveErr);
-            return res.status(500).json({ 
-              error: 'Session save failed',
-              type: 'session_error'
-            });
+        res.json({ 
+          message: 'Login successful',
+          user: {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            role: user.role
           }
-          
-          res.json({ 
-            message: 'Login successful',
-            user: {
-              id: user.id,
-              username: user.username,
-              email: user.email,
-              role: user.role
-            }
-          });
         });
       });
     } catch (error: any) {
