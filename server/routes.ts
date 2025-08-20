@@ -114,20 +114,20 @@ const registerSchema = z.object({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Session setup
+  // Session setup - simplified for immediate persistence
   app.use(session({
     store: new PgSession({
       pool: pool,
       tableName: 'sessions'
     }),
     secret: 'iambillboard-secret-2025-consistent',
-    resave: false,
-    saveUninitialized: false,
+    resave: true, // Force session save on each request
+    saveUninitialized: true, // Create session immediately
     name: 'iambb-session',
-    rolling: true, // Refresh session on each request
+    rolling: false, // Keep original session
     cookie: {
       secure: false,
-      httpOnly: true,
+      httpOnly: false, // Allow JavaScript access for debugging
       maxAge: 24 * 60 * 60 * 1000,
       sameSite: 'lax'
     }

@@ -139,7 +139,7 @@ function Admin() {
     // Set tab based on URL parameter or user role
     if (tabParam && getAvailableTabs().some(tab => tab.id === tabParam)) {
       setActiveTab(tabParam);
-    } else if (currentUser?.role === 'campaigns' || currentUser?.role === 'campaign_manager') {
+    } else if (currentUser?.role === 'campaign_manager') {
       setActiveTab('campaigns');
     }
   }, [currentUser]);
@@ -211,8 +211,8 @@ function Admin() {
       { id: "email", label: "Email Setup", icon: "📧", shortLabel: "Email" },
     ];
 
-    // If user role is 'campaigns' or 'campaign_manager', show campaigns and contacts tabs
-    if (currentUser?.role === 'campaigns' || currentUser?.role === 'campaign_manager') {
+    // If user role is 'campaign_manager', show campaigns and contacts tabs
+    if (currentUser?.role === 'campaign_manager') {
       return allTabs.filter(tab => tab.id === 'campaigns' || tab.id === 'contacts');
     }
 
