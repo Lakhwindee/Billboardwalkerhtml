@@ -139,8 +139,10 @@ function Admin() {
     // Set tab based on URL parameter or user role
     if (tabParam && getAvailableTabs().some(tab => tab.id === tabParam)) {
       setActiveTab(tabParam);
-    } else if (currentUser?.role === 'campaigns' || currentUser?.role === 'campaign_manager') {
+    } else if (currentUser?.role === 'campaign_manager') {
       setActiveTab('campaigns');
+    } else if (currentUser?.role === 'admin') {
+      setActiveTab('dashboard');
     }
   }, [currentUser]);
 
@@ -188,6 +190,7 @@ function Admin() {
   // Define available tabs based on user role
   const getAvailableTabs = () => {
     const allTabs = [
+      { id: "dashboard", label: "Dashboard", icon: "🏠", shortLabel: "Dashboard" },
       { id: "campaigns", label: "Campaigns", icon: "📋", shortLabel: "Campaigns" },
       { id: "contacts", label: "Contact Messages", icon: "📞", shortLabel: "Contact" },
       { id: "users", label: "Users Management", icon: "👥", shortLabel: "Users" },
@@ -1228,6 +1231,110 @@ function Admin() {
         </div>
 
         {/* Tab Content */}
+        {activeTab === "dashboard" && currentUser?.role === 'admin' && (
+          <div className="space-y-4 sm:space-y-6">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-bold text-white">Admin Dashboard</h2>
+              <div className="text-sm text-gray-400">
+                Overview of all system activities
+              </div>
+            </div>
+
+            {/* Dashboard Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              {/* Campaign Stats */}
+              <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-xl p-4 sm:p-6 border border-blue-500/30">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-2xl">📋</div>
+                  <div className="text-xs text-blue-300">Campaigns</div>
+                </div>
+                <div className="text-xl sm:text-2xl font-bold text-white">{campaigns.length}</div>
+                <div className="text-xs text-blue-200">Total Campaigns</div>
+              </div>
+
+              {/* Contact Messages Stats */}
+              <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 rounded-xl p-4 sm:p-6 border border-green-500/30">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-2xl">📞</div>
+                  <div className="text-xs text-green-300">Messages</div>
+                </div>
+                <div className="text-xl sm:text-2xl font-bold text-white">{contacts.length}</div>
+                <div className="text-xs text-green-200">Contact Messages</div>
+              </div>
+
+              {/* User Stats */}
+              <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 rounded-xl p-4 sm:p-6 border border-purple-500/30">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-2xl">👥</div>
+                  <div className="text-xs text-purple-300">Users</div>
+                </div>
+                <div className="text-xl sm:text-2xl font-bold text-white">{users.length}</div>
+                <div className="text-xs text-purple-200">Registered Users</div>
+              </div>
+
+              {/* Visitors Stats */}
+              <div className="bg-gradient-to-br from-red-500/20 to-red-600/20 rounded-xl p-4 sm:p-6 border border-red-500/30">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-2xl">🌐</div>
+                  <div className="text-xs text-red-300">Visitors</div>
+                </div>
+                <div className="text-xl sm:text-2xl font-bold text-white">{visitorsData?.totalActiveVisitors || '0'}</div>
+                <div className="text-xs text-red-200">Active Visitors</div>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="bg-white/10 rounded-xl p-4 sm:p-6 border border-white/20 glass-effect">
+              <h3 className="text-lg font-bold text-white mb-4">🚀 Quick Actions</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <button
+                  onClick={() => setActiveTab('campaigns')}
+                  className="flex items-center gap-3 p-3 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg border border-blue-500/30 transition-colors"
+                >
+                  <span className="text-xl">📋</span>
+                  <div className="text-left">
+                    <div className="text-sm font-medium text-white">Manage Campaigns</div>
+                    <div className="text-xs text-blue-200">Review & approve</div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('users')}
+                  className="flex items-center gap-3 p-3 bg-green-500/20 hover:bg-green-500/30 rounded-lg border border-green-500/30 transition-colors"
+                >
+                  <span className="text-xl">👥</span>
+                  <div className="text-left">
+                    <div className="text-sm font-medium text-white">User Management</div>
+                    <div className="text-xs text-green-200">Ban/unban users</div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('pricing')}
+                  className="flex items-center gap-3 p-3 bg-purple-500/20 hover:bg-purple-500/30 rounded-lg border border-purple-500/30 transition-colors"
+                >
+                  <span className="text-xl">💰</span>
+                  <div className="text-left">
+                    <div className="text-sm font-medium text-white">Price Settings</div>
+                    <div className="text-xs text-purple-200">Update pricing</div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('website-editor')}
+                  className="flex items-center gap-3 p-3 bg-red-500/20 hover:bg-red-500/30 rounded-lg border border-red-500/30 transition-colors"
+                >
+                  <span className="text-xl">🌐</span>
+                  <div className="text-left">
+                    <div className="text-sm font-medium text-white">Website Editor</div>
+                    <div className="text-xs text-red-200">Edit homepage</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {activeTab === "website-editor" && currentUser?.role === 'admin' && (
           <div className="space-y-4 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
