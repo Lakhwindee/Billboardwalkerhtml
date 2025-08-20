@@ -125,12 +125,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     saveUninitialized: false,
     name: 'connect.sid',
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // Disabled for development/preview environments
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
       sameSite: 'lax',
-      path: '/'
-      // Auto-detect domain for deployment compatibility
+      path: '/',
+      domain: undefined // Let browser auto-detect for all subdomains/contexts
     }
   }));
 
@@ -365,22 +365,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.error('Session destroy error:', err);
           return res.status(500).json({ error: 'Logout failed' });
         }
-        // Clear session cookies for all environments
+        // Clear session cookies for all contexts (side panel + new tab)
         res.clearCookie('connect.sid', { 
           path: '/',
           httpOnly: true,
-          sameSite: 'lax'
+          sameSite: 'lax',
+          secure: false
         });
-        
-        // For deployment environments, clear with additional options
-        if (process.env.NODE_ENV === 'production') {
-          res.clearCookie('connect.sid', { 
-            path: '/',
-            httpOnly: true,
-            sameSite: 'lax',
-            secure: true
-          });
-        }
         res.json({ message: 'Logout successful' });
       });
     } catch (error: any) {
