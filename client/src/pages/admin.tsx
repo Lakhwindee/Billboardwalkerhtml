@@ -8,7 +8,7 @@ import PaymentGatewaySettings from '@/components/PaymentGatewaySettings';
 
 
 function Admin() {
-  const [activeTab, setActiveTab] = useState("campaigns");
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [showPriceModal, setShowPriceModal] = useState(false);
@@ -136,13 +136,16 @@ function Admin() {
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
     
-    // Set tab based on URL parameter or user role
-    if (tabParam && getAvailableTabs().some(tab => tab.id === tabParam)) {
-      setActiveTab(tabParam);
-    } else if (currentUser?.role === 'campaign_manager') {
-      setActiveTab('campaigns');
-    } else if (currentUser?.role === 'admin') {
-      setActiveTab('dashboard');
+    // Only set tab based on user role if no URL parameter and user is loaded
+    if (currentUser) {
+      const availableTabs = getAvailableTabs();
+      if (tabParam && availableTabs.some(tab => tab.id === tabParam)) {
+        setActiveTab(tabParam);
+      } else if (currentUser.role === 'campaign_manager') {
+        setActiveTab('campaigns');
+      } else if (currentUser.role === 'admin') {
+        setActiveTab('dashboard');
+      }
     }
   }, [currentUser]);
 
