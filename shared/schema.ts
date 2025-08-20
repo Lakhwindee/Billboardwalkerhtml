@@ -19,6 +19,7 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   email: text("email").notNull().unique(),
+  phone: text("phone"), // Add phone field for users
   role: text("role").default("user").notNull(), // user, admin
   isEmailVerified: boolean("is_email_verified").default(false),
   emailVerificationToken: text("email_verification_token"),
@@ -46,6 +47,11 @@ export const orders = pgTable("orders", {
   quantity: integer("quantity").notNull(),
   designRequirements: text("design_requirements"),
   status: text("status").default("pending").notNull(),
+  customerPhone: text("customer_phone"),
+  customerAddress: text("customer_address"),
+  customerCity: text("customer_city"),
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }),
+  paymentStatus: text("payment_status").default("pending"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -91,7 +97,10 @@ export const campaigns = pgTable("campaigns", {
   email: text("email"), // Customer email for notifications
   phone: text("phone"), // Customer phone number
   customerName: text("customer_name"), // Customer full name
+  customerPhone: text("customer_phone"), // Additional customer phone field
   businessName: text("business_name"), // Business name if applicable
+  selectedOption: text("selected_option"), // Selected option/package
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }), // Total campaign amount
   
   status: text("status").default("pending").notNull(), // pending, approved, rejected, in_production, shipped, delivered
   adminNotes: text("admin_notes"),

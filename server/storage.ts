@@ -220,12 +220,6 @@ export class DatabaseStorage implements IStorage {
     return bcrypt.hash(password, 12);
   }
 
-  async updateUserPassword(userId: number, hashedPassword: string): Promise<void> {
-    await db
-      .update(users)
-      .set({ password: hashedPassword })
-      .where(eq(users.id, userId));
-  }
 
   async createContact(insertContact: InsertContact): Promise<Contact> {
     const [contact] = await db

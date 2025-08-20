@@ -2,6 +2,14 @@ import type { Express } from "express";
 import express from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
+import { User } from "@shared/schema";
+
+// Extend session to include user property
+declare module 'express-session' {
+  interface SessionData {
+    user?: User;
+  }
+}
 import connectPgSimple from "connect-pg-simple";
 import { storage } from "./storage";
 // Simple auth middleware for sessions
@@ -1170,7 +1178,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           try {
             const smsMessage = `🎨 IamBillBoard: Your campaign "${campaign.title}" needs design reupload. Check email for details. Upload new design at: ${process.env.FRONTEND_URL || 'https://iambillboard.com'}/dashboard`;
             
-            await smsService.sendSMS(user.phone, smsMessage);
+            await smsService.sendSMS({ phone: user.phone, message: smsMessage });
             console.log(`📱 Design reupload SMS sent to ${user.phone}`);
           } catch (smsError) {
             console.error('Error sending reupload SMS:', smsError);
@@ -1425,7 +1433,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Get campaign to verify it belongs to current user and needs reupload
-      const campaign = await storage.getCampaign(id);
+      const campaigns = await storage.getCampaigns();
+      const campaign = campaigns.find(c => c.id === id);
       if (!campaign) {
         return res.status(404).json({ error: 'Campaign not found' });
       }
@@ -1451,7 +1460,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const notificationData = {
           userId: 1, // Admin user ID 
           title: 'Design Reuploaded',
-          message: `User has reuploaded design for campaign "${campaign.campaignId}". Ready for review.`,
+          message: `User has reuploaded design for campaign "${campaign.title || 'Campaign #' + campaign.id}". Ready for review.`,
           type: 'design_reupload_user',
           actionUrl: `/admin?tab=campaigns&campaign=${campaign.id}`,
           priority: 'medium'
@@ -2503,7 +2512,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const transaction = await storage.createTransaction({
         transactionRef,
         orderId: paymentResult.orderId || receipt,
-        amount: parseFloat(amount),
+        amount: amount.toString(),
         currency: 'INR',
         paymentMethod: paymentMethod || 'unknown',
         status: 'pending',
