@@ -36,9 +36,10 @@ Zero tolerance for unused/backup files - user demands "exdum clean files chahiye
 - **Session Storage**: PostgreSQL-based.
 
 ### Admin Panel
-- **Access**: Restricted to 'judge' account (judge/judge1313 credentials). 'Campaign manager' role also has specific access.
+- **Access**: Restricted to 'judge' account (judge/judge1313 credentials). 'Campaign manager' role (campaign/campaign123) has access to campaigns and contact messages tabs.
 - **Features**: Campaign approval, dynamic price management, contact management, user management (ban/unban, activity logs), website content editing (homepage GUI editor), bottle samples management (upload, live preview), payment account/transaction management, and visitor analytics.
 - **Authentication**: Secure session-based authentication with protected API routes and multi-step signup verification (email and phone OTP).
+- **Navigation**: Desktop interface includes Dashboard (admin only), Home, and Sign Out buttons. Mobile interface shows Home and Sign Out icons. Campaign managers have access to Campaigns and Contact Messages tabs.
 - **In-stores Delivery**: Enhanced address input system for in-stores delivery with PIN code and contact phone validation.
 
 ## External Dependencies

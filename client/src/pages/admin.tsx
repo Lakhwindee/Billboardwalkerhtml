@@ -1096,7 +1096,14 @@ function Admin() {
                   </p>
                 </div>
               </div>
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 flex space-x-1">
+                <a 
+                  href="/"
+                  className="home-button bg-green-500 hover:bg-green-600 text-white px-1 py-1 rounded text-xs transition-colors"
+                  title="Home"
+                >
+                  🏠
+                </a>
                 <button 
                   onClick={handleLogout}
                   className="logout-button bg-red-500 hover:bg-red-600 text-white px-1 py-1 rounded text-xs transition-colors"
@@ -1142,6 +1149,15 @@ function Admin() {
                     <span>Dashboard</span>
                   </a>
                 )}
+                <a 
+                  href="/" 
+                  className="bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                  </svg>
+                  <span>Home</span>
+                </a>
                 <button 
                   onClick={handleLogout}
                   className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2"
