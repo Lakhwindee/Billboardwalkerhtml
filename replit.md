@@ -53,6 +53,7 @@ IamBillBoard is a full-stack web application offering custom bottle advertising 
 - **DEPLOYMENT COMPATIBILITY FIXED (Aug 16, 2025)**: Session configuration optimized for production deployment with auto-detect HTTPS, fixed password hash authentication, resolved preview vs deployment environment differences
 - **IN-STORES ADDRESS FIELD ENHANCEMENT (Aug 16, 2025)**: Added complete address input system for in-stores delivery option - when users select city and area, additional address field appears for customer's home address to identify nearby shops for delivery, includes PIN code and contact phone with proper validation and Hindi error messages ("कृपया अपना पूरा घर का पता लिखें")
 - **SESSION AUTHENTICATION COMPLETELY FIXED (Aug 17, 2025)**: Fixed critical session cookie issue preventing authentication - changed session configuration from secure: 'auto' to secure: process.env.NODE_ENV === 'production' for proper development environment compatibility. Added explicit session.save() for guaranteed persistence. Fixed CORS configuration from wildcard (*) to specific origins for credential support. Sessions now properly persist between requests, eliminating logout issues when navigating between pages. Server-side authentication confirmed working perfectly with testuser credentials.
+- **REPLIT MIGRATION COMPLETED (Aug 20, 2025)**: Successfully migrated from Replit Agent to standard Replit environment with complete database setup, admin user creation (judge/judge1313), all packages properly installed, and application running on port 5000 with full functionality restored.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -84,7 +85,7 @@ Zero tolerance for unused/backup files - user demands "exdum clean files chahiye
 - **Core Functionality**: User authentication and authorization, campaign management (admin approval/decline), dynamic price management, contact form submissions, automated email workflow system (campaign confirmations, status updates), and payment account/transaction management.
 
 ### Data Storage
-- **Primary Database**: PostgreSQL (configured for Neon Database)
+- **Primary Database**: PostgreSQL (Replit PostgreSQL Database)
 - **ORM**: Drizzle ORM with schema-first approach
 - **Migrations**: Drizzle Kit
 - **Schema**: Users, campaigns, price settings, site settings, user profiles, user activity logs, payment accounts, transactions.
