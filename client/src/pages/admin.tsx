@@ -3494,7 +3494,7 @@ function Admin() {
                       const error = await response.json();
                       toast({
                         title: "❌ Email Test Failed",
-                        description: error.error,
+                        description: error.message || error.error || "Unknown error occurred",
                         variant: "destructive"
                       });
                     }
