@@ -423,12 +423,14 @@ class EmailService {
           }
         });
         console.log('📧 Using custom Gmail config for test email');
+        console.log('📧 Transporter created successfully:', transporter ? 'Yes' : 'No');
       } catch (error) {
         console.error('❌ Failed to create transporter with provided config:', error);
         return false;
       }
     }
     
+    console.log('📧 Final transporter check:', transporter ? 'Available' : 'Not available');
     if (!transporter) {
       console.error('❌ Email transporter not initialized. Please configure Gmail credentials.');
       return false;
