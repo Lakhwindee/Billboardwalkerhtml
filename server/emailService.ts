@@ -115,68 +115,79 @@ class EmailService {
       return false;
     }
 
-    // Email content
-    const subject = '📧 Gmail Test - IamBillBoard System';
+    // Anti-spam optimized email content
+    const subject = 'Email Verification Test - IamBillBoard';
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #10b981 0%, #047857 100%); color: white;">
-        <div style="padding: 40px 30px; text-align: center;">
-          <h1 style="margin: 0; font-size: 32px; font-weight: bold;">✅ Gmail Test Success!</h1>
-          <p style="margin: 10px 0 0 0; font-size: 18px; opacity: 0.9;">IamBillBoard Email System</p>
+      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; color: #333333;">
+        <div style="padding: 30px 20px; text-align: center; background: #f8f9fa; border-bottom: 3px solid #4f46e5;">
+          <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #4f46e5;">Email System Verification</h1>
+          <p style="margin: 10px 0 0 0; font-size: 16px; color: #666;">IamBillBoard Platform</p>
         </div>
         
-        <div style="background: white; color: #333; padding: 30px; border-radius: 10px 10px 0 0;">
-          <h2 style="color: #10b981; margin: 0 0 20px 0;">🎉 Gmail Integration Working!</h2>
+        <div style="background: #ffffff; color: #333; padding: 30px;">
+          <h2 style="color: #4f46e5; margin: 0 0 20px 0; font-size: 20px;">Email Configuration Successful</h2>
           
-          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-            Excellent! Your Gmail App Password setup is correct and working perfectly. This confirms your email notifications will work properly.
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 20px 0; color: #555;">
+            Your email system has been successfully configured and tested. All notifications and verifications will now be delivered properly.
           </p>
           
-          <div style="background: #f0fdf4; padding: 20px; border-radius: 8px; border-left: 4px solid #10b981; margin: 20px 0;">
-            <h3 style="margin: 0 0 15px 0; color: #10b981;">📋 Test Message</h3>
-            <p style="margin: 0; font-size: 16px; line-height: 1.6; font-style: italic; color: #065f46;">"${testMessage}"</p>
+          <div style="background: #f0f4ff; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e0e7ff;">
+            <h3 style="margin: 0 0 15px 0; color: #4f46e5; font-size: 16px;">Test Message</h3>
+            <p style="margin: 0; font-size: 16px; line-height: 1.6; color: #4338ca; background: #ffffff; padding: 10px; border-radius: 4px; border: 1px solid #c7d2fe;">${testMessage}</p>
           </div>
           
-          <div style="background: #eff6ff; padding: 20px; border-radius: 8px; border-left: 4px solid #3b82f6; margin: 20px 0;">
-            <h3 style="margin: 0 0 15px 0; color: #3b82f6;">✨ What's Working</h3>
-            <ul style="margin: 0; padding-left: 20px; line-height: 1.8; color: #1e40af;">
-              <li>✅ Gmail SMTP connection established</li>
-              <li>✅ App Password authentication successful</li>
-              <li>✅ Email delivery confirmed</li>
-              <li>✅ All campaign notifications ready</li>
-            </ul>
+          <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e2e8f0;">
+            <h3 style="margin: 0 0 15px 0; color: #475569; font-size: 16px;">System Status</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr><td style="padding: 8px 0; color: #64748b;">SMTP Connection:</td><td style="padding: 8px 0; color: #16a34a; font-weight: 600;">Active</td></tr>
+              <tr><td style="padding: 8px 0; color: #64748b;">Authentication:</td><td style="padding: 8px 0; color: #16a34a; font-weight: 600;">Verified</td></tr>
+              <tr><td style="padding: 8px 0; color: #64748b;">Email Delivery:</td><td style="padding: 8px 0; color: #16a34a; font-weight: 600;">Operational</td></tr>
+              <tr><td style="padding: 8px 0; color: #64748b;">Test Time:</td><td style="padding: 8px 0; color: #64748b;">${new Date().toLocaleString()}</td></tr>
+            </table>
           </div>
           
-          <div style="text-align: center; margin: 30px 0;">
-            <p style="margin: 0; font-size: 16px; color: #10b981; font-weight: bold;">
-              🚀 Email system fully operational!
-            </p>
-            <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">
-              Test completed at: ${new Date().toLocaleString()}
+          <div style="text-align: center; margin: 30px 0; padding: 20px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0;">
+            <p style="margin: 0; font-size: 16px; color: #16a34a; font-weight: 600;">
+              Email system is now ready for production use
             </p>
           </div>
         </div>
         
-        <div style="background: #f8fafc; padding: 20px 30px; text-align: center; border-radius: 0 0 10px 10px;">
-          <p style="margin: 0; color: #666; font-size: 14px;">
-            This is a test email from IamBillBoard Gmail integration
+        <div style="background: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+          <p style="margin: 0; color: #64748b; font-size: 14px;">
+            This message was sent from your IamBillBoard account verification system
           </p>
-          <p style="margin: 10px 0 0 0; color: #999; font-size: 12px;">
-            © 2025 IamBillBoard. All rights reserved.
+          <p style="margin: 10px 0 0 0; color: #94a3b8; font-size: 12px;">
+            © 2025 IamBillBoard Platform. All rights reserved.
           </p>
         </div>
       </div>
     `;
 
-    // Send test email with direct transporter
+    // Send test email with anti-spam headers
     const mailOptions = {
       from: `"IamBillBoard Team" <${config.gmailUser}>`,
       to: toEmail,
       subject: subject,
-      html: html
+      html: html,
+      headers: {
+        'X-Mailer': 'IamBillBoard Platform',
+        'X-Priority': '3',
+        'X-MSMail-Priority': 'Normal',
+        'Importance': 'Normal',
+        'List-Unsubscribe': '<mailto:unsubscribe@iambillboard.com>',
+        'Reply-To': config.gmailUser,
+        'Return-Path': config.gmailUser,
+        'MIME-Version': '1.0',
+        'Content-Type': 'text/html; charset=UTF-8'
+      },
+      messageId: `<${Date.now()}.${Math.random().toString(36).substr(2, 9)}@iambillboard.com>`,
+      date: new Date(),
+      encoding: 'utf8'
     };
 
     try {
-      console.log('📧 Sending Gmail test email...');
+      console.log('📧 Sending anti-spam optimized email...');
       await testTransporter.sendMail(mailOptions);
       console.log(`✅ Gmail test email sent successfully to ${toEmail}`);
       return true;
@@ -189,49 +200,49 @@ class EmailService {
     }
   }
 
-  // 🆕 OTP Verification Email for Registration
+  // 🆕 OTP Verification Email for Registration (Anti-spam optimized)
   async sendOTPEmail(email: string, otp: string, name?: string): Promise<boolean> {
-    const subject = '🔐 Your OTP for IamBillBoard Account Verification';
+    const subject = 'Account Verification Code - IamBillBoard';
     
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white;">
-        <div style="padding: 40px 30px; text-align: center;">
-          <h1 style="margin: 0; font-size: 32px; font-weight: bold;">🔐 OTP Verification</h1>
-          <p style="margin: 10px 0 0 0; font-size: 18px; opacity: 0.9;">IamBillBoard Account Security</p>
+      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; color: #333333;">
+        <div style="padding: 30px 20px; text-align: center; background: #f8f9fa; border-bottom: 3px solid #4f46e5;">
+          <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #4f46e5;">Account Verification</h1>
+          <p style="margin: 10px 0 0 0; font-size: 16px; color: #666;">IamBillBoard Platform</p>
         </div>
         
-        <div style="background: white; color: #333; padding: 30px; border-radius: 10px 10px 0 0;">
-          <h2 style="color: #4f46e5; margin: 0 0 20px 0;">Verify Your Account</h2>
+        <div style="background: #ffffff; color: #333; padding: 30px;">
+          <h2 style="color: #4f46e5; margin: 0 0 20px 0; font-size: 20px;">Account Verification Required</h2>
           
-          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-            ${name ? `Hi ${name},` : 'Hello,'} Here's your One-Time Password (OTP) to verify your IamBillBoard account:
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 20px 0; color: #555;">
+            ${name ? `Hello ${name},` : 'Hello,'} Please use the verification code below to complete your account setup:
           </p>
           
-          <div style="background: #f0f4ff; padding: 30px; border-radius: 12px; text-align: center; margin: 30px 0;">
-            <p style="margin: 0 0 15px 0; font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px;">Your OTP Code</p>
-            <div style="font-size: 48px; font-weight: bold; color: #4f46e5; letter-spacing: 8px; font-family: 'Courier New', monospace;">${otp}</div>
-            <p style="margin: 15px 0 0 0; font-size: 12px; color: #999;">Valid for 10 minutes</p>
+          <div style="background: #f0f4ff; padding: 25px; border-radius: 8px; text-align: center; margin: 25px 0; border: 1px solid #e0e7ff;">
+            <p style="margin: 0 0 10px 0; font-size: 14px; color: #64748b; font-weight: 600;">Verification Code</p>
+            <div style="font-size: 32px; font-weight: bold; color: #4f46e5; letter-spacing: 4px; font-family: 'Courier New', monospace; background: #ffffff; padding: 15px; border-radius: 6px; border: 2px solid #c7d2fe;">${otp}</div>
+            <p style="margin: 10px 0 0 0; font-size: 12px; color: #94a3b8;">Code expires in 10 minutes</p>
           </div>
           
-          <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin: 20px 0;">
-            <p style="margin: 0; font-size: 14px; color: #856404;">
-              ⚠️ <strong>Security Notice:</strong> Never share this OTP with anyone. IamBillBoard will never ask for your OTP over phone or email.
+          <div style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 15px; margin: 20px 0;">
+            <p style="margin: 0; font-size: 14px; color: #92400e;">
+              <strong>Security Notice:</strong> This code is confidential. Never share it with anyone.
             </p>
           </div>
           
-          <div style="text-align: center; margin: 30px 0;">
-            <p style="margin: 0; font-size: 14px; color: #666;">
-              Enter this code on the verification page to complete your registration.
+          <div style="text-align: center; margin: 25px 0;">
+            <p style="margin: 0; font-size: 14px; color: #64748b;">
+              Enter this code on the verification page to activate your account.
             </p>
           </div>
         </div>
         
-        <div style="background: #f8fafc; padding: 20px 30px; text-align: center; border-radius: 0 0 10px 10px;">
-          <p style="margin: 0; color: #666; font-size: 14px;">
-            This is an automated security email from IamBillBoard
+        <div style="background: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+          <p style="margin: 0; color: #64748b; font-size: 14px;">
+            This is an automated message from your IamBillBoard account
           </p>
-          <p style="margin: 10px 0 0 0; color: #999; font-size: 12px;">
-            © 2025 IamBillBoard. All rights reserved.
+          <p style="margin: 10px 0 0 0; color: #94a3b8; font-size: 12px;">
+            © 2025 IamBillBoard Platform. All rights reserved.
           </p>
         </div>
       </div>
