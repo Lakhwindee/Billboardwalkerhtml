@@ -5,6 +5,14 @@ import { type Contact, type Campaign, type PriceSetting, type BottleSample, type
 import { toast } from "@/hooks/use-toast";
 import PaymentGatewaySettings from '@/components/PaymentGatewaySettings';
 
+// Define interface for current user
+interface CurrentUser {
+  id: number;
+  username: string;
+  email: string;
+  role: 'admin' | 'campaign_manager' | 'user';
+}
+
 
 
 function Admin() {
@@ -124,7 +132,7 @@ function Admin() {
   const queryClient = useQueryClient();
 
   // Get current user for role-based access
-  const { data: currentUser } = useQuery({
+  const { data: currentUser } = useQuery<CurrentUser>({
     queryKey: ['/api/current-user'],
     retry: false,
   });
