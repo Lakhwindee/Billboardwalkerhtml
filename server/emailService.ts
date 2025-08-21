@@ -408,8 +408,31 @@ class EmailService {
     return await this.sendEmail({ to: userEmail, subject, html });
   }
 
-  // Test email functionality
-  async sendTestEmail(toEmail: string, testMessage: string = "This is a test email"): Promise<boolean> {
+  // Test email functionality with optional custom config
+  async sendTestEmail(toEmail: string, testMessage: string = "This is a test email", config?: { gmailUser: string; gmailPassword: string }): Promise<boolean> {
+    let transporter = this.transporter;
+    
+    // If custom config provided, create temporary transporter
+    if (config && config.gmailUser && config.gmailPassword) {
+      try {
+        transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: config.gmailUser,
+            pass: config.gmailPassword
+          }
+        });
+        console.log('📧 Using custom Gmail config for test email');
+      } catch (error) {
+        console.error('❌ Failed to create transporter with provided config:', error);
+        return false;
+      }
+    }
+    
+    if (!transporter) {
+      console.error('❌ Email transporter not initialized. Please configure Gmail credentials.');
+      return false;
+    }
     const subject = '📧 Email Test - IamBillBoard System';
     
     const html = `

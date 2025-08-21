@@ -3691,7 +3691,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: 'Admin access required' });
       }
       
-      const { email, message } = req.body;
+      const { email, message, config } = req.body;
       
       if (!email) {
         return res.status(400).json({ error: 'Email address is required' });
@@ -3703,10 +3703,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Invalid email format' });
       }
       
+      // Check if Gmail config is provided (either in request or environment)
+      const hasEnvConfig = process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD;
+      const hasRequestConfig = config && config.gmailUser && config.gmailPassword;
+      
+      if (!hasEnvConfig && !hasRequestConfig) {
+        return res.status(400).json({ 
+          success: false,
+          message: 'Gmail configuration not found. Please configure your Gmail credentials first.'
+        });
+      }
+      
       console.log(`📧 Sending test email to: ${email}`);
       
       const emailService = new (await import('./emailService')).EmailService();
-      const success = await emailService.sendTestEmail(email, message || "Testing Gmail integration from IamBillBoard admin panel");
+      const success = await emailService.sendTestEmail(
+        email, 
+        message || "Testing Gmail integration from IamBillBoard admin panel",
+        config || undefined
+      );
       
       if (success) {
         res.json({ 

@@ -3481,7 +3481,8 @@ function Admin() {
                   try {
                     const response = await apiRequest('POST', '/api/test-email', {
                       email: testEmail,
-                      message: testMessage
+                      message: testMessage,
+                      config: emailConfig.gmailUser ? emailConfig : undefined
                     });
                     
                     if (response.ok) {
