@@ -72,11 +72,6 @@ function Admin() {
   });
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [savingChanges, setSavingChanges] = useState(false);
-  const [emailConfig, setEmailConfig] = useState({
-    gmailUser: '',
-    gmailPassword: '',
-    fromName: 'IamBillBoard'
-  });
 
   const [smsConfig, setSmsConfig] = useState({
     twilioAccountSid: '',
@@ -216,7 +211,6 @@ function Admin() {
       { id: "payment-accounts", label: "Payment Accounts", icon: "🏦", shortLabel: "Accounts" },
       { id: "payment-gateways", label: "Payment Gateways", icon: "💳", shortLabel: "Gateway" },
       { id: "site-visitors", label: "Site Visitors", icon: "👥", shortLabel: "Visitors" },
-      { id: "email", label: "Email Setup", icon: "📧", shortLabel: "Email" },
     ];
 
     // If user role is 'campaign_manager', show campaigns and contacts tabs
@@ -3311,8 +3305,8 @@ function Admin() {
           </div>
         )}
 
-        {/* Email Configuration Tab */}
-        {activeTab === "email" && currentUser?.role === 'admin' && (
+        {/* Email Configuration Tab - REMOVED */}
+        {false && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Email Configuration</h2>

@@ -3605,70 +3605,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Email test endpoint for admin
+  // Email test endpoint - DISABLED  
   app.post("/api/test-email", async (req, res) => {
-    try {
-      const session = req.session as any;
-      
-      // Check if user is admin
-      if (!session?.user || session.user.role !== 'admin') {
-        return res.status(403).json({ error: 'Admin access required' });
-      }
-      
-      const { email, message, config } = req.body;
-      
-      if (!email) {
-        return res.status(400).json({ error: 'Email address is required' });
-      }
-      
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        return res.status(400).json({ error: 'Invalid email format' });
-      }
-      
-      // Check if Gmail config is provided (either in request or environment)
-      const hasEnvConfig = process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD;
-      const hasRequestConfig = config && config.gmailUser && config.gmailPassword;
-      
-      if (!hasEnvConfig && !hasRequestConfig) {
-        return res.status(400).json({ 
-          success: false,
-          message: 'Gmail configuration not found. Please configure your Gmail credentials first.'
-        });
-      }
-      
-      console.log(`📧 Sending test email to: ${email}`);
-      console.log(`📧 Config provided:`, config ? 'Yes' : 'No');
-      console.log(`📧 Message:`, message || 'Default message');
-      
-      // Use the imported emailService directly
-      const success = await emailService.sendTestEmail(
-        email, 
-        message || "Testing Gmail integration from IamBillBoard admin panel",
-        config || undefined
-      );
-      
-      if (success) {
-        res.json({ 
-          success: true, 
-          message: `Test email sent successfully to ${email}`,
-          timestamp: new Date().toISOString()
-        });
-      } else {
-        res.status(500).json({ 
-          error: 'Failed to send test email. Check email credentials.',
-          success: false
-        });
-      }
-      
-    } catch (error: any) {
-      console.error('Email test error:', error);
-      res.status(500).json({ 
-        error: 'Email test failed: ' + error.message,
-        success: false
-      });
-    }
+    res.status(503).json({ 
+      error: "Email testing temporarily disabled",
+      message: "Email functionality is being updated. Please try again later."
+    });
   });
 
   const httpServer = createServer(app);
