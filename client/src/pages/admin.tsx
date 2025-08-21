@@ -493,15 +493,13 @@ function Admin() {
       }
       
       // Send password change request to backend
-      const response = await apiRequest('/api/change-admin-password', {
-        method: 'POST',
-        body: {
-          currentPassword: adminSettings.currentPassword,
-          newPassword: adminSettings.newPassword
-        }
+      const response = await apiRequest('POST', '/api/change-admin-password', {
+        currentPassword: adminSettings.currentPassword,
+        newPassword: adminSettings.newPassword
       });
       
-      if (response.success) {
+      if (response.ok) {
+        const result = await response.json();
         alert('Password changed successfully!');
         setAdminSettings({
           currentPassword: '',
@@ -509,7 +507,8 @@ function Admin() {
           confirmPassword: ''
         });
       } else {
-        alert(response.message || 'Error changing password!');
+        const error = await response.json();
+        alert(error.message || 'Error changing password!');
       }
     } catch (error) {
       console.error('Password change error:', error);
