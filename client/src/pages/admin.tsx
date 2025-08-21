@@ -3457,6 +3457,101 @@ function Admin() {
                   Click the button above to complete the setup process.
                 </p>
               </div>
+
+              {/* Email Test Section */}
+              <div className="mt-8 bg-green-900 border border-green-600 rounded-lg p-6">
+                <h4 className="text-xl font-bold text-green-200 mb-4">📧 Test Email Functionality</h4>
+                <p className="text-green-100 text-sm mb-6">
+                  Send a test email to verify your Gmail integration is working properly.
+                </p>
+                
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.target as HTMLFormElement);
+                  const testEmail = formData.get('testEmail') as string;
+                  const testMessage = formData.get('testMessage') as string;
+                  
+                  try {
+                    const response = await apiRequest('POST', '/api/test-email', {
+                      email: testEmail,
+                      message: testMessage
+                    });
+                    
+                    if (response.ok) {
+                      const result = await response.json();
+                      toast({
+                        title: "✅ Email Test Successful",
+                        description: result.message,
+                      });
+                    } else {
+                      const error = await response.json();
+                      toast({
+                        title: "❌ Email Test Failed",
+                        description: error.error,
+                        variant: "destructive"
+                      });
+                    }
+                  } catch (error) {
+                    console.error('Email test error:', error);
+                    toast({
+                      title: "❌ Email Test Failed",
+                      description: "Network error. Please try again.",
+                      variant: "destructive"
+                    });
+                  }
+                }} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-green-200 mb-2">
+                      Test Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      name="testEmail"
+                      required
+                      placeholder="your.email@example.com"
+                      className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                    <p className="text-xs text-green-300 mt-1">
+                      Enter the email address where you want to receive the test email
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-green-200 mb-2">
+                      Custom Test Message (Optional)
+                    </label>
+                    <textarea
+                      name="testMessage"
+                      placeholder="This is a test of my Gmail integration for IamBillBoard"
+                      className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      rows={3}
+                    />
+                    <p className="text-xs text-green-300 mt-1">
+                      Optional: Add a custom message to include in the test email
+                    </p>
+                  </div>
+                  
+                  <button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-3 px-6 rounded-lg font-medium transition-all flex items-center justify-center"
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    Send Test Email
+                  </button>
+                </form>
+                
+                <div className="mt-6 p-4 bg-green-800/30 rounded-lg border border-green-500/30">
+                  <h5 className="text-green-300 font-semibold mb-2">✨ What happens when you test:</h5>
+                  <ul className="list-disc list-inside space-y-1 text-sm text-green-100">
+                    <li>A beautifully formatted test email will be sent</li>
+                    <li>You'll receive confirmation if Gmail integration is working</li>
+                    <li>The email will include your custom message if provided</li>
+                    <li>All future customer emails will work automatically</li>
+                  </ul>
+                </div>
+              </div>
             </div>
 
             {/* SMS Configuration Section */}

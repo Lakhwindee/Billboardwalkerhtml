@@ -408,6 +408,63 @@ class EmailService {
     return await this.sendEmail({ to: userEmail, subject, html });
   }
 
+  // Test email functionality
+  async sendTestEmail(toEmail: string, testMessage: string = "This is a test email"): Promise<boolean> {
+    const subject = '📧 Email Test - IamBillBoard System';
+    
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white;">
+        <div style="padding: 40px 30px; text-align: center;">
+          <h1 style="margin: 0; font-size: 32px; font-weight: bold;">📧 Email Test</h1>
+          <p style="margin: 10px 0 0 0; font-size: 18px; opacity: 0.9;">IamBillBoard Email System</p>
+        </div>
+        
+        <div style="background: white; color: #333; padding: 30px; border-radius: 10px 10px 0 0;">
+          <h2 style="color: #4f46e5; margin: 0 0 20px 0;">Email System Test Successful! ✅</h2>
+          
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+            Congratulations! Your Gmail integration is working perfectly. This test email confirms that your email service is properly configured and ready to send notifications.
+          </p>
+          
+          <div style="background: #f0f4ff; padding: 20px; border-radius: 8px; border-left: 4px solid #4f46e5; margin: 20px 0;">
+            <h3 style="margin: 0 0 15px 0; color: #4f46e5;">📋 Test Message</h3>
+            <p style="margin: 0; font-size: 16px; line-height: 1.6; font-style: italic;">"${testMessage}"</p>
+          </div>
+          
+          <div style="background: #ecfdf5; padding: 20px; border-radius: 8px; border-left: 4px solid #10b981; margin: 20px 0;">
+            <h3 style="margin: 0 0 15px 0; color: #10b981;">✨ What This Means</h3>
+            <ul style="margin: 0; padding-left: 20px; line-height: 1.8; color: #065f46;">
+              <li>Gmail SMTP connection is working</li>
+              <li>Email credentials are valid</li>
+              <li>All email notifications will work properly</li>
+              <li>Campaign emails, password resets, and welcome emails are ready</li>
+            </ul>
+          </div>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <p style="margin: 0; font-size: 16px; color: #10b981; font-weight: bold;">
+              🎉 Email service is fully operational!
+            </p>
+            <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">
+              Test sent at: ${new Date().toLocaleString()}
+            </p>
+          </div>
+        </div>
+        
+        <div style="background: #f8fafc; padding: 20px 30px; text-align: center; border-radius: 0 0 10px 10px;">
+          <p style="margin: 0; color: #666; font-size: 14px;">
+            This is an automated test email from IamBillBoard
+          </p>
+          <p style="margin: 10px 0 0 0; color: #999; font-size: 12px;">
+            © 2025 IamBillBoard. All rights reserved.
+          </p>
+        </div>
+      </div>
+    `;
+
+    return await this.sendEmail({ to: toEmail, subject, html });
+  }
+
   // Welcome email for new users
   async sendWelcomeEmail(email: string, firstName: string, username: string): Promise<boolean> {
     const subject = '🎉 Welcome to IamBillBoard - Your Account is Ready!';
