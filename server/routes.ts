@@ -2353,36 +2353,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Email testing route
-  app.post("/api/test-email", async (req, res) => {
-    try {
-      const { testEmail, config } = req.body;
-      
-      if (!config || !config.gmailUser || !config.gmailPassword) {
-        return res.status(400).json({ 
-          success: false, 
-          message: "Gmail configuration is required" 
-        });
-      }
-
-      // Test OTP email sending
-      console.log('Test email would be sent to:', testEmail);
-      const success = true;
-
-      res.json({ 
-        success,
-        message: success ? 
-          "Test email sent successfully!" : 
-          "Failed to send test email. Please check your Gmail credentials."
-      });
-    } catch (error: any) {
-      console.error('Error testing email:', error);
-      res.status(500).json({ 
-        success: false, 
-        message: "Failed to send test email: " + error.message 
-      });
-    }
-  });
+  // Removed duplicate fake email testing route - using the proper admin endpoint below
 
   // Order Campaign routes for tracking
   app.post("/api/order-campaigns", async (req, res) => {
@@ -2981,54 +2952,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Test email configuration endpoint
-  app.post("/api/test-email", async (req, res) => {
-    try {
-      const { testEmail, config } = req.body;
-      
-      if (!testEmail || !config?.gmailUser || !config?.gmailPassword) {
-        return res.status(400).json({ message: "Missing required fields" });
-      }
-
-      // Send test email
-      const testEmailData = {
-        customerName: "Test Customer",
-        email: testEmail,
-        phone: "+91 9876543210",
-        campaignId: "TEST-001",
-        transactionId: "TEST-TXN-001",
-        amount: 5000,
-        distributionOption: "In Stores",
-        city: "Mumbai",
-        area: "Andheri",
-        address: JSON.stringify({
-          houseNumber: "123",
-          street: "Test Street",
-          pincode: "400001"
-        }),
-        orderSummary: JSON.stringify({
-          bottles750ml: 50,
-          bottles1L: 30,
-          totalPacks: 7
-        }),
-        paymentMethod: "UPI",
-        designFile: "test-design.jpg"
-      };
-
-      // Send test OTP email instead of order confirmation for testing
-      const otp = "123456"; // Test OTP  
-      const emailSent = await console.log("Email service disabled");
-      
-      if (emailSent) {
-        res.json({ success: true, message: "Test email sent successfully!" });
-      } else {
-        res.status(500).json({ success: false, message: "Failed to send test email" });
-      }
-    } catch (error: any) {
-      console.error('Test email error:', error);
-      res.status(500).json({ success: false, message: error.message });
-    }
-  });
+  // Removed second duplicate fake email testing route - using the proper admin endpoint below
 
   // Payment Management Routes
   app.get("/api/payment-accounts", async (req, res) => {
@@ -3715,6 +3639,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log(`📧 Sending test email to: ${email}`);
+      console.log(`📧 Config provided:`, config ? 'Yes' : 'No');
+      console.log(`📧 Message:`, message || 'Default message');
       
       const emailService = new (await import('./emailService')).EmailService();
       const success = await emailService.sendTestEmail(
