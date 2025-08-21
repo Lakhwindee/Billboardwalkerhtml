@@ -3642,7 +3642,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`📧 Config provided:`, config ? 'Yes' : 'No');
       console.log(`📧 Message:`, message || 'Default message');
       
-      const emailService = new (await import('./emailService')).EmailService();
+      const { EmailService } = await import('./emailService');
+      const emailService = new EmailService();
       const success = await emailService.sendTestEmail(
         email, 
         message || "Testing Gmail integration from IamBillBoard admin panel",
