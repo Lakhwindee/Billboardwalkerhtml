@@ -201,7 +201,7 @@ class EmailService {
   }
 
   // 🆕 OTP Verification Email for Registration (Anti-spam optimized)
-  async sendOTPEmail(email: string, otp: string, name?: string): Promise<boolean> {
+  async sendOTPEmail(email: string, otp: string, name?: string, config?: any): Promise<boolean> {
     const subject = 'Account Verification Code - IamBillBoard';
     
     const html = `
@@ -247,6 +247,12 @@ class EmailService {
         </div>
       </div>
     `;
+
+    // If no transporter but we have config, use the test email method
+    if (!this.transporter && config) {
+      console.log('📧 Using provided Gmail config for OTP email');
+      return this.sendTestEmail(email, `Your verification code: ${otp}`, config);
+    }
 
     return this.sendEmail({ to: email, subject, html });
   }

@@ -16,7 +16,7 @@ class EmailVerificationService {
   }
 
   // Send email verification OTP for signup
-  async sendVerificationEmail(email: string, firstName: string): Promise<{ success: boolean; message: string; verificationId?: number }> {
+  async sendVerificationEmail(email: string, firstName: string, gmailConfig?: any): Promise<{ success: boolean; message: string; verificationId?: number }> {
     try {
       const otp = this.generateOTP();
       const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
@@ -74,8 +74,9 @@ class EmailVerificationService {
 
       // Send verification email using Gmail integration
       console.log(`📧 Sending Gmail OTP verification to ${email}: ${otp}`);
+      console.log(`📧 Gmail config provided: ${gmailConfig ? 'Yes' : 'No'}`);
       
-      const emailSent = await emailService.sendOTPEmail(email, otp, firstName);
+      const emailSent = await emailService.sendOTPEmail(email, otp, firstName, gmailConfig);
 
       console.log(`📧 Gmail OTP sent status: ${emailSent ? 'Success' : 'Failed'}`);
 

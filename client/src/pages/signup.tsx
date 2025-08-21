@@ -86,10 +86,26 @@ export default function SignupPage() {
   // Send email verification
   const emailVerificationMutation = useMutation({
     mutationFn: async (data: SignupForm) => {
+      // Get Gmail config from localStorage for signup OTP
+      let gmailConfig = null;
+      try {
+        const savedConfig = localStorage.getItem('billboardwalker_email_config');
+        if (savedConfig) {
+          gmailConfig = JSON.parse(savedConfig);
+          console.log('📧 Gmail config found for signup verification');
+        }
+      } catch (e) {
+        console.log('No Gmail config found in localStorage');
+      }
+
       const response = await fetch("/api/send-email-verification", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: data.email, firstName: data.firstName }),
+        body: JSON.stringify({ 
+          email: data.email, 
+          firstName: data.firstName,
+          gmailConfig: gmailConfig
+        }),
       });
       
       if (!response.ok) {

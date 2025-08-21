@@ -541,13 +541,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Email verification endpoints
   app.post("/api/send-email-verification", async (req, res) => {
     try {
-      const { email, firstName } = req.body;
+      const { email, firstName, gmailConfig } = req.body;
       
       if (!email || !firstName) {
         return res.status(400).json({ message: 'Email and first name are required' });
       }
       
-      const result = await emailVerificationService.sendVerificationEmail(email, firstName);
+      // Pass Gmail config if provided
+      const result = await emailVerificationService.sendVerificationEmail(email, firstName, gmailConfig);
       
       if (result.success) {
         res.json({ message: result.message, verificationId: result.verificationId });
