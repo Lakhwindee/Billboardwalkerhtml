@@ -3605,12 +3605,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Email test endpoint - DISABLED  
+  // Gmail Test Email endpoint
   app.post("/api/test-email", async (req, res) => {
-    res.status(503).json({ 
-      error: "Email testing temporarily disabled",
-      message: "Email functionality is being updated. Please try again later."
-    });
+    try {
+      const session = req.session as any;
+      
+      // Check if user is admin
+      if (!session?.user || session.user.role !== 'admin') {
+        return res.status(403).json({ error: 'Admin access required' });
+      }
+      
+      const { email, message, config } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ error: 'Email address is required' });
+      }
+      
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: 'Invalid email format' });
+      }
+      
+      console.log(`📧 Testing Gmail integration for: ${email}`);
+      
+      // Use emailService to send test email
+      const success = await emailService.sendTestEmail(
+        email, 
+        message || "Testing Gmail integration for OTPs and notifications",
+        config
+      );
+      
+      if (success) {
+        res.json({ 
+          success: true, 
+          message: `Gmail test email sent successfully to ${email}`,
+          timestamp: new Date().toISOString()
+        });
+      } else {
+        res.status(500).json({ 
+          error: 'Failed to send test email. Check Gmail App Password.',
+          success: false
+        });
+      }
+      
+    } catch (error: any) {
+      console.error('Gmail test error:', error);
+      res.status(500).json({ 
+        error: 'Gmail test failed: ' + error.message,
+        success: false
+      });
+    }
   });
 
   const httpServer = createServer(app);

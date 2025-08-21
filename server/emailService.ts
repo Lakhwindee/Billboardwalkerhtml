@@ -92,7 +92,7 @@ class EmailService {
     // Clean Gmail SMTP Configuration
     let testTransporter;
     try {
-      testTransporter = nodemailer.createTransporter({
+      testTransporter = nodemailer.createTransport({
         service: 'Gmail',
         host: 'smtp.gmail.com',
         port: 587,
@@ -186,6 +186,57 @@ class EmailService {
       }
       return false;
     }
+  }
+
+  // 🆕 OTP Verification Email for Registration
+  async sendOTPEmail(email: string, otp: string, name?: string): Promise<boolean> {
+    const subject = '🔐 Your OTP for IamBillBoard Account Verification';
+    
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white;">
+        <div style="padding: 40px 30px; text-align: center;">
+          <h1 style="margin: 0; font-size: 32px; font-weight: bold;">🔐 OTP Verification</h1>
+          <p style="margin: 10px 0 0 0; font-size: 18px; opacity: 0.9;">IamBillBoard Account Security</p>
+        </div>
+        
+        <div style="background: white; color: #333; padding: 30px; border-radius: 10px 10px 0 0;">
+          <h2 style="color: #4f46e5; margin: 0 0 20px 0;">Verify Your Account</h2>
+          
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+            ${name ? `Hi ${name},` : 'Hello,'} Here's your One-Time Password (OTP) to verify your IamBillBoard account:
+          </p>
+          
+          <div style="background: #f0f4ff; padding: 30px; border-radius: 12px; text-align: center; margin: 30px 0;">
+            <p style="margin: 0 0 15px 0; font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px;">Your OTP Code</p>
+            <div style="font-size: 48px; font-weight: bold; color: #4f46e5; letter-spacing: 8px; font-family: 'Courier New', monospace;">${otp}</div>
+            <p style="margin: 15px 0 0 0; font-size: 12px; color: #999;">Valid for 10 minutes</p>
+          </div>
+          
+          <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin: 20px 0;">
+            <p style="margin: 0; font-size: 14px; color: #856404;">
+              ⚠️ <strong>Security Notice:</strong> Never share this OTP with anyone. IamBillBoard will never ask for your OTP over phone or email.
+            </p>
+          </div>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <p style="margin: 0; font-size: 14px; color: #666;">
+              Enter this code on the verification page to complete your registration.
+            </p>
+          </div>
+        </div>
+        
+        <div style="background: #f8fafc; padding: 20px 30px; text-align: center; border-radius: 0 0 10px 10px;">
+          <p style="margin: 0; color: #666; font-size: 14px;">
+            This is an automated security email from IamBillBoard
+          </p>
+          <p style="margin: 10px 0 0 0; color: #999; font-size: 12px;">
+            © 2025 IamBillBoard. All rights reserved.
+          </p>
+        </div>
+      </div>
+    `;
+
+    return this.sendEmail({ to: email, subject, html });
   }
 
   // Campaign submission confirmation email

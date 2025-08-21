@@ -72,6 +72,11 @@ function Admin() {
   });
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [savingChanges, setSavingChanges] = useState(false);
+  const [emailConfig, setEmailConfig] = useState({
+    gmailUser: '',
+    gmailPassword: '',
+    fromName: 'IamBillBoard Team'
+  });
 
   const [smsConfig, setSmsConfig] = useState({
     twilioAccountSid: '',
@@ -207,6 +212,7 @@ function Admin() {
       { id: "admin-settings", label: "Admin Settings", icon: "⚙️", shortLabel: "Settings" },
       { id: "activity", label: "Activity Logs", icon: "📊", shortLabel: "Activity" },
       { id: "design-samples", label: "Design Samples", icon: "🎨", shortLabel: "Designs" },
+      { id: "email", label: "Gmail Integration", icon: "📧", shortLabel: "Gmail" },
       { id: "revenue", label: "Revenue & Transactions", icon: "💰", shortLabel: "Revenue" },
       { id: "payment-accounts", label: "Payment Accounts", icon: "🏦", shortLabel: "Accounts" },
       { id: "payment-gateways", label: "Payment Gateways", icon: "💳", shortLabel: "Gateway" },
@@ -3305,8 +3311,8 @@ function Admin() {
           </div>
         )}
 
-        {/* Email Configuration Tab - REMOVED */}
-        {false && (
+        {/* Gmail Integration Tab */}
+        {activeTab === "email" && currentUser?.role === 'admin' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Email Configuration</h2>
@@ -3316,7 +3322,7 @@ function Admin() {
               <div className="text-center py-8">
                 <div className="text-6xl mb-4">📧</div>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-2xl font-bold">Gmail Email Setup</h3>
+                  <h3 className="text-2xl font-bold">Gmail Integration for OTPs & Notifications</h3>
                   {emailConfig.gmailUser ? (
                     <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                       ✓ Configured
@@ -3328,7 +3334,7 @@ function Admin() {
                   )}
                 </div>
                 <p className="text-gray-300 mb-6">
-                  Configure your Gmail account to send automated order confirmation emails
+                  Configure Gmail to send OTPs, order confirmations, and automated notifications
                 </p>
                 {/* Gmail Configuration Form */}
                 <form onSubmit={async (e) => {
@@ -3353,9 +3359,9 @@ function Admin() {
                     
                     const data = await response.json();
                     if (data.success) {
-                      alert('✅ Gmail setup saved and tested successfully! Emails are now configured and ready to send OTP verification emails.');
+                      alert('✅ Gmail setup completed! OTPs, confirmations, and notifications are now active.');
                     } else {
-                      alert('⚠️ Gmail settings saved but test email failed. Please check your credentials.');
+                      alert('⚠️ Gmail settings saved but test failed. Please check your App Password.');
                     }
                   } catch (error) {
                     alert('⚠️ Gmail settings saved but couldn\'t test. Please verify your setup.');
@@ -3418,52 +3424,52 @@ function Admin() {
               </div>
 
               <div className="mt-8 bg-blue-900 border border-blue-600 rounded-lg p-6">
-                <h4 className="text-xl font-bold text-blue-200 mb-4">📋 Email Features</h4>
+                <h4 className="text-xl font-bold text-blue-200 mb-4">📧 Gmail Integration Features</h4>
                 <div className="grid md:grid-cols-2 gap-4 text-blue-100">
                   <div className="flex items-start space-x-3">
-                    <div className="text-green-400 text-xl">✅</div>
+                    <div className="text-green-400 text-xl">🔐</div>
                     <div>
-                      <div className="font-semibold">Order Confirmation</div>
-                      <div className="text-sm opacity-80">Automatic emails when orders are placed</div>
+                      <div className="font-semibold">OTP Verification</div>
+                      <div className="text-sm opacity-80">Secure account registration and login verification</div>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
-                    <div className="text-green-400 text-xl">✅</div>
+                    <div className="text-green-400 text-xl">📧</div>
                     <div>
-                      <div className="font-semibold">Status Updates</div>
-                      <div className="text-sm opacity-80">Email notifications for approval, production, dispatch</div>
+                      <div className="font-semibold">Order Confirmations</div>
+                      <div className="text-sm opacity-80">Automatic emails when campaigns are submitted</div>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
-                    <div className="text-green-400 text-xl">✅</div>
+                    <div className="text-green-400 text-xl">🔔</div>
+                    <div>
+                      <div className="font-semibold">Status Notifications</div>
+                      <div className="text-sm opacity-80">Campaign approval, production, and delivery updates</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="text-green-400 text-xl">🎨</div>
                     <div>
                       <div className="font-semibold">Professional Templates</div>
-                      <div className="text-sm opacity-80">Beautifully designed HTML email templates</div>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="text-green-400 text-xl">✅</div>
-                    <div>
-                      <div className="font-semibold">Detailed Information</div>
-                      <div className="text-sm opacity-80">Complete order details, timeline, and contact info</div>
+                      <div className="text-sm opacity-80">Beautiful HTML emails with brand consistency</div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-6 bg-yellow-900 border border-yellow-600 rounded-lg p-4">
-                <h4 className="font-semibold text-yellow-200 mb-2">⚠️ Setup Required</h4>
-                <p className="text-yellow-100 text-sm">
-                  You need to configure your Gmail credentials before automated emails will work. 
-                  Click the button above to complete the setup process.
+              <div className="mt-6 bg-purple-900 border border-purple-600 rounded-lg p-4">
+                <h4 className="font-semibold text-purple-200 mb-2">🚀 Ready for Production</h4>
+                <p className="text-purple-100 text-sm">
+                  Once configured, all OTPs, confirmations, and notifications will be sent automatically. 
+                  Gmail App Password is required for security.
                 </p>
               </div>
 
               {/* Email Test Section */}
               <div className="mt-8 bg-green-900 border border-green-600 rounded-lg p-6">
-                <h4 className="text-xl font-bold text-green-200 mb-4">📧 Test Email Functionality</h4>
+                <h4 className="text-xl font-bold text-green-200 mb-4">🧪 Test Gmail Integration</h4>
                 <p className="text-green-100 text-sm mb-6">
-                  Send a test email to verify your Gmail integration is working properly.
+                  Test your Gmail setup to ensure OTPs and notifications will work properly.
                 </p>
                 
                 <form onSubmit={async (e) => {
