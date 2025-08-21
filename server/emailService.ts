@@ -108,6 +108,7 @@ class EmailService {
       
       console.log('📧 Clean Gmail SMTP setup created');
       console.log('📧 Testing with email:', config.gmailUser.substring(0, 5) + '***');
+      console.log(`📧 App Password length: ${config.gmailPassword.length} characters`);
       
     } catch (error) {
       console.error('❌ Failed to create Gmail transporter:', error);

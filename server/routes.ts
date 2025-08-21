@@ -3644,8 +3644,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       } else {
         res.status(500).json({ 
-          error: 'Failed to send test email. Check Gmail App Password.',
-          success: false
+          error: 'Gmail authentication failed. Please check your App Password setup.',
+          success: false,
+          hint: 'Enable 2-Step Verification and generate App Password from Google Account settings'
         });
       }
       

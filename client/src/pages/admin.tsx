@@ -3390,12 +3390,19 @@ function Admin() {
                       name="gmailPassword"
                       required
                       defaultValue={emailConfig.gmailPassword}
-                      placeholder="Your Gmail app password"
+                      placeholder="16-character app password (without spaces)"
                       className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
-                    <p className="text-xs text-gray-400 mt-1">
-                      Generate app password from Google Account security settings
-                    </p>
+                    <div className="mt-2 bg-red-900/50 border border-red-600 rounded-lg p-3">
+                      <p className="text-red-200 text-xs font-semibold mb-2">🚨 Gmail App Password Setup Required</p>
+                      <ol className="text-red-100 text-xs space-y-1">
+                        <li>1. Gmail → Settings → Security</li>
+                        <li>2. Enable 2-Step Verification</li>
+                        <li>3. Generate App Password for "Mail"</li>
+                        <li>4. Copy 16-character code here</li>
+                      </ol>
+                      <p className="text-yellow-200 text-xs mt-2">❌ Regular Gmail password will NOT work</p>
+                    </div>
                   </div>
 
                   <div>
