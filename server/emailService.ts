@@ -487,7 +487,21 @@ class EmailService {
       </div>
     `;
 
-    return await this.sendEmail({ to: toEmail, subject, html });
+    const mailOptions = {
+      from: `"IamBillBoard Team" <${config?.gmailUser || process.env.GMAIL_USER || 'noreply@iambillboard.com'}>`,
+      to: toEmail,
+      subject: subject,
+      html: html
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log(`✅ Test email sent successfully to ${toEmail}`);
+      return true;
+    } catch (error) {
+      console.error('❌ Failed to send test email:', error);
+      return false;
+    }
   }
 
   // Welcome email for new users
