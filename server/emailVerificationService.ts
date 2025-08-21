@@ -72,30 +72,30 @@ class EmailVerificationService {
         </div>
       `;
 
-      // Send verification email
-      const emailSent = await emailService.sendEmail({
-        to: email,
-        subject: emailSubject,
-        html: emailHtml
-      });
+      // Send verification email using Gmail integration
+      console.log(`📧 Sending Gmail OTP verification to ${email}: ${otp}`);
+      
+      const emailSent = await emailService.sendOTPEmail(email, otp, firstName);
 
-      // Log for development
-      console.log(`📧 Email verification OTP for ${email}: ${otp}`);
-      console.log(`📧 Email sent status: ${emailSent ? 'Success' : 'Failed'}`);
+      console.log(`📧 Gmail OTP sent status: ${emailSent ? 'Success' : 'Failed'}`);
 
-      // For development, provide helpful message about temporary OTP
-      let message = 'Verification email sent successfully';
-      if (!emailSent) {
-        message = `Email service not configured. For testing, use this OTP: ${otp} (valid for 15 minutes)`;
+      // Return appropriate message based on success
+      if (emailSent) {
+        return {
+          success: true,
+          message: 'Verification email sent successfully to your inbox',
+          verificationId: verificationRecord.id
+        };
+      } else {
+        // If Gmail fails, provide the OTP for development/testing
+        return {
+          success: true,
+          message: `Gmail service not configured. For testing, use this OTP: ${otp} (valid for 15 minutes)`,
+          verificationId: verificationRecord.id,
+          // Include OTP in development when email fails
+          ...(process.env.NODE_ENV === 'development' && { tempOtp: otp })
+        };
       }
-
-      return {
-        success: true,
-        message: message,
-        verificationId: verificationRecord.id,
-        // Only include OTP in development when email fails
-        ...(process.env.NODE_ENV === 'development' && !emailSent && { tempOtp: otp })
-      };
     } catch (error) {
       console.error('Error sending verification email:', error);
       return {
