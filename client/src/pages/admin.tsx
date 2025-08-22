@@ -212,6 +212,16 @@ function Admin() {
           console.log('📱 SMS config loaded from database');
         }
       }
+
+      // Load website content from database
+      const websiteResponse = await fetch('/api/admin-settings/website_content');
+      if (websiteResponse.ok) {
+        const websiteData = await websiteResponse.json();
+        if (websiteData.value) {
+          setWebsiteContent(websiteData.value);
+          console.log('🌐 Website content loaded from database');
+        }
+      }
     } catch (error) {
       console.log('Error loading configurations from database:', error);
       
@@ -230,6 +240,24 @@ function Admin() {
           });
         } catch (e) {
           console.log('Error migrating email config');
+        }
+      }
+
+      // Migrate website content from localStorage to database if exists
+      const savedWebsiteContent = localStorage.getItem('billboardwalker_website_content');
+      if (savedWebsiteContent) {
+        try {
+          const content = JSON.parse(savedWebsiteContent);
+          setWebsiteContent(content);
+          console.log('🌐 Migrating website content to database...');
+          // Migrate to database
+          await fetch('/api/admin-settings/website_content', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ value: content })
+          });
+        } catch (e) {
+          console.log('Error migrating website content');
         }
       }
     }
@@ -338,12 +366,32 @@ function Admin() {
   const handleSaveChanges = async () => {
     setSavingChanges(true);
     try {
-      // Save to localStorage for now (can be extended to save to database)
-      localStorage.setItem('billboardwalker_website_content', JSON.stringify(websiteContent));
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate save
-      alert('Website changes saved successfully!');
+      // Save to database
+      const response = await fetch('/api/admin-settings/website_content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ value: websiteContent })
+      });
+
+      if (response.ok) {
+        // Also save to localStorage as backup
+        localStorage.setItem('billboardwalker_website_content', JSON.stringify(websiteContent));
+        toast({
+          title: "Success",
+          description: "Website changes saved successfully!",
+        });
+        console.log('🌐 Website content saved to database');
+      } else {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to save');
+      }
     } catch (error) {
-      alert('Error saving changes. Please try again.');
+      console.error('Error saving website content:', error);
+      toast({
+        title: "Error",
+        description: "Error saving changes. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setSavingChanges(false);
     }
