@@ -26,6 +26,7 @@ import { insertContactSchema, insertOrderSchema, insertCampaignSchema, insertPri
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import { emailService } from "./emailService";
 import { emailVerificationService } from "./emailVerificationService";
 import { smsService } from "./smsService";
@@ -777,33 +778,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Generate password reset OTP
-      const resetOtp = Math.floor(100000 + Math.random() * 900000);
-      const expiryTime = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+      // Generate secure reset token
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      const expiryTime = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
       
-      // Store reset OTP in database 
+      // Store reset token in database 
       try {
         await storage.createPasswordResetOtp({
           userId: user.id,
-          otp: resetOtp.toString(),
+          otp: resetToken,
           expiresAt: expiryTime,
           isUsed: false
         });
         
-        console.log(`🔐 PASSWORD RESET OTP for ${user.email}: ${resetOtp}`);
+        console.log(`🔐 PASSWORD RESET TOKEN generated for ${user.email}`);
+        
+        // Create reset link
+        const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:5000'}/reset-password?token=${resetToken}&email=${encodeURIComponent(user.email)}`;
         
         // Send reset email if email service is available
         if (emailService.isConfigured()) {
           try {
-            await emailService.sendPasswordResetEmail(user.email, resetOtp.toString(), user.username);
+            await emailService.sendPasswordResetLinkEmail(user.email, resetLink, user.username);
             console.log('✅ Password reset email sent successfully');
           } catch (emailError) {
             console.error('❌ Failed to send password reset email:', emailError);
           }
+        } else {
+          console.log(`🔗 PASSWORD RESET LINK for ${user.email}: ${resetLink}`);
         }
         
       } catch (dbError) {
-        console.error('Database error storing reset OTP:', dbError);
+        console.error('Database error storing reset token:', dbError);
       }
       
       // Always return success for security
@@ -937,6 +943,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error('Password reset error:', error);
+      res.status(500).json({ 
+        error: 'Server error. Please try again.',
+        type: 'server_error'
+      });
+    }
+  });
+
+  // Reset password with token endpoint (Professional reset link flow)
+  app.post("/api/reset-password-with-token", async (req, res) => {
+    try {
+      const { token, email, newPassword, confirmPassword } = req.body;
+      
+      if (!token || !email || !newPassword || !confirmPassword) {
+        return res.status(400).json({ 
+          error: 'All fields are required',
+          type: 'validation_error'
+        });
+      }
+      
+      if (newPassword !== confirmPassword) {
+        return res.status(400).json({ 
+          error: 'Passwords do not match',
+          type: 'password_mismatch'
+        });
+      }
+      
+      if (newPassword.length < 6) {
+        return res.status(400).json({ 
+          error: 'Password must be at least 6 characters long',
+          type: 'password_too_short'
+        });
+      }
+      
+      // Find user by email
+      const user = await storage.getUserByEmail(email.trim());
+      if (!user) {
+        return res.status(404).json({ 
+          error: 'Invalid reset link',
+          type: 'invalid_token'
+        });
+      }
+      
+      // Verify reset token
+      const isValidToken = await storage.verifyPasswordResetOtp(user.id, token);
+      if (!isValidToken) {
+        return res.status(400).json({ 
+          error: 'Invalid or expired reset link',
+          type: 'invalid_token'
+        });
+      }
+      
+      // Hash new password
+      const hashedPassword = await bcrypt.hash(newPassword, 12);
+      
+      // Update password
+      await storage.updateUserPassword(user.id, hashedPassword);
+      
+      // Mark reset token as used
+      await storage.markPasswordResetOtpsAsUsed(user.id);
+      
+      // Log password change
+      await storage.createUserActivityLog({
+        userId: user.id,
+        action: 'password_reset',
+        details: 'Password reset successfully via reset link',
+        ipAddress: req.ip || 'unknown',
+        userAgent: req.get('User-Agent') || 'unknown'
+      });
+      
+      res.json({ 
+        success: true,
+        message: 'Password reset successfully. You can now login with your new password.'
+      });
+    } catch (error: any) {
+      console.error('Password reset with token error:', error);
       res.status(500).json({ 
         error: 'Server error. Please try again.',
         type: 'server_error'

@@ -10,6 +10,7 @@ import Dashboard from "@/pages/dashboard";
 import Signin from "@/pages/signin";
 import Signup from "@/pages/signup";
 import ForgotPassword from "@/pages/forgot-password";
+import ResetPassword from "@/pages/reset-password";
 import Admin from "@/pages/admin";
 
 import Terms from "@/pages/terms";
@@ -31,6 +32,7 @@ function Router() {
       <Route path="/signin" component={Signin} />
       <Route path="/signup" component={Signup} />
       <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/reset-password" component={ResetPassword} />
       <Route path="/admin" component={Admin} />
 
       <Route path="/terms" component={Terms} />
