@@ -26,12 +26,21 @@ export default function ResetPasswordPage() {
   const [, setLocation] = useLocation();
   const [success, setSuccess] = useState(false);
   const [invalidToken, setInvalidToken] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // Get token from URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const token = urlParams.get('token');
-  const email = urlParams.get('email');
+  // Get token from URL safely
+  const [token, setToken] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenParam = urlParams.get('token');
+    const emailParam = urlParams.get('email');
+    setToken(tokenParam);
+    setEmail(emailParam);
+    setLoading(false);
+  }, []);
 
   const form = useForm<ResetPasswordForm>({
     resolver: zodResolver(resetPasswordSchema),
@@ -41,12 +50,12 @@ export default function ResetPasswordPage() {
     },
   });
 
-  // Check if token is valid on page load
+  // Check if token is valid after loading
   useEffect(() => {
-    if (!token || !email) {
+    if (!loading && (!token || !email)) {
       setInvalidToken(true);
     }
-  }, [token, email]);
+  }, [token, email, loading]);
 
   const resetPasswordMutation = useMutation({
     mutationFn: async (data: ResetPasswordForm) => {
@@ -87,6 +96,20 @@ export default function ResetPasswordPage() {
   const onSubmit = (data: ResetPasswordForm) => {
     resetPasswordMutation.mutate(data);
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-red-50 dark:from-purple-950 dark:via-pink-950 dark:to-red-950 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-2xl border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg">
+          <CardContent className="text-center p-8">
+            <Loader2 className="mx-auto h-8 w-8 animate-spin text-purple-600 mb-4" />
+            <p className="text-gray-600 dark:text-gray-400">Loading reset page...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   // Invalid token page
   if (invalidToken) {
