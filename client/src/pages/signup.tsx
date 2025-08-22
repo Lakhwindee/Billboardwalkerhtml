@@ -123,10 +123,12 @@ export default function SignupPage() {
       // Show different messages based on whether email was sent or not
       if (result.tempOtp) {
         toast({
-          title: "Development Mode",
-          description: `Email service not configured. Use OTP: ${result.tempOtp}`,
-          duration: 10000,
+          title: "📧 Manual OTP Required",
+          description: `Gmail not configured. Use this OTP: ${result.tempOtp}`,
+          duration: 15000,
         });
+        // Also show in console for easy copy-paste
+        console.log(`🔑 OTP for ${data.email}: ${result.tempOtp}`);
       } else {
         toast({
           title: "Verification Email Sent!",
