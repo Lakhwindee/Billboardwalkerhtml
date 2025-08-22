@@ -570,11 +570,8 @@ function Admin() {
       }
       
       // Send password change request to backend for campaigns user
-      const response = await apiRequest('/api/change-campaign-password', {
-        method: 'POST',
-        body: {
-          newPassword: campaignPasswordSettings.newPassword
-        }
+      const response = await apiRequest('POST', '/api/change-campaign-password', {
+        newPassword: campaignPasswordSettings.newPassword
       });
       
       if (response.success) {

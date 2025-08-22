@@ -35,7 +35,7 @@ import { paymentGateway } from "./paymentGateway";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import { pool } from "./db";
+import { pool, db } from "./db";
 
 // Configure multer for image uploads
 const storage_multer = multer.diskStorage({

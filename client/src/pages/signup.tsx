@@ -128,7 +128,7 @@ export default function SignupPage() {
           duration: 15000,
         });
         // Also show in console for easy copy-paste
-        console.log(`🔑 OTP for ${data.email}: ${result.tempOtp}`);
+        console.log(`🔑 OTP for ${form.getValues('email')}: ${result.tempOtp}`);
       } else {
         toast({
           title: "Verification Email Sent!",

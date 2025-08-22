@@ -16,7 +16,7 @@ class EmailVerificationService {
   }
 
   // Send email verification OTP for signup
-  async sendVerificationEmail(email: string, firstName: string, gmailConfig?: any): Promise<{ success: boolean; message: string; verificationId?: number }> {
+  async sendVerificationEmail(email: string, firstName: string, gmailConfig?: any): Promise<{ success: boolean; message: string; verificationId?: number; tempOtp?: string }> {
     try {
       const otp = this.generateOTP();
       const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
@@ -101,11 +101,21 @@ class EmailVerificationService {
       console.error('Error sending verification email:', error);
       
       // For deployed sites without Gmail config, provide the OTP for manual verification
+      // Generate fallback OTP and record if they're not available
+      const fallbackOtp = this.generateOTP();
+      const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+      const [fallbackRecord] = await db.insert(emailVerifications).values({
+        email,
+        otp: fallbackOtp,
+        isUsed: false,
+        expiresAt,
+      }).returning();
+      
       return {
         success: true,
-        message: `Email service not configured on deployed site. For testing, use this OTP: ${otp} (valid for 15 minutes)`,
-        verificationId: verificationRecord.id,
-        tempOtp: otp
+        message: `Email service not configured on deployed site. For testing, use this OTP: ${fallbackOtp} (valid for 15 minutes)`,
+        verificationId: fallbackRecord.id,
+        tempOtp: fallbackOtp
       };
     }
   }

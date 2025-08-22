@@ -32,7 +32,7 @@ class EmailService {
 
     // Create transporter with flexible configuration
     if (emailService === 'gmail') {
-      this.transporter = nodemailer.createTransporter({
+      this.transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
           user: emailUser,
@@ -41,7 +41,7 @@ class EmailService {
       });
     } else {
       // Generic SMTP configuration for Ionos and other services
-      this.transporter = nodemailer.createTransporter({
+      this.transporter = nodemailer.createTransport({
         host: emailHost,
         port: emailPort,
         secure: emailPort === 465, // true for 465, false for other ports
@@ -191,7 +191,7 @@ class EmailService {
       await testTransporter.sendMail(mailOptions);
       console.log(`✅ Gmail test email sent successfully to ${toEmail}`);
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Gmail test email failed:', error);
       if (error.code === 'EAUTH') {
         console.error('❌ Authentication failed - check your Gmail App Password');
