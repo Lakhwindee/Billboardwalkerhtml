@@ -200,52 +200,189 @@ class EmailService {
     }
   }
 
-  // 🆕 OTP Verification Email for Registration (Anti-spam optimized)
+  // 🆕 Professional OTP Verification Email (Premium Design)
   async sendOTPEmail(email: string, otp: string, name?: string, config?: any): Promise<boolean> {
-    const subject = 'Account Verification Code - IamBillBoard';
+    const subject = '🎯 IamBillBoard - Account Verification Code';
     
     const html = `
-      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; color: #333333;">
-        <div style="padding: 30px 20px; text-align: center; background: #f8f9fa; border-bottom: 3px solid #4f46e5;">
-          <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #4f46e5;">Account Verification</h1>
-          <p style="margin: 10px 0 0 0; font-size: 16px; color: #666;">IamBillBoard Platform</p>
-        </div>
-        
-        <div style="background: #ffffff; color: #333; padding: 30px;">
-          <h2 style="color: #4f46e5; margin: 0 0 20px 0; font-size: 20px;">Account Verification Required</h2>
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Account Verification - IamBillBoard</title>
+      </head>
+      <body style="margin: 0; padding: 0; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif;">
+        <div style="max-width: 600px; margin: 40px auto; background: #ffffff; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border-radius: 16px; overflow: hidden;">
           
-          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 20px 0; color: #555;">
-            ${name ? `Hello ${name},` : 'Hello,'} Please use the verification code below to complete your account setup:
-          </p>
-          
-          <div style="background: #f0f4ff; padding: 25px; border-radius: 8px; text-align: center; margin: 25px 0; border: 1px solid #e0e7ff;">
-            <p style="margin: 0 0 10px 0; font-size: 14px; color: #64748b; font-weight: 600;">Verification Code</p>
-            <div style="font-size: 32px; font-weight: bold; color: #4f46e5; letter-spacing: 4px; font-family: 'Courier New', monospace; background: #ffffff; padding: 15px; border-radius: 6px; border: 2px solid #c7d2fe;">${otp}</div>
-            <p style="margin: 10px 0 0 0; font-size: 12px; color: #94a3b8;">Code expires in 10 minutes</p>
+          <!-- Header with Gradient -->
+          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 50px 40px; text-align: center; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); opacity: 0.3;"></div>
+            <div style="position: relative; z-index: 2;">
+              <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 25px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.2);">
+                <h1 style="margin: 0; font-size: 36px; font-weight: bold; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.3); letter-spacing: -1px;">
+                  🎯 IamBillBoard
+                </h1>
+                <p style="margin: 10px 0 0 0; font-size: 16px; color: #e0e7ff; font-weight: 500; letter-spacing: 0.5px;">
+                  Premium Bottle Advertising Solutions
+                </p>
+              </div>
+              <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3);">
+                <h2 style="margin: 0; font-size: 22px; color: #ffffff; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                  🔐 Email Verification Required
+                </h2>
+              </div>
+            </div>
           </div>
           
-          <div style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 15px; margin: 20px 0;">
-            <p style="margin: 0; font-size: 14px; color: #92400e;">
-              <strong>Security Notice:</strong> This code is confidential. Never share it with anyone.
-            </p>
+          <!-- Welcome Section -->
+          <div style="padding: 50px 40px 30px 40px;">
+            <div style="text-align: center; margin-bottom: 40px;">
+              <h3 style="margin: 0 0 15px 0; font-size: 28px; color: #1e293b; font-weight: 700; letter-spacing: -0.5px;">
+                Welcome${name ? ` ${name}` : ''}! 👋
+              </h3>
+              <p style="margin: 0; font-size: 17px; line-height: 1.6; color: #475569; max-width: 450px; margin: 0 auto;">
+                Thank you for joining IamBillBoard! You're just one step away from accessing our premium bottle advertising platform.
+              </p>
+            </div>
+            
+            <!-- OTP Code Section with Animation Effect -->
+            <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border: 3px solid transparent; background-clip: padding-box; border-radius: 20px; padding: 40px; text-align: center; margin: 40px 0; position: relative; overflow: hidden;">
+              <!-- Animated background -->
+              <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(102,126,234,0.08) 0%, transparent 70%); z-index: 1; animation: pulse 3s ease-in-out infinite;"></div>
+              
+              <div style="position: relative; z-index: 2;">
+                <div style="margin-bottom: 20px;">
+                  <span style="font-size: 48px; animation: bounce 2s ease-in-out infinite;">🔑</span>
+                </div>
+                <p style="margin: 0 0 20px 0; font-size: 14px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">
+                  Your Verification Code
+                </p>
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; font-size: 42px; font-weight: bold; padding: 25px 40px; border-radius: 16px; letter-spacing: 8px; font-family: 'Courier New', Monaco, monospace; display: inline-block; box-shadow: 0 10px 40px rgba(102,126,234,0.4); text-shadow: 0 2px 4px rgba(0,0,0,0.3); transform: scale(1); transition: transform 0.3s ease;">
+                  ${otp}
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: rgba(239,68,68,0.1); border-radius: 10px; border: 1px solid rgba(239,68,68,0.2);">
+                  <p style="margin: 0; font-size: 13px; color: #dc2626; font-weight: 600;">
+                    ⏰ This code will expire in 15 minutes
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Step-by-Step Instructions -->
+            <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-left: 5px solid #0284c7; border-radius: 12px; padding: 30px; margin: 30px 0;">
+              <h4 style="margin: 0 0 20px 0; font-size: 18px; color: #0369a1; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+                📋 How to Complete Verification
+              </h4>
+              <div style="space-y: 15px;">
+                <div style="display: flex; align-items: center; margin-bottom: 15px; padding: 12px; background: rgba(255,255,255,0.7); border-radius: 8px;">
+                  <span style="background: #0284c7; color: white; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; margin-right: 15px;">1</span>
+                  <span style="color: #0369a1; font-weight: 500;">Return to the IamBillBoard verification page</span>
+                </div>
+                <div style="display: flex; align-items: center; margin-bottom: 15px; padding: 12px; background: rgba(255,255,255,0.7); border-radius: 8px;">
+                  <span style="background: #0284c7; color: white; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; margin-right: 15px;">2</span>
+                  <span style="color: #0369a1; font-weight: 500;">Enter the 6-digit verification code above</span>
+                </div>
+                <div style="display: flex; align-items: center; margin-bottom: 0; padding: 12px; background: rgba(255,255,255,0.7); border-radius: 8px;">
+                  <span style="background: #0284c7; color: white; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; margin-right: 15px;">3</span>
+                  <span style="color: #0369a1; font-weight: 500;">Click "Verify Email" to activate your account</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Security Warning -->
+            <div style="background: linear-gradient(135deg, #fef2f2 0%, #fce7e7 100%); border: 2px solid #fca5a5; border-radius: 12px; padding: 25px; margin: 30px 0;">
+              <div style="display: flex; align-items: flex-start; gap: 15px;">
+                <span style="font-size: 24px;">🛡️</span>
+                <div>
+                  <h4 style="margin: 0 0 10px 0; font-size: 16px; color: #dc2626; font-weight: 700;">
+                    Important Security Notice
+                  </h4>
+                  <ul style="margin: 0; padding-left: 20px; color: #991b1b; line-height: 1.6; font-size: 14px;">
+                    <li>Never share this verification code with anyone</li>
+                    <li>IamBillBoard staff will never ask for your verification code</li>
+                    <li>If you didn't request this verification, please ignore this email</li>
+                    <li>This code can only be used once and expires automatically</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Call to Action Button -->
+            <div style="text-align: center; margin: 40px 0;">
+              <a href="#" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 18px 40px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 8px 32px rgba(102,126,234,0.4); transition: all 0.3s ease; text-shadow: 0 1px 2px rgba(0,0,0,0.2); letter-spacing: 0.5px;">
+                🚀 Complete Your Verification
+              </a>
+              <p style="margin: 15px 0 0 0; font-size: 12px; color: #94a3b8;">
+                Click the button to go back to verification page
+              </p>
+            </div>
+            
+            <!-- What's Next Section -->
+            <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 16px; padding: 35px; margin: 40px 0; border: 1px solid #e2e8f0;">
+              <h4 style="margin: 0 0 25px 0; font-size: 20px; color: #1e293b; font-weight: 700; text-align: center;">
+                🎯 What Awaits You After Verification
+              </h4>
+              <div style="display: grid; gap: 20px;">
+                <div style="display: flex; align-items: center; padding: 15px; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                  <span style="font-size: 28px; margin-right: 20px;">🍾</span>
+                  <div>
+                    <strong style="color: #1e293b; font-size: 16px; display: block; margin-bottom: 4px;">Custom Bottle Design Studio</strong>
+                    <p style="margin: 0; font-size: 13px; color: #64748b; line-height: 1.4;">Create stunning, professional bottle labels with our advanced design tools</p>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; padding: 15px; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                  <span style="font-size: 28px; margin-right: 20px;">💰</span>
+                  <div>
+                    <strong style="color: #1e293b; font-size: 16px; display: block; margin-bottom: 4px;">Real-time Smart Pricing</strong>
+                    <p style="margin: 0; font-size: 13px; color: #64748b; line-height: 1.4;">Get instant, accurate quotes based on quantity, location, and specifications</p>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; padding: 15px; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                  <span style="font-size: 28px; margin-right: 20px;">📊</span>
+                  <div>
+                    <strong style="color: #1e293b; font-size: 16px; display: block; margin-bottom: 4px;">Professional Campaign Dashboard</strong>
+                    <p style="margin: 0; font-size: 13px; color: #64748b; line-height: 1.4;">Track orders, monitor progress, and manage your advertising campaigns</p>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; padding: 15px; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                  <span style="font-size: 28px; margin-right: 20px;">🎯</span>
+                  <div>
+                    <strong style="color: #1e293b; font-size: 16px; display: block; margin-bottom: 4px;">Targeted Distribution Network</strong>
+                    <p style="margin: 0; font-size: 13px; color: #64748b; line-height: 1.4;">Reach your audience across Chandigarh, Panchkula, and Mohali regions</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           
-          <div style="text-align: center; margin: 25px 0;">
-            <p style="margin: 0; font-size: 14px; color: #64748b;">
-              Enter this code on the verification page to activate your account.
-            </p>
+          <!-- Premium Footer -->
+          <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 40px; text-align: center; color: #ffffff;">
+            <div style="margin-bottom: 25px;">
+              <h4 style="margin: 0 0 8px 0; font-size: 20px; font-weight: 700; color: #ffffff;">
+                IamBillBoard Team
+              </h4>
+              <p style="margin: 0; color: #94a3b8; font-size: 15px; line-height: 1.6;">
+                Revolutionizing brand advertising through innovative bottle solutions<br>
+                <strong style="color: #667eea; font-size: 16px;">Chandigarh • Panchkula • Mohali</strong>
+              </p>
+            </div>
+            
+            <div style="border-top: 1px solid #374151; padding-top: 25px; margin-top: 25px;">
+              <div style="margin-bottom: 15px;">
+                <span style="background: rgba(102,126,234,0.2); color: #93c5fd; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: 0.5px;">
+                  PREMIUM ADVERTISING PLATFORM
+                </span>
+              </div>
+              <p style="margin: 0; color: #6b7280; font-size: 12px; line-height: 1.5;">
+                © 2025 IamBillBoard Platform. All rights reserved.<br>
+                This is an automated security message. Please do not reply to this email.
+              </p>
+            </div>
           </div>
         </div>
-        
-        <div style="background: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0;">
-          <p style="margin: 0; color: #64748b; font-size: 14px;">
-            This is an automated message from your IamBillBoard account
-          </p>
-          <p style="margin: 10px 0 0 0; color: #94a3b8; font-size: 12px;">
-            © 2025 IamBillBoard Platform. All rights reserved.
-          </p>
-        </div>
-      </div>
+      </body>
+      </html>
     `;
 
     // If no transporter but we have config, use the test email method
