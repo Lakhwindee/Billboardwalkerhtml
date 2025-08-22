@@ -100,7 +100,7 @@ export default function ForgotPasswordPage() {
       const response = await fetch("/api/verify-reset-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp: data.otp }),
+        body: JSON.stringify({ usernameOrEmail: email, otp: data.otp }),
       });
       
       if (!response.ok) {
