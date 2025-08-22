@@ -795,17 +795,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Create reset link
         const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:5000'}/reset-password?token=${resetToken}&email=${encodeURIComponent(user.email)}`;
+        console.log(`🔗 PROFESSIONAL RESET LINK: ${resetLink}`);
         
-        // Send reset email if email service is available
-        if (emailService.isConfigured()) {
-          try {
+        // Send reset email - try email service first, fallback to console link
+        try {
+          if (emailService.isConfigured()) {
             await emailService.sendPasswordResetLinkEmail(user.email, resetLink, user.username);
             console.log('✅ Password reset email sent successfully');
-          } catch (emailError) {
-            console.error('❌ Failed to send password reset email:', emailError);
+          } else {
+            console.log('⚠️ Email service not configured, using console link above');
           }
-        } else {
-          console.log(`🔗 PASSWORD RESET LINK for ${user.email}: ${resetLink}`);
+        } catch (emailError) {
+          console.error('❌ Failed to send password reset email:', emailError);
+          console.log(`⚠️ Email failed - use the reset link displayed above`);
         }
         
       } catch (dbError) {
