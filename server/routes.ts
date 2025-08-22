@@ -22,7 +22,7 @@ const requireAuth = (req: any, res: any, next: any) => {
 };
 
 
-import { insertContactSchema, insertOrderSchema, insertCampaignSchema, insertPriceSettingSchema, insertSiteSettingSchema, insertHomeImageSchema, insertOrderCampaignSchema, insertLogoSettingSchema, insertUserSchema, insertDesignSampleSchema } from "../shared/schema";
+import { insertContactSchema, insertOrderSchema, insertCampaignSchema, insertPriceSettingSchema, insertSiteSettingSchema, insertHomeImageSchema, insertOrderCampaignSchema, insertLogoSettingSchema, insertUserSchema, insertDesignSampleSchema , adminSettings } from "../shared/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -3607,6 +3607,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Gmail Test Email endpoint
+  // Admin Settings API endpoints
+  app.get("/api/admin-settings/:key", async (req, res) => {
+    try {
+      const { key } = req.params;
+      
+      // Only admin can access settings
+      if (req.session.user?.role !== 'admin') {
+        return res.status(403).json({ error: 'Admin access required' });
+      }
+      
+      const [setting] = await db.select()
+        .from(adminSettings)
+        .where(eq(adminSettings.settingKey, key))
+        .limit(1);
+      
+      if (setting) {
+        res.json({ key, value: setting.settingValue });
+      } else {
+        res.json({ key, value: null });
+      }
+    } catch (error) {
+      console.error('Error fetching admin setting:', error);
+      res.status(500).json({ error: 'Failed to fetch setting' });
+    }
+  });
+
+  app.post("/api/admin-settings/:key", async (req, res) => {
+    try {
+      const { key } = req.params;
+      const { value } = req.body;
+      
+      // Only admin can save settings
+      if (req.session.user?.role !== 'admin') {
+        return res.status(403).json({ error: 'Admin access required' });
+      }
+      
+      // Update or insert setting
+      await db.insert(adminSettings)
+        .values({
+          settingKey: key,
+          settingValue: value,
+          updatedAt: new Date()
+        })
+        .onConflictDoUpdate({
+          target: adminSettings.settingKey,
+          set: {
+            settingValue: value,
+            updatedAt: new Date()
+          }
+        });
+      
+      console.log(`📧 Admin setting '${key}' saved to database`);
+      res.json({ success: true, message: 'Setting saved successfully' });
+    } catch (error) {
+      console.error('Error saving admin setting:', error);
+      res.status(500).json({ error: 'Failed to save setting' });
+    }
+  });
+
   app.post("/api/test-email", async (req, res) => {
     try {
       const session = req.session as any;

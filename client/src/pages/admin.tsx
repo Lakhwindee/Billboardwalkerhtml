@@ -160,9 +160,24 @@ function Admin() {
       });
       
       if (response.ok) {
-        // Clear any local storage/session storage
+        // Clear only user-specific data, keep admin settings
+        const adminKeys = ['billboardwalker_email_config', 'billboardwalker_sms_config'];
+        const adminData: any = {};
+        
+        // Backup admin settings
+        adminKeys.forEach(key => {
+          const value = localStorage.getItem(key);
+          if (value) adminData[key] = value;
+        });
+        
+        // Clear everything
         localStorage.clear();
         sessionStorage.clear();
+        
+        // Restore admin settings (will be loaded from database anyway)
+        Object.keys(adminData).forEach(key => {
+          localStorage.setItem(key, adminData[key]);
+        });
         
         // Force complete page reload to clear any cached data
         window.location.replace('/');
@@ -176,25 +191,46 @@ function Admin() {
     }
   };
 
-  const loadConfigurations = () => {
-    // Load saved configurations after successful auth
-    const savedEmailConfig = localStorage.getItem('billboardwalker_email_config');
-    if (savedEmailConfig) {
-      try {
-        const config = JSON.parse(savedEmailConfig);
-        setEmailConfig(config);
-      } catch (error) {
-        console.log('Error loading email config');
+  const loadConfigurations = async () => {
+    try {
+      // Load email configuration from database
+      const emailResponse = await fetch('/api/admin-settings/email_config');
+      if (emailResponse.ok) {
+        const emailData = await emailResponse.json();
+        if (emailData.value) {
+          setEmailConfig(emailData.value);
+          console.log('📧 Gmail config loaded from database');
+        }
       }
-    }
 
-    const savedSmsConfig = localStorage.getItem('billboardwalker_sms_config');
-    if (savedSmsConfig) {
-      try {
-        const config = JSON.parse(savedSmsConfig);
-        setSmsConfig(config);
-      } catch (error) {
-        console.log('Error loading SMS config');
+      // Load SMS configuration from database
+      const smsResponse = await fetch('/api/admin-settings/sms_config');
+      if (smsResponse.ok) {
+        const smsData = await smsResponse.json();
+        if (smsData.value) {
+          setSmsConfig(smsData.value);
+          console.log('📱 SMS config loaded from database');
+        }
+      }
+    } catch (error) {
+      console.log('Error loading configurations from database:', error);
+      
+      // Fallback to localStorage for migration
+      const savedEmailConfig = localStorage.getItem('billboardwalker_email_config');
+      if (savedEmailConfig) {
+        try {
+          const config = JSON.parse(savedEmailConfig);
+          setEmailConfig(config);
+          console.log('📧 Migrating email config to database...');
+          // Migrate to database
+          await fetch('/api/admin-settings/email_config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ value: config })
+          });
+        } catch (e) {
+          console.log('Error migrating email config');
+        }
       }
     }
   };
@@ -3346,7 +3382,15 @@ function Admin() {
                     fromName: formData.get('fromName') as string || 'IamBillBoard'
                   };
 
-                  // Save to localStorage for persistence
+                  // Save to database for persistence
+                  await fetch('/api/admin-settings/email_config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ value: emailConfig })
+                  });
+                  console.log('📧 Gmail config saved to database');
+                  
+                  // Also save to localStorage as backup
                   localStorage.setItem('billboardwalker_email_config', JSON.stringify(emailConfig));
                   setEmailConfig(emailConfig); // Update state to show configured status
                   

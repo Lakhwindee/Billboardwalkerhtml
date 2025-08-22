@@ -56,6 +56,15 @@ export const orders = pgTable("orders", {
 });
 
 // Admin management tables
+// Email and SMS configuration settings (persisted in database)
+export const adminSettings = pgTable("admin_settings", {
+  id: serial("id").primaryKey(),
+  settingKey: text("setting_key").notNull().unique(), // "email_config", "sms_config", etc.
+  settingValue: jsonb("setting_value").notNull(), // JSON data for the setting
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const campaigns = pgTable("campaigns", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id),
