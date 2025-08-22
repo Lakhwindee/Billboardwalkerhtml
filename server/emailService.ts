@@ -33,11 +33,20 @@ class EmailService {
     // Create transporter with flexible configuration
     if (emailService === 'gmail') {
       this.transporter = nodemailer.createTransport({
-        service: 'gmail',
+        service: 'Gmail',
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false, // Use TLS
         auth: {
           user: emailUser,
-          pass: emailPass
-        }
+          pass: emailPass // App Password required
+        },
+        tls: {
+          rejectUnauthorized: false
+        },
+        pool: true,
+        maxConnections: 1,
+        maxMessages: 3
       });
     } else {
       // Generic SMTP configuration for Ionos and other services
