@@ -434,11 +434,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Modern signup endpoint
   app.post("/api/signup", async (req, res) => {
     try {
-      const { firstName, lastName, email, phone, businessName, businessType, password, agreeMarketing } = req.body;
+      const { firstName, lastName, email, phone, businessName, businessType, address, city, state, pincode, password, agreeMarketing } = req.body;
       
       // Basic validation
-      if (!firstName || !lastName || !email || !phone || !businessName || !businessType || !password) {
-        return res.status(400).json({ message: 'All fields are required' });
+      if (!firstName || !lastName || !email || !phone || !businessName || !businessType || !address || !city || !state || !pincode || !password) {
+        return res.status(400).json({ message: 'All fields including address information are required' });
       }
       
       // Email validation
@@ -490,6 +490,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         phone,
         businessName,
         businessType,
+        address,
+        city,
+        state,
+        pincode,
         marketingOptIn: agreeMarketing || false,
         isBanned: false,
         banReason: null,
@@ -640,7 +644,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Create user account
-      const { firstName, lastName, email, businessName, businessType, password, agreeMarketing } = userData;
+      const { firstName, lastName, email, businessName, businessType, address, city, state, pincode, password, agreeMarketing } = userData;
       
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(email);
@@ -668,6 +672,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email,
         password: hashedPassword,
         role: 'user' as const,
+        firstName,
+        lastName,
+        phone,
+        businessName,
+        businessType,
+        address,
+        city,
+        state,
+        pincode,
         isEmailVerified: true,  // Email was verified in previous step
         isBanned: false,
         banReason: null

@@ -24,6 +24,16 @@ const signupSchema = z.object({
     .regex(/^[6-9]\d{9}$/, "Please enter a valid Indian phone number (10 digits starting with 6-9)"),
   businessName: z.string().min(2, "Business name must be at least 2 characters"),
   businessType: z.string().min(1, "Please select a business type"),
+  
+  // Address Information
+  address: z.string().min(5, "Address must be at least 5 characters"),
+  city: z.string().min(2, "City must be at least 2 characters"),
+  state: z.string().min(1, "Please select a state"),
+  pincode: z.string()
+    .min(6, "PIN code must be 6 digits")
+    .max(6, "PIN code must be 6 digits")
+    .regex(/^\d{6}$/, "Please enter a valid 6-digit PIN code"),
+  
   password: z.string()
     .min(8, "Password must be at least 8 characters")
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Password must contain at least one uppercase letter, one lowercase letter, and one number"),
@@ -53,6 +63,42 @@ const businessTypes = [
   "Other"
 ];
 
+const indianStates = [
+  "Andhra Pradesh",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chhattisgarh",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Manipur",
+  "Meghalaya",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tamil Nadu",
+  "Telangana",
+  "Tripura",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal",
+  "Delhi",
+  "Chandigarh",
+  "Jammu and Kashmir",
+  "Ladakh",
+  "Puducherry"
+];
+
 export default function SignupPage() {
   const [, setLocation] = useLocation();
   const [showPassword, setShowPassword] = useState(false);
@@ -76,6 +122,10 @@ export default function SignupPage() {
       phone: "",
       businessName: "",
       businessType: "",
+      address: "",
+      city: "",
+      state: "",
+      pincode: "",
       password: "",
       confirmPassword: "",
       agreeTerms: false,
@@ -674,6 +724,99 @@ export default function SignupPage() {
                     </FormItem>
                   )}
                 />
+
+                {/* Address Information Section */}
+                <div className="border-t pt-6 mt-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Address Information</h3>
+                  
+                  {/* Address */}
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">Address</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="House No., Street Name, Area"
+                            className="h-11 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-purple-500 dark:focus:border-purple-400"
+                            data-testid="input-address"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* City and State */}
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <FormField
+                      control={form.control}
+                      name="city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium">City</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="Enter your city"
+                              className="h-11 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-purple-500 dark:focus:border-purple-400"
+                              data-testid="input-city"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="state"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium">State</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="h-11 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-purple-500 dark:focus:border-purple-400" data-testid="select-state">
+                                <SelectValue placeholder="Select state" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {indianStates.map((state) => (
+                                <SelectItem key={state} value={state}>
+                                  {state}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* PIN Code */}
+                  <FormField
+                    control={form.control}
+                    name="pincode"
+                    render={({ field }) => (
+                      <FormItem className="mt-4">
+                        <FormLabel className="text-sm font-medium">PIN Code</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="123456"
+                            maxLength={6}
+                            className="h-11 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-purple-500 dark:focus:border-purple-400"
+                            data-testid="input-pincode"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 {/* Password Fields */}
                 <FormField

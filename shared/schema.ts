@@ -21,6 +21,19 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   phone: text("phone"), // Add phone field for users
   role: text("role").default("user").notNull(), // user, admin
+  
+  // Personal Information
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  businessName: text("business_name"),
+  businessType: text("business_type"),
+  
+  // Address Information
+  address: text("address"),
+  city: text("city"),
+  state: text("state"),
+  pincode: text("pincode"),
+  
   isEmailVerified: boolean("is_email_verified").default(false),
   emailVerificationToken: text("email_verification_token"),
   emailVerificationExpiry: timestamp("email_verification_expiry"),
