@@ -2114,43 +2114,88 @@ function Admin() {
                           <div className="bg-white/5 rounded-lg p-4 border border-white/10">
                             <h4 className="text-sm font-medium text-gray-300 mb-3">Complete Profile Details:</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {/* Account Credentials */}
                               <div>
-                                <div className="text-xs text-gray-400">Full Name</div>
-                                <div className="text-white text-sm font-medium">{profile.fullName || 'Not provided'}</div>
+                                <div className="text-xs text-gray-400">Username</div>
+                                <div className="text-white text-sm font-medium">{user.username || 'Not provided'}</div>
+                              </div>
+                              <div>
+                                <div className="text-xs text-gray-400">Password (Hashed)</div>
+                                <div className="text-yellow-400 text-sm font-medium font-mono text-xs break-all">
+                                  {user.password ? user.password.substring(0, 50) + (user.password.length > 50 ? '...' : '') : 'Not provided'}
+                                </div>
                               </div>
                               <div>
                                 <div className="text-xs text-gray-400">Email Address</div>
                                 <div className="text-white text-sm font-medium">{user.email || 'Not provided'}</div>
                               </div>
+                              
+                              {/* Personal Information */}
+                              <div>
+                                <div className="text-xs text-gray-400">Full Name</div>
+                                <div className="text-white text-sm font-medium">{profile?.fullName || user.firstName || user.lastName ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : 'Not provided'}</div>
+                              </div>
+                              <div>
+                                <div className="text-xs text-gray-400">First Name</div>
+                                <div className="text-white text-sm font-medium">{user.firstName || 'Not provided'}</div>
+                              </div>
+                              <div>
+                                <div className="text-xs text-gray-400">Last Name</div>
+                                <div className="text-white text-sm font-medium">{user.lastName || 'Not provided'}</div>
+                              </div>
                               <div>
                                 <div className="text-xs text-gray-400">Phone Number</div>
-                                <div className="text-white text-sm font-medium">{profile.phone || 'Not provided'}</div>
+                                <div className="text-white text-sm font-medium">{user.phone || profile?.phone || 'Not provided'}</div>
+                              </div>
+                              
+                              {/* Business Information */}
+                              <div>
+                                <div className="text-xs text-gray-400">Business Name</div>
+                                <div className="text-white text-sm font-medium">{user.businessName || profile?.company || 'Not provided'}</div>
                               </div>
                               <div>
-                                <div className="text-xs text-gray-400">Company/Business</div>
-                                <div className="text-white text-sm font-medium">{profile.company || 'Not provided'}</div>
+                                <div className="text-xs text-gray-400">Business Type</div>
+                                <div className="text-white text-sm font-medium">{user.businessType || 'Not provided'}</div>
                               </div>
+                              
+                              {/* Address Information */}
                               <div>
                                 <div className="text-xs text-gray-400">Complete Address</div>
-                                <div className="text-white text-sm font-medium">{profile.address || 'Not provided'}</div>
+                                <div className="text-white text-sm font-medium">{user.address || profile?.address || 'Not provided'}</div>
                               </div>
                               <div>
                                 <div className="text-xs text-gray-400">City</div>
-                                <div className="text-white text-sm font-medium">{profile.city || 'Not provided'}</div>
+                                <div className="text-white text-sm font-medium">{user.city || profile?.city || 'Not provided'}</div>
                               </div>
                               <div>
                                 <div className="text-xs text-gray-400">State</div>
-                                <div className="text-white text-sm font-medium">{profile.state || 'Not provided'}</div>
+                                <div className="text-white text-sm font-medium">{user.state || profile?.state || 'Not provided'}</div>
                               </div>
                               <div>
                                 <div className="text-xs text-gray-400">Pincode</div>
-                                <div className="text-white text-sm font-medium">{profile.pincode || 'Not provided'}</div>
+                                <div className="text-white text-sm font-medium">{user.pincode || profile?.pincode || 'Not provided'}</div>
                               </div>
+                              
+                              {/* Account Status */}
                               <div>
                                 <div className="text-xs text-gray-400">Email Verification</div>
                                 <div className={`text-sm font-medium ${user.isEmailVerified ? 'text-green-400' : 'text-yellow-400'}`}>
                                   {user.isEmailVerified ? 'Verified' : 'Unverified'}
                                 </div>
+                              </div>
+                              <div>
+                                <div className="text-xs text-gray-400">Account Status</div>
+                                <div className={`text-sm font-medium ${user.isBanned ? 'text-red-400' : 'text-green-400'}`}>
+                                  {user.isBanned ? 'Banned' : 'Active'}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-xs text-gray-400">User Role</div>
+                                <div className="text-blue-400 text-sm font-medium">{user.role || 'user'}</div>
+                              </div>
+                              <div>
+                                <div className="text-xs text-gray-400">Registered Date</div>
+                                <div className="text-white text-sm font-medium">{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Not available'}</div>
                               </div>
                             </div>
                           </div>
