@@ -544,14 +544,398 @@ class EmailService {
   }
 
   // Welcome email for new users
-  async sendWelcomeEmail(email: string, firstName: string, username: string): Promise<boolean> {
+  async sendWelcomeEmail(email: string, firstName: string, username: string, password: string): Promise<boolean> {
     const subject = '🎉 Welcome to IamBillBoard - Your Account is Ready!';
     
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1>Welcome ${firstName}!</h1>
-        <p>Your account ${username} has been created successfully.</p>
-      </div>
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Welcome to IamBillBoard</title>
+      </head>
+      <body style="margin: 0; padding: 0; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); font-family: 'Segoe UI', Arial, sans-serif;">
+        <div style="max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); overflow: hidden;">
+          
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); padding: 40px 40px 30px; text-align: center; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);"></div>
+            <div style="position: relative; z-index: 2;">
+              <h1 style="color: #ffffff; font-size: 28px; font-weight: 700; margin: 0 0 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">🎉 Welcome to IamBillBoard!</h1>
+              <p style="color: rgba(255,255,255,0.9); font-size: 16px; margin: 0;">India's #1 Custom Bottle Advertising Platform</p>
+            </div>
+          </div>
+          
+          <!-- Content -->
+          <div style="padding: 50px 40px;">
+            <div style="text-align: center; margin-bottom: 40px;">
+              <h2 style="color: #1e293b; font-size: 24px; font-weight: 600; margin: 0 0 16px;">Hi ${firstName}!</h2>
+              <p style="color: #64748b; font-size: 16px; line-height: 24px; margin: 0;">Your account has been successfully created! Here are your login credentials:</p>
+            </div>
+            
+            <!-- Credentials Box -->
+            <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 2px solid #e2e8f0; border-radius: 16px; padding: 30px; text-align: center; margin: 30px 0; position: relative; overflow: hidden;">
+              <div style="position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(239,68,68,0.05) 0%, transparent 70%);"></div>
+              <div style="position: relative; z-index: 2;">
+                <p style="color: #64748b; font-size: 14px; margin: 0 0 20px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Your Login Credentials</p>
+                
+                <div style="background: #ffffff; border: 2px solid #ef4444; border-radius: 12px; padding: 24px; margin: 0 auto 20px; display: inline-block; box-shadow: 0 4px 12px rgba(239,68,68,0.15); text-align: left; max-width: 280px;">
+                  <div style="margin-bottom: 16px;">
+                    <p style="color: #64748b; font-size: 12px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 1px;">Username/Email</p>
+                    <p style="font-family: 'Courier New', monospace; font-size: 16px; font-weight: 600; color: #1e293b; margin: 0; word-break: break-all;">${username}</p>
+                  </div>
+                  <div>
+                    <p style="color: #64748b; font-size: 12px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 1px;">Password</p>
+                    <p style="font-family: 'Courier New', monospace; font-size: 16px; font-weight: 600; color: #ef4444; margin: 0; letter-spacing: 2px;">${password}</p>
+                  </div>
+                </div>
+                
+                <p style="color: #64748b; font-size: 12px; margin: 0; font-style: italic;">Please keep these credentials safe and consider changing your password after first login</p>
+              </div>
+            </div>
+            
+            <!-- Login Button -->
+            <div style="text-align: center; margin: 40px 0;">
+              <a href="${process.env.FRONTEND_URL || 'http://localhost:5000'}/signin" style="display: inline-block; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(239,68,68,0.3); transition: all 0.2s ease;">
+                Sign In to Your Account
+              </a>
+            </div>
+            
+            <!-- Features -->
+            <div style="background: rgba(239,68,68,0.05); border-left: 4px solid #ef4444; padding: 20px; border-radius: 8px; margin: 30px 0;">
+              <h3 style="color: #1e293b; font-size: 16px; font-weight: 600; margin: 0 0 12px;">What You Can Do:</h3>
+              <ul style="color: #64748b; font-size: 14px; line-height: 20px; margin: 0; padding-left: 20px;">
+                <li style="margin-bottom: 8px;">Design custom bottle labels with our easy-to-use tools</li>
+                <li style="margin-bottom: 8px;">Get instant price quotes for your campaigns</li>
+                <li style="margin-bottom: 8px;">Track your orders and campaign performance</li>
+                <li style="margin-bottom: 8px;">Access professional design templates</li>
+                <li>Connect with pan-India distribution network</li>
+              </ul>
+            </div>
+            
+            <!-- Support */}
+            <div style="text-align: center; margin: 30px 0;">
+              <p style="color: #64748b; font-size: 14px; margin: 0 0 8px;">Need help getting started?</p>
+              <p style="color: #ef4444; font-size: 14px; margin: 0;">📞 Contact Support: support@iambillboard.com</p>
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div style="background: #f8fafc; padding: 30px 40px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="color: #64748b; font-size: 12px; margin: 0 0 8px;">© 2025 IamBillBoard. All rights reserved.</p>
+            <p style="color: #94a3b8; font-size: 11px; margin: 0;">India's Premier Custom Bottle Advertising Platform</p>
+          </div>
+          
+        </div>
+      </body>
+      </html>
+    `;
+
+    return this.sendEmail({ to: email, subject, html });
+  }
+
+  // Order Confirmation Email
+  async sendOrderConfirmationEmail(email: string, userName: string, orderDetails: any): Promise<boolean> {
+    const subject = '✅ Order Confirmed - IamBillBoard Campaign Started!';
+    
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Order Confirmation</title>
+      </head>
+      <body style="margin: 0; padding: 0; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); font-family: 'Segoe UI', Arial, sans-serif;">
+        <div style="max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); overflow: hidden;">
+          
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px 40px 30px; text-align: center;">
+            <h1 style="color: #ffffff; font-size: 28px; font-weight: 700; margin: 0 0 8px;">✅ Order Confirmed!</h1>
+            <p style="color: rgba(255,255,255,0.9); font-size: 16px; margin: 0;">Your campaign has been successfully placed</p>
+          </div>
+          
+          <!-- Content -->
+          <div style="padding: 50px 40px;">
+            <h2 style="color: #1e293b; font-size: 24px; font-weight: 600; margin: 0 0 16px;">Hi ${userName}!</h2>
+            <p style="color: #64748b; font-size: 16px; line-height: 24px; margin: 0 0 30px;">Great news! Your bottle advertising campaign order has been confirmed and is now being processed by our team.</p>
+            
+            <!-- Order Details -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin: 20px 0;">
+              <h3 style="color: #1e293b; margin: 0 0 15px;">Order Details:</h3>
+              <p style="color: #64748b; margin: 5px 0;"><strong>Campaign Name:</strong> ${orderDetails.campaignName || 'Custom Campaign'}</p>
+              <p style="color: #64748b; margin: 5px 0;"><strong>Quantity:</strong> ${orderDetails.quantity || 'N/A'} bottles</p>
+              <p style="color: #64748b; margin: 5px 0;"><strong>Estimated Cost:</strong> ₹${orderDetails.estimatedCost || 'TBD'}</p>
+              <p style="color: #64748b; margin: 5px 0;"><strong>Order Date:</strong> ${new Date().toLocaleDateString('en-IN')}</p>
+            </div>
+            
+            <!-- Next Steps -->
+            <div style="background: rgba(16,185,129,0.05); border-left: 4px solid #10b981; padding: 20px; border-radius: 8px; margin: 30px 0;">
+              <h3 style="color: #1e293b; font-size: 16px; font-weight: 600; margin: 0 0 12px;">What Happens Next:</h3>
+              <ol style="color: #64748b; font-size: 14px; line-height: 20px; margin: 0; padding-left: 20px;">
+                <li style="margin-bottom: 8px;">Our design team will review your campaign requirements</li>
+                <li style="margin-bottom: 8px;">You'll receive email updates on approval status</li>
+                <li style="margin-bottom: 8px;">Once approved, production will begin immediately</li>
+                <li>Track your campaign progress in your dashboard</li>
+              </ol>
+            </div>
+            
+            <!-- CTA Button -->
+            <div style="text-align: center; margin: 40px 0;">
+              <a href="${process.env.FRONTEND_URL || 'http://localhost:5000'}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: 600; font-size: 16px;">
+                View Dashboard
+              </a>
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div style="background: #f8fafc; padding: 30px 40px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="color: #64748b; font-size: 12px; margin: 0;">© 2025 IamBillBoard. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    return this.sendEmail({ to: email, subject, html });
+  }
+
+  // Campaign Approval Email
+  async sendCampaignApprovalEmail(email: string, userName: string, campaignName: string): Promise<boolean> {
+    const subject = '🎉 Campaign Approved - Production Starting!';
+    
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Campaign Approved</title>
+      </head>
+      <body style="margin: 0; padding: 0; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); font-family: 'Segoe UI', Arial, sans-serif;">
+        <div style="max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); overflow: hidden;">
+          
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); padding: 40px 40px 30px; text-align: center;">
+            <h1 style="color: #ffffff; font-size: 28px; font-weight: 700; margin: 0 0 8px;">🎉 Campaign Approved!</h1>
+            <p style="color: rgba(255,255,255,0.9); font-size: 16px; margin: 0;">Your design has been approved and production is starting</p>
+          </div>
+          
+          <!-- Content -->
+          <div style="padding: 50px 40px;">
+            <h2 style="color: #1e293b; font-size: 24px; font-weight: 600; margin: 0 0 16px;">Congratulations ${userName}!</h2>
+            <p style="color: #64748b; font-size: 16px; line-height: 24px; margin: 0 0 30px;">Your campaign "<strong>${campaignName}</strong>" has been reviewed and approved by our team. We're now moving forward with production!</p>
+            
+            <!-- Status Update -->
+            <div style="background: rgba(59,130,246,0.05); border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 30px 0;">
+              <h3 style="color: #1e293b; font-size: 16px; font-weight: 600; margin: 0 0 12px;">Production Timeline:</h3>
+              <ul style="color: #64748b; font-size: 14px; line-height: 20px; margin: 0; padding-left: 20px;">
+                <li style="margin-bottom: 8px;">Design finalization: 1-2 business days</li>
+                <li style="margin-bottom: 8px;">Bottle printing & production: 3-5 business days</li>
+                <li style="margin-bottom: 8px;">Quality check & packaging: 1-2 business days</li>
+                <li>Shipping & delivery: 2-3 business days</li>
+              </ul>
+            </div>
+            
+            <!-- CTA Button -->
+            <div style="text-align: center; margin: 40px 0;">
+              <a href="${process.env.FRONTEND_URL || 'http://localhost:5000'}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: 600; font-size: 16px;">
+                Track Progress
+              </a>
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div style="background: #f8fafc; padding: 30px 40px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="color: #64748b; font-size: 12px; margin: 0;">© 2025 IamBillBoard. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    return this.sendEmail({ to: email, subject, html });
+  }
+
+  // Campaign Rejection Email
+  async sendCampaignRejectionEmail(email: string, userName: string, campaignName: string, rejectionReason: string): Promise<boolean> {
+    const subject = '❌ Campaign Update Required - Please Review';
+    
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Campaign Review Required</title>
+      </head>
+      <body style="margin: 0; padding: 0; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); font-family: 'Segoe UI', Arial, sans-serif;">
+        <div style="max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); overflow: hidden;">
+          
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 40px 40px 30px; text-align: center;">
+            <h1 style="color: #ffffff; font-size: 28px; font-weight: 700; margin: 0 0 8px;">⚠️ Review Required</h1>
+            <p style="color: rgba(255,255,255,0.9); font-size: 16px; margin: 0;">Your campaign needs some updates before approval</p>
+          </div>
+          
+          <!-- Content -->
+          <div style="padding: 50px 40px;">
+            <h2 style="color: #1e293b; font-size: 24px; font-weight: 600; margin: 0 0 16px;">Hi ${userName},</h2>
+            <p style="color: #64748b; font-size: 16px; line-height: 24px; margin: 0 0 30px;">We've reviewed your campaign "<strong>${campaignName}</strong>" and need some updates before we can proceed with production.</p>
+            
+            <!-- Feedback -->
+            <div style="background: rgba(245,158,11,0.05); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 30px 0;">
+              <h3 style="color: #1e293b; font-size: 16px; font-weight: 600; margin: 0 0 12px;">Feedback from our team:</h3>
+              <p style="color: #64748b; font-size: 14px; line-height: 20px; margin: 0;">${rejectionReason}</p>
+            </div>
+            
+            <!-- Next Steps -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin: 20px 0;">
+              <h3 style="color: #1e293b; margin: 0 0 15px;">What to do next:</h3>
+              <ol style="color: #64748b; font-size: 14px; line-height: 20px; margin: 0; padding-left: 20px;">
+                <li style="margin-bottom: 8px;">Review the feedback above</li>
+                <li style="margin-bottom: 8px;">Update your design or campaign details</li>
+                <li style="margin-bottom: 8px;">Resubmit for review</li>
+                <li>Our team will review again within 24 hours</li>
+              </ol>
+            </div>
+            
+            <!-- CTA Button -->
+            <div style="text-align: center; margin: 40px 0;">
+              <a href="${process.env.FRONTEND_URL || 'http://localhost:5000'}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: 600; font-size: 16px;">
+                Update Campaign
+              </a>
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div style="background: #f8fafc; padding: 30px 40px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="color: #64748b; font-size: 12px; margin: 0;">© 2025 IamBillBoard. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    return this.sendEmail({ to: email, subject, html });
+  }
+
+  // Design Reupload Email
+  async sendDesignReuploadEmail(email: string, userName: string, campaignName: string): Promise<boolean> {
+    const subject = '🔄 Design Updated - Review in Progress';
+    
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Design Updated</title>
+      </head>
+      <body style="margin: 0; padding: 0; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); font-family: 'Segoe UI', Arial, sans-serif;">
+        <div style="max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); overflow: hidden;">
+          
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); padding: 40px 40px 30px; text-align: center;">
+            <h1 style="color: #ffffff; font-size: 28px; font-weight: 700; margin: 0 0 8px;">🔄 Design Updated!</h1>
+            <p style="color: rgba(255,255,255,0.9); font-size: 16px; margin: 0;">Your updated design is now under review</p>
+          </div>
+          
+          <!-- Content -->
+          <div style="padding: 50px 40px;">
+            <h2 style="color: #1e293b; font-size: 24px; font-weight: 600; margin: 0 0 16px;">Hi ${userName}!</h2>
+            <p style="color: #64748b; font-size: 16px; line-height: 24px; margin: 0 0 30px;">Thank you for updating your campaign "<strong>${campaignName}</strong>". Our design team is now reviewing your new submission.</p>
+            
+            <!-- Status -->
+            <div style="background: rgba(139,92,246,0.05); border-left: 4px solid #8b5cf6; padding: 20px; border-radius: 8px; margin: 30px 0;">
+              <h3 style="color: #1e293b; font-size: 16px; font-weight: 600; margin: 0 0 12px;">Review Process:</h3>
+              <ul style="color: #64748b; font-size: 14px; line-height: 20px; margin: 0; padding-left: 20px;">
+                <li style="margin-bottom: 8px;">✅ Design received and queued for review</li>
+                <li style="margin-bottom: 8px;">🔄 Quality check in progress (24-48 hours)</li>
+                <li style="margin-bottom: 8px;">📧 You'll receive approval/feedback via email</li>
+                <li>🚀 Upon approval, production begins immediately</li>
+              </ul>
+            </div>
+            
+            <!-- CTA Button -->
+            <div style="text-align: center; margin: 40px 0;">
+              <a href="${process.env.FRONTEND_URL || 'http://localhost:5000'}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: 600; font-size: 16px;">
+                View Campaign
+              </a>
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div style="background: #f8fafc; padding: 30px 40px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="color: #64748b; font-size: 12px; margin: 0;">© 2025 IamBillBoard. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    return this.sendEmail({ to: email, subject, html });
+  }
+
+  // Password Change Confirmation Email
+  async sendPasswordChangeConfirmationEmail(email: string, userName: string): Promise<boolean> {
+    const subject = '🔐 Password Changed Successfully - IamBillBoard';
+    
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Password Changed</title>
+      </head>
+      <body style="margin: 0; padding: 0; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); font-family: 'Segoe UI', Arial, sans-serif;">
+        <div style="max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); overflow: hidden;">
+          
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px 40px 30px; text-align: center;">
+            <h1 style="color: #ffffff; font-size: 28px; font-weight: 700; margin: 0 0 8px;">🔐 Password Updated!</h1>
+            <p style="color: rgba(255,255,255,0.9); font-size: 16px; margin: 0;">Your account password has been successfully changed</p>
+          </div>
+          
+          <!-- Content -->
+          <div style="padding: 50px 40px;">
+            <h2 style="color: #1e293b; font-size: 24px; font-weight: 600; margin: 0 0 16px;">Hi ${userName}!</h2>
+            <p style="color: #64748b; font-size: 16px; line-height: 24px; margin: 0 0 30px;">Your password has been successfully updated. Your account is now more secure with the new password.</p>
+            
+            <!-- Security Info -->
+            <div style="background: rgba(16,185,129,0.05); border-left: 4px solid #10b981; padding: 20px; border-radius: 8px; margin: 30px 0;">
+              <h3 style="color: #1e293b; font-size: 16px; font-weight: 600; margin: 0 0 12px;">Security Details:</h3>
+              <ul style="color: #64748b; font-size: 14px; line-height: 20px; margin: 0; padding-left: 20px;">
+                <li style="margin-bottom: 8px;"><strong>Change Time:</strong> ${new Date().toLocaleString('en-IN')}</li>
+                <li style="margin-bottom: 8px;"><strong>Account:</strong> ${email}</li>
+                <li style="margin-bottom: 8px;"><strong>Status:</strong> Password updated successfully</li>
+                <li><strong>Action Required:</strong> None - You're all set!</li>
+              </ul>
+            </div>
+            
+            <!-- Important Notice -->
+            <div style="background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.2); border-radius: 12px; padding: 20px; margin: 30px 0;">
+              <h3 style="color: #1e293b; font-size: 16px; font-weight: 600; margin: 0 0 12px;">⚠️ If you didn't change your password:</h3>
+              <p style="color: #64748b; font-size: 14px; line-height: 20px; margin: 0;">If you did not make this change, please contact our support team immediately at <strong>support@iambillboard.com</strong> or call us.</p>
+            </div>
+            
+            <!-- CTA Button -->
+            <div style="text-align: center; margin: 40px 0;">
+              <a href="${process.env.FRONTEND_URL || 'http://localhost:5000'}/signin" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: 600; font-size: 16px;">
+                Sign In Now
+              </a>
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div style="background: #f8fafc; padding: 30px 40px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="color: #64748b; font-size: 12px; margin: 0;">© 2025 IamBillBoard. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
     `;
 
     return this.sendEmail({ to: email, subject, html });

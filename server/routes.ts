@@ -512,9 +512,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userAgent: req.get('User-Agent') || ''
       });
       
-      // Send welcome email
+      // Send welcome email with credentials
       try {
-        await emailService.sendWelcomeEmail(email, firstName, username);
+        await emailService.sendWelcomeEmail(email, firstName, username, password);
         console.log(`Welcome email sent to ${email}`);
       } catch (emailError) {
         console.error('Failed to send welcome email:', emailError);
@@ -934,6 +934,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ipAddress: req.ip || 'unknown',
         userAgent: req.get('User-Agent') || 'unknown'
       });
+      
+      // Send password change confirmation email
+      try {
+        await emailService.sendPasswordChangeConfirmationEmail(user.email, user.username);
+        console.log(`Password change confirmation email sent to ${user.email}`);
+      } catch (emailError) {
+        console.error('Failed to send password change confirmation email:', emailError);
+      }
       
       res.json({ 
         success: true,
@@ -1434,10 +1442,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
               selectedArea: campaign.selectedArea
             };
             
-            // Send email notification
+            // Send order confirmation email
             if (user.email) {
-              await emailService.sendCampaignSubmissionEmail(user.email, campaignNotificationData);
-              console.log(`Campaign submission email sent to ${user.email}`);
+              const orderDetails = {
+                campaignName: campaign.title || 'Custom Campaign',
+                quantity: campaign.quantity || 1000,
+                estimatedCost: campaign.totalAmount || 'TBD'
+              };
+              await emailService.sendOrderConfirmationEmail(user.email, user.username, orderDetails);
+              console.log(`Order confirmation email sent to ${user.email}`);
             }
             
             // Send SMS notification (get phone from campaign data or user profile)
@@ -1527,9 +1540,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Get user's phone number for SMS
             const userPhone = campaign.phone || user.phone;
             
-            // Send email notification
+            // Send design reupload email notification
             try {
-              await emailService.sendDesignReuploadEmail(user.email, campaignEmailData);
+              await emailService.sendDesignReuploadEmail(user.email, user.username, campaign.title || 'Your Campaign');
               console.log(`Design reupload email sent to ${user.email}`);
             } catch (emailError) {
               console.error('Failed to send design reupload email:', emailError);
@@ -1676,7 +1689,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               case 'approved':
                 // Send both email and SMS
                 if (user.email) {
-                  await emailService.sendCampaignApprovalEmail(user.email, campaignEmailData);
+                  await emailService.sendCampaignApprovalEmail(user.email, user.username, campaign.name || 'Your Campaign');
                   console.log(`Campaign approval email sent to ${user.email}`);
                 }
                 if (userPhone) {
@@ -1687,7 +1700,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               case 'rejected':
                 // Send both email and SMS
                 if (user.email) {
-                  await emailService.sendCampaignRejectionEmail(user.email, campaignEmailData, rejectionReason);
+                  await emailService.sendCampaignRejectionEmail(user.email, user.username, campaign.name || 'Your Campaign', rejectionReason || 'No specific reason provided');
                   console.log(`Campaign rejection email sent to ${user.email}`);
                 }
                 if (userPhone) {
