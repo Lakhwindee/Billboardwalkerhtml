@@ -778,36 +778,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Generate secure reset token
-      const resetToken = crypto.randomBytes(32).toString('hex');
-      const expiryTime = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+      // Generate 6-digit OTP
+      const resetOtp = Math.floor(100000 + Math.random() * 900000);
+      const expiryTime = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
       
       // Store reset token in database 
       try {
         await storage.createPasswordResetOtp({
           userId: user.id,
-          otp: resetToken,
+          otp: resetOtp.toString(),
           expiresAt: expiryTime,
           isUsed: false
         });
         
-        console.log(`🔐 PASSWORD RESET TOKEN generated for ${user.email}`);
+        console.log(`🔐 PASSWORD RESET OTP generated for ${user.email}: ${resetOtp}`);
         
-        // Create reset link
-        const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:5000'}/reset-password?token=${resetToken}&email=${encodeURIComponent(user.email)}`;
-        console.log(`🔗 PROFESSIONAL RESET LINK: ${resetLink}`);
-        
-        // Send reset email - try email service first, fallback to console link
+        // Send OTP email
         try {
           if (emailService.isConfigured()) {
-            await emailService.sendPasswordResetLinkEmail(user.email, resetLink, user.username);
-            console.log('✅ Password reset email sent successfully');
+            await emailService.sendPasswordResetOtpEmail(user.email, resetOtp.toString(), user.username);
+            console.log('✅ Password reset OTP email sent successfully');
           } else {
-            console.log('⚠️ Email service not configured, using console link above');
+            console.log('⚠️ Email service not configured, OTP displayed in console above');
           }
         } catch (emailError) {
           console.error('❌ Failed to send password reset email:', emailError);
-          console.log(`⚠️ Email failed - use the reset link displayed above`);
+          console.log(`⚠️ Email failed - OTP for testing: ${resetOtp}`);
         }
         
       } catch (dbError) {

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowLeft, Mail, Loader2, CheckCircle, KeyRound } from "lucide-react";
+import { ArrowLeft, Mail, Loader2, CheckCircle, KeyRound, Lock } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -12,27 +12,57 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
-const forgotPasswordSchema = z.object({
+// Step 1: Email Schema
+const emailSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
 });
 
-type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>;
+// Step 2: OTP Schema
+const otpSchema = z.object({
+  otp: z.string().length(6, "OTP must be 6 digits"),
+});
+
+// Step 3: Password Reset Schema
+const passwordResetSchema = z.object({
+  newPassword: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
+type EmailForm = z.infer<typeof emailSchema>;
+type OtpForm = z.infer<typeof otpSchema>;
+type PasswordResetForm = z.infer<typeof passwordResetSchema>;
 
 export default function ForgotPasswordPage() {
   const [, setLocation] = useLocation();
+  const [step, setStep] = useState(1); // 1: email, 2: otp, 3: password
+  const [email, setEmail] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
   const { toast } = useToast();
 
-  const form = useForm<ForgotPasswordForm>({
-    resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: {
-      email: "",
-    },
+  // Step 1: Email Form
+  const emailForm = useForm<EmailForm>({
+    resolver: zodResolver(emailSchema),
+    defaultValues: { email: "" },
   });
 
-  const forgotPasswordMutation = useMutation({
-    mutationFn: async (data: ForgotPasswordForm) => {
+  // Step 2: OTP Form
+  const otpForm = useForm<OtpForm>({
+    resolver: zodResolver(otpSchema),
+    defaultValues: { otp: "" },
+  });
+
+  // Step 3: Password Form
+  const passwordForm = useForm<PasswordResetForm>({
+    resolver: zodResolver(passwordResetSchema),
+    defaultValues: { newPassword: "", confirmPassword: "" },
+  });
+
+  // Step 1: Send OTP Email
+  const sendOtpMutation = useMutation({
+    mutationFn: async (data: EmailForm) => {
       const response = await fetch("/api/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -41,65 +71,114 @@ export default function ForgotPasswordPage() {
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to send reset email");
+        throw new Error(errorData.message || "Failed to send OTP");
       }
       
       return response.json();
     },
-    onSuccess: () => {
-      setSuccess(true);
+    onSuccess: (_, variables) => {
+      setEmail(variables.email);
+      setStep(2);
       toast({
-        title: "Reset email sent!",
-        description: "Check your email for password reset instructions.",
+        title: "OTP Sent!",
+        description: "Check your email for the 6-digit OTP code.",
       });
     },
     onError: (error: Error) => {
       setError(error.message);
       toast({
-        title: "Failed to send reset email",
+        title: "Failed to send OTP",
         description: error.message,
         variant: "destructive",
       });
     },
   });
 
-  const onSubmit = (data: ForgotPasswordForm) => {
+  // Step 2: Verify OTP
+  const verifyOtpMutation = useMutation({
+    mutationFn: async (data: OtpForm) => {
+      const response = await fetch("/api/verify-reset-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp: data.otp }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Invalid OTP");
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      setStep(3);
+      toast({
+        title: "OTP Verified!",
+        description: "Now set your new password.",
+      });
+    },
+    onError: (error: Error) => {
+      setError(error.message);
+      toast({
+        title: "OTP Verification Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Step 3: Reset Password
+  const resetPasswordMutation = useMutation({
+    mutationFn: async (data: PasswordResetForm) => {
+      const response = await fetch("/api/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          usernameOrEmail: email,
+          resetToken: "verified", // Token not needed after OTP verification
+          newPassword: data.newPassword,
+          confirmPassword: data.confirmPassword,
+        }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to reset password");
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Password Reset Successful!",
+        description: "You can now sign in with your new password.",
+      });
+      setLocation("/signin");
+    },
+    onError: (error: Error) => {
+      setError(error.message);
+      toast({
+        title: "Password Reset Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const onEmailSubmit = (data: EmailForm) => {
     setError("");
-    forgotPasswordMutation.mutate(data);
+    sendOtpMutation.mutate(data);
   };
 
-  if (success) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-red-50 dark:from-purple-950 dark:via-pink-950 dark:to-red-950 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md shadow-2xl border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg">
-          <CardContent className="text-center p-8">
-            <div className="mx-auto w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mb-6">
-              <CheckCircle className="h-8 w-8 text-white" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Email Sent!</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              We've sent password reset instructions to your email address. Please check your inbox and follow the instructions.
-            </p>
-            <div className="space-y-3">
-              <Button 
-                onClick={() => setLocation("/signin")}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-              >
-                Back to Sign In
-              </Button>
-              <Button 
-                variant="outline"
-                onClick={() => setSuccess(false)}
-                className="w-full"
-              >
-                Resend Email
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const onOtpSubmit = (data: OtpForm) => {
+    setError("");
+    verifyOtpMutation.mutate(data);
+  };
+
+  const onPasswordSubmit = (data: PasswordResetForm) => {
+    setError("");
+    resetPasswordMutation.mutate(data);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-red-50 dark:from-purple-950 dark:via-pink-950 dark:to-red-950 flex items-center justify-center p-4">
@@ -118,24 +197,47 @@ export default function ForgotPasswordPage() {
           
           <div className="mb-4">
             <div className="mx-auto w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-              <KeyRound className="h-8 w-8 text-white" />
+              {step === 1 && <Mail className="h-8 w-8 text-white" />}
+              {step === 2 && <KeyRound className="h-8 w-8 text-white" />}
+              {step === 3 && <Lock className="h-8 w-8 text-white" />}
             </div>
           </div>
           
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Forgot Password?
+            {step === 1 && "Forgot Password?"}
+            {step === 2 && "Enter OTP Code"}
+            {step === 3 && "Set New Password"}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            No worries! Enter your email and we'll send you reset instructions
+            {step === 1 && "Enter your email to receive OTP"}
+            {step === 2 && "Check your email for the 6-digit code"}
+            {step === 3 && "Create your new password"}
           </p>
         </div>
 
-        {/* Forgot Password Card */}
+        {/* Progress Indicator */}
+        <div className="flex justify-center mb-8">
+          <div className="flex items-center space-x-4">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= 1 ? 'bg-orange-500 text-white' : 'bg-gray-300 text-gray-600'}`}>1</div>
+            <div className={`w-8 h-1 ${step >= 2 ? 'bg-orange-500' : 'bg-gray-300'}`}></div>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= 2 ? 'bg-orange-500 text-white' : 'bg-gray-300 text-gray-600'}`}>2</div>
+            <div className={`w-8 h-1 ${step >= 3 ? 'bg-orange-500' : 'bg-gray-300'}`}></div>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= 3 ? 'bg-orange-500 text-white' : 'bg-gray-300 text-gray-600'}`}>3</div>
+          </div>
+        </div>
+
+        {/* Main Card */}
         <Card className="shadow-2xl border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg">
           <CardHeader className="space-y-1 text-center pb-6">
-            <CardTitle className="text-2xl font-semibold">Reset Password</CardTitle>
+            <CardTitle className="text-2xl font-semibold">
+              {step === 1 && "Reset Password"}
+              {step === 2 && "Verify OTP"}
+              {step === 3 && "New Password"}
+            </CardTitle>
             <CardDescription>
-              Enter your email address to receive reset instructions
+              {step === 1 && "Enter your email address"}
+              {step === 2 && `OTP sent to ${email}`}
+              {step === 3 && "Choose a strong password"}
             </CardDescription>
           </CardHeader>
           
@@ -146,74 +248,186 @@ export default function ForgotPasswordPage() {
               </Alert>
             )}
 
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium">Email Address</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+            {/* Step 1: Email Input */}
+            {step === 1 && (
+              <Form {...emailForm}>
+                <form onSubmit={emailForm.handleSubmit(onEmailSubmit)} className="space-y-5">
+                  <FormField
+                    control={emailForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">Email Address</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                            <Input
+                              {...field}
+                              type="email"
+                              placeholder="Enter your email address"
+                              className="pl-10 h-12 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-orange-500 dark:focus:border-orange-400"
+                              autoComplete="email"
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button
+                    type="submit"
+                    className="w-full h-12 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-semibold"
+                    disabled={sendOtpMutation.isPending}
+                  >
+                    {sendOtpMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Sending OTP...
+                      </>
+                    ) : (
+                      "Send OTP"
+                    )}
+                  </Button>
+                </form>
+              </Form>
+            )}
+
+            {/* Step 2: OTP Input */}
+            {step === 2 && (
+              <Form {...otpForm}>
+                <form onSubmit={otpForm.handleSubmit(onOtpSubmit)} className="space-y-5">
+                  <FormField
+                    control={otpForm.control}
+                    name="otp"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">Enter 6-Digit OTP</FormLabel>
+                        <FormControl>
                           <Input
                             {...field}
-                            type="email"
-                            placeholder="Enter your email address"
-                            className="pl-10 h-12 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-purple-500 dark:focus:border-purple-400"
-                            autoComplete="email"
-                            data-testid="input-email"
+                            type="text"
+                            placeholder="123456"
+                            maxLength={6}
+                            className="h-12 text-center text-2xl font-mono tracking-widest bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-orange-500 dark:focus:border-orange-400"
+                            autoComplete="one-time-code"
                           />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
+                  <div className="flex space-x-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setStep(1)}
+                      className="flex-1"
+                    >
+                      Back
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="flex-1 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white"
+                      disabled={verifyOtpMutation.isPending}
+                    >
+                      {verifyOtpMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Verifying...
+                        </>
+                      ) : (
+                        "Verify OTP"
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            )}
+
+            {/* Step 3: Password Reset */}
+            {step === 3 && (
+              <Form {...passwordForm}>
+                <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-5">
+                  <FormField
+                    control={passwordForm.control}
+                    name="newPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">New Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="password"
+                            placeholder="Enter new password"
+                            className="h-12 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-orange-500 dark:focus:border-orange-400"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={passwordForm.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">Confirm Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="password"
+                            placeholder="Confirm new password"
+                            className="h-12 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-orange-500 dark:focus:border-orange-400"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button
+                    type="submit"
+                    className="w-full h-12 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-semibold"
+                    disabled={resetPasswordMutation.isPending}
+                  >
+                    {resetPasswordMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Updating Password...
+                      </>
+                    ) : (
+                      "Update Password"
+                    )}
+                  </Button>
+                </form>
+              </Form>
+            )}
+
+            {/* Resend OTP option for step 2 */}
+            {step === 2 && (
+              <div className="text-center">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                  Didn't receive OTP?
+                </p>
                 <Button
-                  type="submit"
-                  className="w-full h-12 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
-                  disabled={forgotPasswordMutation.isPending}
-                  data-testid="button-send-reset"
+                  variant="link"
+                  onClick={() => sendOtpMutation.mutate({ email })}
+                  disabled={sendOtpMutation.isPending}
+                  className="text-orange-600 hover:text-orange-700"
                 >
-                  {forgotPasswordMutation.isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Sending Reset Email...
-                    </>
-                  ) : (
-                    "Send Reset Instructions"
-                  )}
+                  Resend OTP
                 </Button>
-              </form>
-            </Form>
-
-            {/* Additional Info */}
-            <div className="text-center text-sm text-gray-500 dark:text-gray-400 space-y-2">
-              <p>Remember your password?</p>
-              <Link href="/signin" className="text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 font-medium">
-                Sign in here
-              </Link>
-            </div>
-
-            <div className="text-center text-xs text-gray-400 dark:text-gray-500">
-              <p>
-                If you don't receive an email within a few minutes, please check your spam folder 
-                or contact our support team.
-              </p>
-            </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
         {/* Footer */}
         <div className="text-center mt-8 text-sm text-gray-500 dark:text-gray-400">
           <p>© 2025 IamBillBoard. All rights reserved.</p>
-          <div className="mt-2 space-x-4">
-            <Link href="/terms" className="hover:text-gray-700 dark:hover:text-gray-300">Terms</Link>
-            <Link href="/privacy" className="hover:text-gray-700 dark:hover:text-gray-300">Privacy</Link>
-          </div>
         </div>
       </div>
     </div>

@@ -557,14 +557,14 @@ class EmailService {
     return this.sendEmail({ to: email, subject, html });
   }
 
-  async sendPasswordResetLinkEmail(toEmail: string, resetLink: string, username: string): Promise<boolean> {
+  async sendPasswordResetOtpEmail(toEmail: string, resetOtp: string, username: string): Promise<boolean> {
     if (!this.transporter) {
       console.error('Email transporter not initialized');
       return false;
     }
 
     try {
-      const subject = '🔐 IamBillBoard - Password Reset Code';
+      const subject = '🔐 IamBillBoard - Password Reset OTP';
       const html = `
         <!DOCTYPE html>
         <html lang="en">
@@ -592,29 +592,26 @@ class EmailService {
             <div style="padding: 50px 40px;">
               <div style="text-align: center; margin-bottom: 40px;">
                 <h2 style="color: #1e293b; font-size: 24px; font-weight: 600; margin: 0 0 16px;">Hi ${username}!</h2>
-                <p style="color: #64748b; font-size: 16px; line-height: 24px; margin: 0;">We received a request to reset your password. Click the button below to create a new password:</p>
+                <p style="color: #64748b; font-size: 16px; line-height: 24px; margin: 0;">We received a request to reset your password. Use the OTP below to reset your password:</p>
               </div>
               
-              <!-- Reset Button -->
-              <div style="text-align: center; margin: 40px 0;">
-                <a href="${resetLink}" style="display: inline-block; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(239,68,68,0.3); transition: all 0.2s ease;">
-                  Reset My Password
-                </a>
-              </div>
-              
-              <!-- Alternative Link -->
-              <div style="background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.2); border-radius: 12px; padding: 20px; margin: 30px 0;">
-                <p style="color: #64748b; font-size: 14px; margin: 0 0 12px; font-weight: 600;">Can't click the button? Copy and paste this link:</p>
-                <p style="word-break: break-all; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin: 0; font-family: 'Courier New', monospace; font-size: 12px; color: #374151;">
-                  ${resetLink}
-                </p>
+              <!-- OTP Code Box -->
+              <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 2px solid #e2e8f0; border-radius: 16px; padding: 30px; text-align: center; margin: 30px 0; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(239,68,68,0.05) 0%, transparent 70%);"></div>
+                <div style="position: relative; z-index: 2;">
+                  <p style="color: #64748b; font-size: 14px; margin: 0 0 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Your Reset OTP</p>
+                  <div style="background: #ffffff; border: 2px solid #ef4444; border-radius: 12px; padding: 20px; margin: 0 auto; display: inline-block; box-shadow: 0 4px 12px rgba(239,68,68,0.15);">
+                    <span style="font-family: 'Courier New', monospace; font-size: 36px; font-weight: 700; color: #ef4444; letter-spacing: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">${resetOtp}</span>
+                  </div>
+                  <p style="color: #64748b; font-size: 12px; margin: 16px 0 0; font-style: italic;">This OTP expires in 10 minutes</p>
+                </div>
               </div>
               
               <!-- Instructions -->
               <div style="background: rgba(239,68,68,0.05); border-left: 4px solid #ef4444; padding: 20px; border-radius: 8px; margin: 30px 0;">
                 <h3 style="color: #1e293b; font-size: 16px; font-weight: 600; margin: 0 0 12px;">Reset Instructions:</h3>
                 <ol style="color: #64748b; font-size: 14px; line-height: 20px; margin: 0; padding-left: 20px;">
-                  <li style="margin-bottom: 8px;">Click the "Reset My Password" button above</li>
+                  <li style="margin-bottom: 8px;">Enter the 6-digit OTP above on the password reset page</li>
                   <li style="margin-bottom: 8px;">Create a new secure password (minimum 6 characters)</li>
                   <li style="margin-bottom: 8px;">Confirm your new password</li>
                   <li>Sign in with your new password</li>
