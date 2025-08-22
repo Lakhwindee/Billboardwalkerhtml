@@ -761,11 +761,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       if (!user) {
-        // Return success message even if user not found (security measure)
-        return res.json({ 
-          success: true,
-          message: 'If an account exists, you will receive recovery instructions.',
-          isAdmin: false
+        // Return error if user not found 
+        return res.status(404).json({ 
+          error: 'This email address is not registered with us. Please check your email or create a new account.',
+          type: 'user_not_found'
         });
       }
       
