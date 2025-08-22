@@ -63,41 +63,43 @@ const businessTypes = [
   "Other"
 ];
 
-const indianStates = [
-  "Andhra Pradesh",
-  "Arunachal Pradesh",
-  "Assam",
-  "Bihar",
-  "Chhattisgarh",
-  "Goa",
-  "Gujarat",
-  "Haryana",
-  "Himachal Pradesh",
-  "Jharkhand",
-  "Karnataka",
-  "Kerala",
-  "Madhya Pradesh",
-  "Maharashtra",
-  "Manipur",
-  "Meghalaya",
-  "Mizoram",
-  "Nagaland",
-  "Odisha",
-  "Punjab",
-  "Rajasthan",
-  "Sikkim",
-  "Tamil Nadu",
-  "Telangana",
-  "Tripura",
-  "Uttar Pradesh",
-  "Uttarakhand",
-  "West Bengal",
-  "Delhi",
-  "Chandigarh",
-  "Jammu and Kashmir",
-  "Ladakh",
-  "Puducherry"
-];
+const statesAndCities = {
+  "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur", "Nellore", "Kurnool", "Rajahmundry", "Kadapa", "Kakinada", "Anantapur", "Tirupati"],
+  "Arunachal Pradesh": ["Itanagar", "Naharlagun", "Pasighat", "Akurdi", "Bomdila", "Tawang", "Ziro", "Along", "Tezu", "Changlang"],
+  "Assam": ["Guwahati", "Silchar", "Dibrugarh", "Jorhat", "Nagaon", "Tinsukia", "Tezpur", "Bongaigaon", "Karimganj", "Dhubri"],
+  "Bihar": ["Patna", "Gaya", "Bhagalpur", "Muzaffarpur", "Purnia", "Darbhanga", "Bihar Sharif", "Arrah", "Begusarai", "Katihar"],
+  "Chandigarh": ["Chandigarh"],
+  "Chhattisgarh": ["Raipur", "Bhilai", "Bilaspur", "Korba", "Durg", "Rajnandgaon", "Jagdalpur", "Raigarh", "Ambikapur", "Mahasamund"],
+  "Delhi": ["New Delhi", "Delhi", "North Delhi", "South Delhi", "East Delhi", "West Delhi", "Central Delhi", "North East Delhi", "North West Delhi", "South East Delhi", "South West Delhi"],
+  "Goa": ["Panaji", "Vasco da Gama", "Margao", "Mapusa", "Ponda", "Bicholim", "Curchorem", "Sanquelim", "Cuncolim", "Quepem"],
+  "Gujarat": ["Ahmedabad", "Surat", "Vadodara", "Rajkot", "Bhavnagar", "Jamnagar", "Junagadh", "Gandhinagar", "Anand", "Navsari"],
+  "Haryana": ["Gurgaon", "Faridabad", "Panipat", "Ambala", "Yamunanagar", "Rohtak", "Hisar", "Karnal", "Sonipat", "Panchkula"],
+  "Himachal Pradesh": ["Shimla", "Dharamshala", "Solan", "Mandi", "Palampur", "Baddi", "Nahan", "Paonta Sahib", "Sundernagar", "Chamba"],
+  "Jammu and Kashmir": ["Srinagar", "Jammu", "Anantnag", "Baramulla", "Sopore", "Kathua", "Udhampur", "Punch", "Rajouri", "Kupwara"],
+  "Jharkhand": ["Ranchi", "Jamshedpur", "Dhanbad", "Bokaro", "Deoghar", "Phusro", "Hazaribagh", "Giridih", "Ramgarh", "Medininagar"],
+  "Karnataka": ["Bangalore", "Mysore", "Hubli", "Mangalore", "Belgaum", "Gulbarga", "Davanagere", "Bellary", "Bijapur", "Shimoga"],
+  "Kerala": ["Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur", "Kollam", "Palakkad", "Alappuzha", "Malappuram", "Kannur", "Kasaragod"],
+  "Ladakh": ["Leh", "Kargil", "Nubra", "Zanskar", "Changthang", "Sham"],
+  "Madhya Pradesh": ["Bhopal", "Indore", "Gwalior", "Jabalpur", "Ujjain", "Sagar", "Dewas", "Satna", "Ratlam", "Rewa"],
+  "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Thane", "Nashik", "Aurangabad", "Solapur", "Amravati", "Kolhapur", "Sangli"],
+  "Manipur": ["Imphal", "Thoubal", "Bishnupur", "Churachandpur", "Kakching", "Ukhrul", "Senapati", "Tamenglong", "Jiribam", "Kangpokpi"],
+  "Meghalaya": ["Shillong", "Tura", "Nongstoin", "Jowai", "Baghmara", "Ampati", "Resubelpara", "Khliehriat", "Williamnagar", "Mawkyrwat"],
+  "Mizoram": ["Aizawl", "Lunglei", "Saiha", "Champhai", "Kolasib", "Serchhip", "Lawngtlai", "Mamit"],
+  "Nagaland": ["Kohima", "Dimapur", "Mokokchung", "Tuensang", "Wokha", "Zunheboto", "Phek", "Kiphire", "Longleng", "Peren", "Mon"],
+  "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela", "Brahmapur", "Sambalpur", "Puri", "Balasore", "Bhadrak", "Baripada", "Jharsuguda"],
+  "Puducherry": ["Puducherry", "Karaikal", "Mahe", "Yanam"],
+  "Punjab": ["Ludhiana", "Amritsar", "Jalandhar", "Patiala", "Bathinda", "Mohali", "Firozpur", "Batala", "Pathankot", "Moga"],
+  "Rajasthan": ["Jaipur", "Jodhpur", "Kota", "Bikaner", "Ajmer", "Udaipur", "Bhilwara", "Alwar", "Bharatpur", "Sikar"],
+  "Sikkim": ["Gangtok", "Namchi", "Geyzing", "Mangan", "Jorethang", "Naya Bazar", "Rangpo", "Singtam", "Pakyong"],
+  "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem", "Tirunelveli", "Tiruppur", "Vellore", "Erode", "Thoothukkudi"],
+  "Telangana": ["Hyderabad", "Warangal", "Nizamabad", "Khammam", "Karimnagar", "Ramagundam", "Mahbubnagar", "Nalgonda", "Adilabad", "Suryapet"],
+  "Tripura": ["Agartala", "Dharmanagar", "Udaipur", "Kailasahar", "Belonia", "Khowai", "Pratapgarh", "Ranirbazar", "Sonamura", "Amarpur"],
+  "Uttar Pradesh": ["Lucknow", "Kanpur", "Ghaziabad", "Agra", "Meerut", "Varanasi", "Allahabad", "Bareilly", "Aligarh", "Moradabad"],
+  "Uttarakhand": ["Dehradun", "Haridwar", "Roorkee", "Haldwani", "Rudrapur", "Kashipur", "Rishikesh", "Kotdwar", "Ramnagar", "Manglaur"],
+  "West Bengal": ["Kolkata", "Howrah", "Durgapur", "Asansol", "Siliguri", "Bardhaman", "Malda", "Baharampur", "Habra", "Kharagpur"]
+};
+
+const indianStates = Object.keys(statesAndCities).sort();
 
 export default function SignupPage() {
   const [, setLocation] = useLocation();
@@ -111,6 +113,7 @@ export default function SignupPage() {
   const [emailOtp, setEmailOtp] = useState("");
   const [phoneOtp, setPhoneOtp] = useState("");
   const [pendingUserData, setPendingUserData] = useState<any>(null);
+  const [selectedState, setSelectedState] = useState("");
   const { toast } = useToast();
 
   const form = useForm<SignupForm>({
@@ -749,22 +752,33 @@ export default function SignupPage() {
                     )}
                   />
 
-                  {/* City and State */}
+                  {/* State and City */}
                   <div className="grid grid-cols-2 gap-4 mt-4">
                     <FormField
                       control={form.control}
-                      name="city"
+                      name="state"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium">City</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="Enter your city"
-                              className="h-11 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-purple-500 dark:focus:border-purple-400"
-                              data-testid="input-city"
-                            />
-                          </FormControl>
+                          <FormLabel className="text-sm font-medium">State</FormLabel>
+                          <Select onValueChange={(value) => {
+                            field.onChange(value);
+                            setSelectedState(value);
+                            // Reset city when state changes
+                            form.setValue("city", "");
+                          }} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="h-11 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-purple-500 dark:focus:border-purple-400" data-testid="select-state">
+                                <SelectValue placeholder="Select state first" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {indianStates.map((state) => (
+                                <SelectItem key={state} value={state}>
+                                  {state}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -772,20 +786,24 @@ export default function SignupPage() {
 
                     <FormField
                       control={form.control}
-                      name="state"
+                      name="city"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium">State</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormLabel className="text-sm font-medium">City</FormLabel>
+                          <Select 
+                            onValueChange={field.onChange} 
+                            defaultValue={field.value}
+                            disabled={!selectedState}
+                          >
                             <FormControl>
-                              <SelectTrigger className="h-11 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-purple-500 dark:focus:border-purple-400" data-testid="select-state">
-                                <SelectValue placeholder="Select state" />
+                              <SelectTrigger className="h-11 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-purple-500 dark:focus:border-purple-400" data-testid="select-city">
+                                <SelectValue placeholder={selectedState ? "Select city" : "Select state first"} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {indianStates.map((state) => (
-                                <SelectItem key={state} value={state}>
-                                  {state}
+                              {selectedState && statesAndCities[selectedState as keyof typeof statesAndCities]?.map((city) => (
+                                <SelectItem key={city} value={city}>
+                                  {city}
                                 </SelectItem>
                               ))}
                             </SelectContent>
