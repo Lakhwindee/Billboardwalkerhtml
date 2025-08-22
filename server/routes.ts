@@ -740,18 +740,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Forgot Password - Simple admin recovery (Production Ready)
   app.post("/api/forgot-password", async (req, res) => {
     try {
-      const { usernameOrEmail } = req.body;
+      const { usernameOrEmail, email } = req.body;
       
-      if (!usernameOrEmail) {
+      // Accept both field names for compatibility
+      const identifier = usernameOrEmail || email;
+      
+      if (!identifier) {
         return res.status(400).json({ 
           error: 'Please enter your username or email address',
           type: 'validation_error'
         });
       }
       
-      // For production - only admin recovery is supported
-      if (usernameOrEmail.trim() === 'judge') {
-        // Admin account recovery - contact support
+      console.log('Password reset request for:', identifier);
+      
+      // Find user by username or email
+      let user = await storage.getUserByUsername(identifier.trim());
+      if (!user && identifier.includes('@')) {
+        user = await storage.getUserByEmail(identifier.trim());
+      }
+      
+      if (!user) {
+        // Return success message even if user not found (security measure)
+        return res.json({ 
+          success: true,
+          message: 'If an account exists, you will receive recovery instructions.',
+          isAdmin: false
+        });
+      }
+      
+      // For admin accounts
+      if (user.role === 'admin' && user.username === 'judge') {
         return res.json({ 
           success: true,
           message: 'Admin account recovery: Use judge/judge1313 credentials to access admin panel.',
@@ -759,10 +778,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // For regular users - show generic message for security
+      // Generate password reset OTP
+      const resetOtp = Math.floor(100000 + Math.random() * 900000);
+      const expiryTime = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+      
+      // Store reset OTP in database 
+      try {
+        await storage.createPasswordResetOtp({
+          userId: user.id,
+          otp: resetOtp.toString(),
+          expiresAt: expiryTime,
+          isUsed: false
+        });
+        
+        console.log(`🔐 PASSWORD RESET OTP for ${user.email}: ${resetOtp}`);
+        
+        // Send reset email if email service is available
+        if (emailService.isConfigured()) {
+          try {
+            await emailService.sendPasswordResetEmail(user.email, resetOtp.toString(), user.username);
+            console.log('✅ Password reset email sent successfully');
+          } catch (emailError) {
+            console.error('❌ Failed to send password reset email:', emailError);
+          }
+        }
+        
+      } catch (dbError) {
+        console.error('Database error storing reset OTP:', dbError);
+      }
+      
+      // Always return success for security
       return res.json({ 
         success: true,
-        message: 'If an account exists, you will receive recovery instructions. For admin access, use judge/judge1313.',
+        message: 'If an account exists, you will receive recovery instructions.',
         isAdmin: false
       });
       

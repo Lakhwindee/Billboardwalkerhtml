@@ -547,6 +547,115 @@ class EmailService {
 
     return this.sendEmail({ to: email, subject, html });
   }
+
+  async sendPasswordResetEmail(toEmail: string, resetOtp: string, username: string): Promise<boolean> {
+    if (!this.transporter) {
+      console.error('Email transporter not initialized');
+      return false;
+    }
+
+    try {
+      const subject = '🔐 IamBillBoard - Password Reset Code';
+      const html = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Password Reset - IamBillBoard</title>
+        </head>
+        <body style="margin: 0; padding: 0; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif;">
+          <div style="max-width: 600px; margin: 40px auto; background: #ffffff; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border-radius: 16px; overflow: hidden;">
+            
+            <!-- Header with Gradient -->
+            <div style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); padding: 50px 40px; text-align: center; position: relative; overflow: hidden;">
+              <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); opacity: 0.3;"></div>
+              <div style="position: relative; z-index: 2;">
+                <div style="background: rgba(255,255,255,0.15); width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+                  <span style="font-size: 36px;">🔐</span>
+                </div>
+                <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">Password Reset</h1>
+                <p style="color: rgba(255,255,255,0.9); margin: 12px 0 0; font-size: 18px; font-weight: 400;">Secure password reset for your account</p>
+              </div>
+            </div>
+            
+            <!-- Content -->
+            <div style="padding: 50px 40px;">
+              <div style="text-align: center; margin-bottom: 40px;">
+                <h2 style="color: #1e293b; font-size: 24px; font-weight: 600; margin: 0 0 16px;">Hi ${username}!</h2>
+                <p style="color: #64748b; font-size: 16px; line-height: 24px; margin: 0;">We received a request to reset your password. Use the code below to reset your password:</p>
+              </div>
+              
+              <!-- OTP Code Box -->
+              <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 2px solid #e2e8f0; border-radius: 16px; padding: 30px; text-align: center; margin: 30px 0; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(239,68,68,0.05) 0%, transparent 70%);"></div>
+                <div style="position: relative; z-index: 2;">
+                  <p style="color: #64748b; font-size: 14px; margin: 0 0 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Your Reset Code</p>
+                  <div style="background: #ffffff; border: 2px solid #ef4444; border-radius: 12px; padding: 20px; margin: 0 auto; display: inline-block; box-shadow: 0 4px 12px rgba(239,68,68,0.15);">
+                    <span style="font-family: 'Courier New', monospace; font-size: 36px; font-weight: 700; color: #ef4444; letter-spacing: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">${resetOtp}</span>
+                  </div>
+                  <p style="color: #64748b; font-size: 12px; margin: 16px 0 0; font-style: italic;">This code expires in 10 minutes</p>
+                </div>
+              </div>
+              
+              <!-- Instructions -->
+              <div style="background: rgba(239,68,68,0.05); border-left: 4px solid #ef4444; padding: 20px; border-radius: 8px; margin: 30px 0;">
+                <h3 style="color: #1e293b; font-size: 16px; font-weight: 600; margin: 0 0 12px;">Reset Instructions:</h3>
+                <ol style="color: #64748b; font-size: 14px; line-height: 20px; margin: 0; padding-left: 20px;">
+                  <li style="margin-bottom: 8px;">Enter the 6-digit code above on the password reset page</li>
+                  <li style="margin-bottom: 8px;">Create a new secure password (minimum 6 characters)</li>
+                  <li style="margin-bottom: 8px;">Confirm your new password</li>
+                  <li>Complete the password reset process</li>
+                </ol>
+              </div>
+              
+              <!-- Security Notice -->
+              <div style="background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.2); border-radius: 12px; padding: 20px; margin: 30px 0;">
+                <div style="display: flex; align-items: flex-start;">
+                  <span style="font-size: 20px; margin-right: 12px; margin-top: 2px;">⚠️</span>
+                  <div>
+                    <h4 style="color: #92400e; font-size: 14px; font-weight: 600; margin: 0 0 8px;">Security Notice</h4>
+                    <p style="color: #d97706; font-size: 13px; line-height: 18px; margin: 0;">If you didn't request this password reset, please ignore this email. Your account remains secure. The code will expire automatically in 10 minutes.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Footer -->
+            <div style="background: #f8fafc; padding: 30px 40px; text-align: center; border-top: 1px solid #e2e8f0;">
+              <p style="color: #64748b; font-size: 13px; line-height: 18px; margin: 0 0 12px;">
+                <strong>IamBillBoard</strong> - Custom Bottle Advertising Platform<br>
+                Professional branding solutions for businesses across India
+              </p>
+              <p style="color: #94a3b8; font-size: 11px; margin: 0;">
+                This is an automated email. Please do not reply to this message.<br>
+                If you need assistance, contact our support team.
+              </p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      const mailOptions = {
+        from: `"IamBillBoard Team" <${process.env.GMAIL_USER || 'noreply@iambillboard.com'}>`,
+        to: toEmail,
+        subject: subject,
+        html: html
+      };
+
+      await this.transporter.sendMail(mailOptions);
+      console.log(`Password reset email sent successfully to ${toEmail}`);
+      return true;
+    } catch (error: any) {
+      console.error('Failed to send password reset email:', error);
+      return false;
+    }
+  }
+
+  isConfigured(): boolean {
+    return this.transporter !== null;
+  }
 }
 
 // Export single instance
