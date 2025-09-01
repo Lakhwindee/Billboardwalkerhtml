@@ -151,7 +151,7 @@ export default function Restrictions() {
                 </span>
               </h1>
               <p className="text-xl text-gray-600 leading-relaxed">
-                IamBillBoard ke saath advertising karte waqt ye guidelines follow karna zaroori hai
+                Please follow these guidelines when advertising with IamBillBoard
               </p>
             </div>
 
@@ -162,37 +162,37 @@ export default function Restrictions() {
                 {/* General Guidelines */}
                 <div className="border-l-4 border-red-500 pl-6">
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                    🚫 Prohibited Content (Mana Hai)
+                    🚫 Prohibited Content
                   </h2>
                   <div className="space-y-3">
                     <div className="flex items-start space-x-3">
                       <span className="text-red-500 font-bold">❌</span>
                       <p className="text-gray-700">
-                        <strong>Nudity ya Sexual Content:</strong> Koi bhi nude, semi-nude ya sexual nature ka content bilkul approve nahi hoga
+                        <strong>Nudity or Sexual Content:</strong> Any nude, semi-nude or sexual content will not be approved
                       </p>
                     </div>
                     <div className="flex items-start space-x-3">
                       <span className="text-red-500 font-bold">❌</span>
                       <p className="text-gray-700">
-                        <strong>Vulgar Language:</strong> Gande shabd, galiyaan ya offensive language use karna mana hai
+                        <strong>Vulgar Language:</strong> Offensive words, profanity or inappropriate language is prohibited
                       </p>
                     </div>
                     <div className="flex items-start space-x-3">
                       <span className="text-red-500 font-bold">❌</span>
                       <p className="text-gray-700">
-                        <strong>Hate Speech:</strong> Kisi bhi religion, caste, gender ya community ke against hate content nahi chalega
+                        <strong>Hate Speech:</strong> Content against any religion, caste, gender or community is not allowed
                       </p>
                     </div>
                     <div className="flex items-start space-x-3">
                       <span className="text-red-500 font-bold">❌</span>
                       <p className="text-gray-700">
-                        <strong>Violence & Weapons:</strong> Hinsa, weapons ya threatening content allow nahi hai
+                        <strong>Violence & Weapons:</strong> Content depicting violence, weapons or threats is prohibited
                       </p>
                     </div>
                     <div className="flex items-start space-x-3">
                       <span className="text-red-500 font-bold">❌</span>
                       <p className="text-gray-700">
-                        <strong>Illegal Activities:</strong> Drugs, gambling, illegal services ka promotion nahi kar sakte
+                        <strong>Illegal Activities:</strong> Promotion of drugs, gambling or illegal services is not permitted
                       </p>
                     </div>
                   </div>
@@ -201,37 +201,37 @@ export default function Restrictions() {
                 {/* Content Guidelines */}
                 <div className="border-l-4 border-green-500 pl-6">
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                    ✅ Approved Content (Allowed Hai)
+                    ✅ Approved Content
                   </h2>
                   <div className="space-y-3">
                     <div className="flex items-start space-x-3">
                       <span className="text-green-500 font-bold">✓</span>
                       <p className="text-gray-700">
-                        <strong>Business Promotion:</strong> Apne business, products ya services ka clean promotion
+                        <strong>Business Promotion:</strong> Clean promotion of your business, products or services
                       </p>
                     </div>
                     <div className="flex items-start space-x-3">
                       <span className="text-green-500 font-bold">✓</span>
                       <p className="text-gray-700">
-                        <strong>Brand Logos:</strong> Company logos, brand names, contact information
+                        <strong>Brand Logos:</strong> Company logos, brand names and contact information
                       </p>
                     </div>
                     <div className="flex items-start space-x-3">
                       <span className="text-green-500 font-bold">✓</span>
                       <p className="text-gray-700">
-                        <strong>Educational Content:</strong> Knowledge, skills ya awareness related content
+                        <strong>Educational Content:</strong> Knowledge, skills and awareness related content
                       </p>
                     </div>
                     <div className="flex items-start space-x-3">
                       <span className="text-green-500 font-bold">✓</span>
                       <p className="text-gray-700">
-                        <strong>Creative Designs:</strong> Artistic, creative aur attractive designs
+                        <strong>Creative Designs:</strong> Artistic, creative and attractive designs
                       </p>
                     </div>
                     <div className="flex items-start space-x-3">
                       <span className="text-green-500 font-bold">✓</span>
                       <p className="text-gray-700">
-                        <strong>Social Messages:</strong> Positive social messages ya awareness campaigns
+                        <strong>Social Messages:</strong> Positive social messages and awareness campaigns
                       </p>
                     </div>
                   </div>
@@ -240,31 +240,31 @@ export default function Restrictions() {
                 {/* Review Process */}
                 <div className="border-l-4 border-blue-500 pl-6">
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                    🔍 Review Process (Checking Process)
+                    🔍 Review Process
                   </h2>
                   <div className="space-y-3">
                     <div className="flex items-start space-x-3">
                       <span className="text-blue-500 font-bold">1.</span>
                       <p className="text-gray-700">
-                        <strong>Submit Design:</strong> Aap apna design upload karte hain campaign create karte waqt
+                        <strong>Submit Design:</strong> Upload your design when creating a campaign
                       </p>
                     </div>
                     <div className="flex items-start space-x-3">
                       <span className="text-blue-500 font-bold">2.</span>
                       <p className="text-gray-700">
-                        <strong>Admin Review:</strong> Humari team 24-48 hours mein aapke design ko review karti hai
+                        <strong>Admin Review:</strong> Our team reviews your design within 24-48 hours
                       </p>
                     </div>
                     <div className="flex items-start space-x-3">
                       <span className="text-blue-500 font-bold">3.</span>
                       <p className="text-gray-700">
-                        <strong>Approval/Rejection:</strong> Guidelines follow karne par approve, nahi toh rejection with reason
+                        <strong>Approval/Rejection:</strong> Designs are approved if guidelines are followed, otherwise rejected with reason
                       </p>
                     </div>
                     <div className="flex items-start space-x-3">
                       <span className="text-blue-500 font-bold">4.</span>
                       <p className="text-gray-700">
-                        <strong>Production:</strong> Approved designs ko 7-10 days mein print karke deliver karte hain
+                        <strong>Production:</strong> Approved designs are printed and delivered within 7-10 days
                       </p>
                     </div>
                   </div>
@@ -273,60 +273,42 @@ export default function Restrictions() {
                 {/* Consequences */}
                 <div className="border-l-4 border-yellow-500 pl-6">
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                    ⚠️ Violation Consequences (Rules Todne Par)
+                    ⚠️ Violation Consequences
                   </h2>
                   <div className="space-y-3">
                     <div className="flex items-start space-x-3">
                       <span className="text-yellow-500 font-bold">⚠️</span>
                       <p className="text-gray-700">
-                        <strong>First Warning:</strong> Pehli baar rule break karne par warning milegi
+                        <strong>First Warning:</strong> Initial rule violation will result in a warning
                       </p>
                     </div>
                     <div className="flex items-start space-x-3">
                       <span className="text-yellow-500 font-bold">⚠️</span>
                       <p className="text-gray-700">
-                        <strong>Campaign Rejection:</strong> Inappropriate content wale campaigns reject ho jaenge
+                        <strong>Campaign Rejection:</strong> Campaigns with inappropriate content will be rejected
                       </p>
                     </div>
                     <div className="flex items-start space-x-3">
                       <span className="text-red-500 font-bold">🚫</span>
                       <p className="text-gray-700">
-                        <strong>Account Suspension:</strong> Repeated violations par account temporary suspend
+                        <strong>Account Suspension:</strong> Repeated violations may result in temporary account suspension
                       </p>
                     </div>
                     <div className="flex items-start space-x-3">
                       <span className="text-red-500 font-bold">🚫</span>
                       <p className="text-gray-700">
-                        <strong>Permanent Ban:</strong> Serious violations par permanent ban bhi ho sakta hai
+                        <strong>Permanent Ban:</strong> Serious violations may result in permanent account ban
                       </p>
                     </div>
-                  </div>
-                </div>
-
-                {/* Contact Info */}
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">
-                    📞 Questions or Clarifications?
-                  </h3>
-                  <p className="text-gray-700 mb-4">
-                    Agar aapko koi doubt hai ya guidelines ke baare mein clarification chahiye, toh humare support team se contact kariye:
-                  </p>
-                  <div className="space-y-2">
-                    <p className="text-gray-700">
-                      <strong>Email:</strong> support@iambillboard.com
-                    </p>
-                    <p className="text-gray-700">
-                      <strong>WhatsApp:</strong> +91 98765 43210
-                    </p>
                   </div>
                 </div>
 
                 {/* Final Note */}
                 <div className="text-center bg-gradient-to-r from-red-50 to-pink-50 rounded-xl p-6">
                   <p className="text-lg font-semibold text-gray-800">
-                    IamBillBoard ka maqsad hai ki sabko clean aur professional advertising platform mile. 
+                    IamBillBoard aims to provide a clean and professional advertising platform for everyone. 
                     <br />
-                    <span className="text-red-600">Saath milkar ek better advertising community banate hain! 🚀</span>
+                    <span className="text-red-600">Let's build a better advertising community together! 🚀</span>
                   </p>
                 </div>
 
