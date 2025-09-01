@@ -15,6 +15,7 @@ import Admin from "@/pages/admin";
 
 import Terms from "@/pages/terms";
 import Privacy from "@/pages/privacy";
+import Restrictions from "@/pages/restrictions";
 import Checkout from "@/pages/checkout";
 import OrderSuccess from "@/pages/order-success";
 import PaymentFailed from "@/pages/payment-failed";
@@ -37,6 +38,7 @@ function Router() {
 
       <Route path="/terms" component={Terms} />
       <Route path="/privacy" component={Privacy} />
+      <Route path="/restrictions" component={Restrictions} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/order-success" component={OrderSuccess} />
       <Route path="/payment-failed/:reason?" component={PaymentFailed} />

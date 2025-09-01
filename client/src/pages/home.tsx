@@ -453,6 +453,7 @@ export default function Home() {
             <div className="hidden md:flex items-center space-x-8">
               <a href="#home" className="text-black hover:text-red-500 transition-colors font-semibold">Home</a>
               <a href="/designs" className="text-gray-600 hover:text-black transition-colors font-semibold">Designs</a>
+              <a href="/restrictions" className="text-gray-600 hover:text-black transition-colors font-semibold">Restrictions</a>
               <a href="#about" className="text-gray-600 hover:text-black transition-colors font-semibold">About</a>
               <a href="#contact" className="text-gray-600 hover:text-black transition-colors font-semibold">Contact</a>
               
@@ -512,6 +513,7 @@ export default function Home() {
                 <div className="absolute top-12 right-0 bg-white rounded-xl shadow-xl border border-gray-200 py-2 w-48 z-50">
                   <a href="#home" className="block px-4 py-2 text-gray-800 hover:text-red-500 font-semibold">Home</a>
                   <a href="/designs" className="block px-4 py-2 text-gray-800 hover:text-red-500 font-semibold">Designs</a>
+                  <a href="/restrictions" className="block px-4 py-2 text-gray-800 hover:text-red-500 font-semibold">Restrictions</a>
                   <a href="#about" className="block px-4 py-2 text-gray-800 hover:text-red-500 font-semibold">About</a>
                   <a href="#contact" className="block px-4 py-2 text-gray-800 hover:text-red-500 font-semibold">Contact</a>
                   {isSignedIn && (
@@ -1401,6 +1403,7 @@ Chandigarh • Mohali • Panchkula
             <div className="flex flex-wrap justify-center space-x-6 text-sm text-gray-400">
               <a href="/terms" className="hover:text-white transition-colors">Terms of Service</a>
               <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>
+              <a href="/restrictions" className="hover:text-white transition-colors">Restrictions</a>
               {isSignedIn && (
                 <a href="/dashboard" className="hover:text-white transition-colors">Dashboard</a>
               )}
