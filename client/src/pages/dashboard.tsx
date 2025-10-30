@@ -574,6 +574,9 @@ export default function Dashboard() {
     upiId: ''
   });
   
+  // Terms and conditions acceptance state
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  
   // City and area data - Currently serving Chandigarh, Mohali, and Panchkula
   const cityAreaData: Record<string, string[]> = {
     'Chandigarh': [
@@ -670,6 +673,11 @@ export default function Dashboard() {
       errors.quantity = true;
     }
     
+    // Validate terms and conditions acceptance
+    if (!termsAccepted) {
+      errors.terms = true;
+    }
+    
     // Set form errors and show validation
     setFormErrors(errors);
     setShowValidationErrors(true);
@@ -692,7 +700,8 @@ export default function Dashboard() {
         } : null,
         totalAmount: useMixedSelection ? 
           ((mixedBottles['750ml'] * 70) + (mixedBottles['1L'] * 80)) :
-          (quantity * (bottleSize === '750ml' ? 70 : 80))
+          (quantity * (bottleSize === '750ml' ? 70 : 80)),
+        termsAccepted: termsAccepted
       };
       
       localStorage.setItem('billboardwalker_checkout_data', JSON.stringify(checkoutData));
@@ -964,6 +973,42 @@ export default function Dashboard() {
                           <p className="text-red-500 text-sm mt-2 font-medium">⚠️ Please upload your design file to continue</p>
                         )}
                       </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Terms and Conditions / Ad Promotion Permission Section */}
+              <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-white/50 mb-4 sm:mb-8">
+                <div className={`p-4 rounded-xl border-2 transition-all ${
+                  showValidationErrors && formErrors.terms 
+                    ? 'bg-red-50 border-red-300' 
+                    : 'bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200'
+                }`}>
+                  <label className="flex items-start space-x-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={termsAccepted}
+                      onChange={(e) => setTermsAccepted(e.target.checked)}
+                      className="mt-1 w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                      data-testid="terms-checkbox"
+                    />
+                    <div className="flex-1">
+                      <p className={`font-semibold ${showValidationErrors && formErrors.terms ? 'text-red-800' : 'text-gray-800'}`}>
+                        मैं सहमत हूं / I Agree <span className="text-red-600">*</span>
+                      </p>
+                      <p className={`text-sm mt-1 ${showValidationErrors && formErrors.terms ? 'text-red-700' : 'text-gray-700'}`}>
+                        मैं IamBillBoard को अपने डिज़ाइन/विज्ञापन को अपनी बोतलों पर प्रिंट करने और प्रमोट करने की अनुमति देता/देती हूं। साथ ही मैं सभी नियम और शर्तों को स्वीकार करता/करती हूं।
+                      </p>
+                      <p className="text-xs mt-2 text-gray-600">
+                        I give IamBillBoard permission to print and promote my design/advertisement on their bottles. I also accept all terms and conditions.
+                      </p>
+                    </div>
+                  </label>
+                  {showValidationErrors && formErrors.terms && (
+                    <div className="mt-3 p-3 bg-red-100 border border-red-300 rounded-lg">
+                      <p className="text-red-800 text-sm font-bold">⚠️ कृपया आगे बढ़ने के लिए नियम और शर्तों को स्वीकार करें</p>
+                      <p className="text-red-700 text-xs mt-1">Please accept the terms and conditions to proceed</p>
                     </div>
                   )}
                 </div>

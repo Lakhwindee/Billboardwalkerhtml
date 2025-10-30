@@ -132,6 +132,10 @@ export const campaigns = pgTable("campaigns", {
   designFeedback: text("design_feedback"), // Specific feedback about design issues
   reuploadRequired: boolean("reupload_required").default(false), // Whether design needs to be reuploaded
   designRejectionReason: text("design_rejection_reason"), // Detailed reason for design rejection
+  
+  // Terms and conditions / Ad promotion consent
+  termsAccepted: boolean("terms_accepted").default(false), // User consent for terms and ad promotion
+  
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
