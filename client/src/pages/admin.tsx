@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { type Contact, type Campaign, type PriceSetting, type BottleSample, type User, type UserProfile, type UserActivityLog, type LogoSetting, type DesignSample } from "@shared/schema";
@@ -130,25 +131,37 @@ function Admin() {
   const [updatingCampaign, setUpdatingCampaign] = useState(false);
   
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
 
   // Get current user for role-based access
-  const { data: currentUser } = useQuery<CurrentUser>({
+  const { data: currentUser, isLoading: isLoadingUser, isError } = useQuery<CurrentUser>({
     queryKey: ['/api/current-user'],
     retry: false,
   });
 
+  // Protect admin panel - redirect if not authenticated
   useEffect(() => {
-    loadConfigurations();
-    
-    // Check URL parameters for tab
-    const urlParams = new URLSearchParams(window.location.search);
-    const tabParam = urlParams.get('tab');
-    
-    // Set tab based on URL parameter or user role
-    if (tabParam && getAvailableTabs().some(tab => tab.id === tabParam)) {
-      setActiveTab(tabParam);
-    } else if (currentUser?.role === 'campaign_manager') {
-      setActiveTab('campaigns');
+    if (!isLoadingUser && (!currentUser || isError)) {
+      // User is not authenticated, redirect to admin login
+      console.log('⛔ Admin access denied: User not authenticated');
+      setLocation('/admin/login');
+    }
+  }, [currentUser, isLoadingUser, isError, setLocation]);
+
+  useEffect(() => {
+    if (currentUser) {
+      loadConfigurations();
+      
+      // Check URL parameters for tab
+      const urlParams = new URLSearchParams(window.location.search);
+      const tabParam = urlParams.get('tab');
+      
+      // Set tab based on URL parameter or user role
+      if (tabParam && getAvailableTabs().some(tab => tab.id === tabParam)) {
+        setActiveTab(tabParam);
+      } else if (currentUser?.role === 'campaign_manager') {
+        setActiveTab('campaigns');
+      }
     }
   }, [currentUser]);
 
@@ -1168,6 +1181,23 @@ function Admin() {
       default: return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
+
+  // Show loading state while checking authentication
+  if (isLoadingUser) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-pink-500 mx-auto mb-4"></div>
+          <p className="text-gray-400">Verifying admin access...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If user is not authenticated, return null (will be redirected by useEffect)
+  if (!currentUser) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black text-white">
