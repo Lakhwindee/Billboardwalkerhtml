@@ -12,16 +12,6 @@ declare module 'express-session' {
 }
 import connectPgSimple from "connect-pg-simple";
 import { storage } from "./storage";
-// Simple auth middleware for sessions
-const requireAuth = (req: any, res: any, next: any) => {
-  if (req.session?.user) {
-    next();
-  } else {
-    res.status(401).json({ error: "Authentication required" });
-  }
-};
-
-
 import { insertContactSchema, insertOrderSchema, insertCampaignSchema, insertPriceSettingSchema, insertSiteSettingSchema, insertHomeImageSchema, insertOrderCampaignSchema, insertLogoSettingSchema, insertUserSchema, insertDesignSampleSchema , adminSettings } from "../shared/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -32,6 +22,48 @@ import { emailVerificationService } from "./emailVerificationService";
 import { smsService } from "./smsService";
 import otpService from "./otpService";
 import { paymentGateway } from "./paymentGateway";
+
+// Token-based authentication for iframe compatibility
+const authTokens = new Map<string, { userId: number; username: string; role: string; createdAt: number }>();
+
+function generateAuthToken(): string {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+function validateAuthToken(token: string) {
+  const data = authTokens.get(token);
+  if (!data) return null;
+  
+  // Token expires after 7 days
+  if (Date.now() - data.createdAt > 7 * 24 * 60 * 60 * 1000) {
+    authTokens.delete(token);
+    return null;
+  }
+  
+  return data;
+}
+
+// Enhanced auth middleware that supports both sessions and tokens
+const requireAuth = (req: any, res: any, next: any) => {
+  // Check Authorization header first
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.substring(7);
+    const tokenData = validateAuthToken(token);
+    if (tokenData) {
+      req.user = tokenData;
+      return next();
+    }
+  }
+  
+  // Fallback to session
+  if (req.session?.user) {
+    req.user = req.session.user;
+    return next();
+  }
+  
+  res.status(401).json({ error: "Authentication required" });
+};
 
 import multer from "multer";
 import path from "path";
@@ -307,25 +339,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userAgent: req.get('User-Agent') || 'unknown'
       });
       
-      // Set session with fresh data - explicit approach
+      // Generate auth token for iframe compatibility
+      const authToken = generateAuthToken();
+      authTokens.set(authToken, {
+        userId: user.id,
+        username: user.username,
+        role: user.role,
+        createdAt: Date.now()
+      });
+      
+      console.log('✅ Auth token generated:', authToken.substring(0, 10) + '...');
+      console.log('👤 Token user:', { id: user.id, username: user.username, role: user.role });
+      
+      // Also set session for backward compatibility
       (req.session as any).user = {
         id: user.id,
         username: user.username,
         role: user.role
       };
       
-      // Save session explicitly to ensure persistence
       req.session.save((saveErr) => {
         if (saveErr) {
-          console.error('Session save error:', saveErr);
-          return res.status(500).json({ 
-            error: 'Session save failed',
-            type: 'session_error'
-          });
+          console.error('⚠️ Session save warning:', saveErr);
+          // Don't fail login if session save fails - we have token
         }
         
         res.json({ 
           message: 'Login successful',
+          token: authToken,
           user: {
             id: user.id,
             username: user.username,
@@ -345,23 +386,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get current user endpoint for role checking
   app.get("/api/current-user", (req, res) => {
+    console.log('🔍 Current user check');
+    console.log('🔍 Authorization header:', req.headers.authorization);
+    
+    // Check Authorization header first (token-based auth)
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      const tokenData = validateAuthToken(token);
+      if (tokenData) {
+        console.log('✅ User authenticated via token:', tokenData);
+        return res.json({
+          id: tokenData.userId,
+          username: tokenData.username,
+          role: tokenData.role
+        });
+      } else {
+        console.log('❌ Invalid or expired token');
+      }
+    }
+    
+    // Fallback to session-based auth
     const session = req.session as any;
     if (session?.user) {
-      res.json(session.user);
-    } else {
-      res.status(401).json({ error: 'Not authenticated' });
+      console.log('✅ User authenticated via session:', session.user);
+      return res.json(session.user);
     }
+    
+    console.log('❌ User not authenticated');
+    res.status(401).json({ error: 'Not authenticated' });
   });
 
   // Logout endpoint - simple version for any user
   app.post("/api/logout", async (req, res) => {
     try {
+      let userId: number | null = null;
+      
+      // Check if using token auth
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        const tokenData = validateAuthToken(token);
+        if (tokenData) {
+          userId = tokenData.userId;
+          // Remove token from map
+          authTokens.delete(token);
+          console.log('✅ Auth token invalidated');
+        }
+      }
+      
+      // Check session auth
       const session = req.session as any;
+      if (session?.user) {
+        userId = session.user.id;
+      }
       
       // Log the logout if user is authenticated
-      if (session?.user) {
+      if (userId) {
         await storage.createUserActivityLog({
-          userId: session.user.id,
+          userId: userId,
           action: 'logout',
           details: 'User logged out',
           ipAddress: req.ip || 'unknown',
@@ -372,15 +455,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       req.session.destroy((err) => {
         if (err) {
           console.error('Session destroy error:', err);
-          return res.status(500).json({ error: 'Logout failed' });
         }
-        // Clear session cookies
-        res.clearCookie('connect.sid', { 
-          path: '/',
-          httpOnly: true,
-          sameSite: 'lax',
-          secure: false
-        });
+        res.clearCookie('iambillboard.sid', { path: '/' });
+        res.clearCookie('connect.sid', { path: '/' });
         res.json({ message: 'Logout successful' });
       });
     } catch (error: any) {

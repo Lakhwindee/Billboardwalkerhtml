@@ -92,6 +92,12 @@ export default function SigninPage() {
     onSuccess: (data) => {
       setError("");
       
+      // Store auth token in localStorage for iframe compatibility
+      if (data.token) {
+        localStorage.setItem('auth_token', data.token);
+        console.log('✅ Auth token stored in localStorage');
+      }
+      
       // Invalidate current user query to refresh authentication state
       queryClient.invalidateQueries({ queryKey: ['/api/current-user'] });
       

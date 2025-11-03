@@ -15,6 +15,12 @@ export async function apiRequest(
   let headers: HeadersInit = {};
   let body: string | FormData | undefined;
 
+  // Add auth token from localStorage
+  const authToken = localStorage.getItem('auth_token');
+  if (authToken) {
+    headers["Authorization"] = `Bearer ${authToken}`;
+  }
+
   if (data) {
     if (data instanceof FormData) {
       // Don't set Content-Type for FormData - let browser set it with boundary
@@ -42,7 +48,15 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
+    // Add auth token from localStorage
+    const authToken = localStorage.getItem('auth_token');
+    const headers: HeadersInit = {};
+    if (authToken) {
+      headers["Authorization"] = `Bearer ${authToken}`;
+    }
+
     const res = await fetch(queryKey.join("/") as string, {
+      headers,
       credentials: "include",
     });
 
