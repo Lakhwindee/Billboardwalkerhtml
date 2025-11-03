@@ -92,6 +92,21 @@ export default function SigninPage() {
     onSuccess: (data) => {
       setError("");
       
+      // Check if user is admin or campaign_manager - redirect to admin login
+      if (data.user?.role === "admin" || data.user?.role === "campaign_manager") {
+        toast({
+          title: "Admin Access Required",
+          description: "Please use the admin login page for administrator access",
+          variant: "destructive",
+        });
+        
+        // Redirect to admin login without storing token
+        setTimeout(() => {
+          setLocation("/admin/login");
+        }, 1500);
+        return;
+      }
+      
       // Store auth token in localStorage for iframe compatibility
       if (data.token) {
         localStorage.setItem('auth_token', data.token);
@@ -106,15 +121,9 @@ export default function SigninPage() {
         description: "Successfully signed in to IamBillBoard",
       });
       
-      // Redirect based on role with delay for better UX
+      // Redirect to dashboard
       setTimeout(() => {
-        if (data.user?.role === "admin") {
-          setLocation("/admin");
-        } else if (data.user?.role === "campaigns" || data.user?.role === "campaign_manager") {
-          setLocation("/admin?tab=campaigns");
-        } else {
-          setLocation("/dashboard");
-        }
+        setLocation("/dashboard");
       }, 500);
     },
     onError: (error: Error) => {
@@ -318,6 +327,17 @@ export default function SigninPage() {
 
           </CardContent>
         </Card>
+
+        {/* Admin Login Link */}
+        <div className="text-center mt-6">
+          <Link 
+            href="/admin/login" 
+            className="text-xs text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+            data-testid="link-admin-login"
+          >
+            Admin Login →
+          </Link>
+        </div>
 
         {/* Footer */}
         <div className="text-center mt-8 text-sm text-gray-500 dark:text-gray-400">

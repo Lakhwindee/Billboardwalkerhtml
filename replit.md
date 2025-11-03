@@ -10,6 +10,8 @@ Requirements: Clean essential files only, working authentication system, admin p
 Zero tolerance for unused/backup files - user demands "exdum clean files chahiye".
 
 ## Recent Issues & Fixes
+**Separate Admin Login (Nov 3, 2025)**: Implemented dedicated admin login page at /admin/login with Shield icon branding and darker purple theme. Admin and campaign_manager users are now blocked from using the regular /signin page and must use the admin-specific login. If admin credentials are used on the regular signin page, the user is automatically redirected to /admin/login without authentication being stored.
+
 **Deployment Session Contamination (Aug 20, 2025)**: Fixed critical deployment issue where admin credentials (judge/judge1313) were showing campaign manager interface after deployment. Implemented session regeneration, enhanced cookie clearing, and comprehensive logout mechanism. Also fixed Contact Messages access for campaign managers.
 
 ## System Architecture
@@ -39,9 +41,12 @@ Zero tolerance for unused/backup files - user demands "exdum clean files chahiye
 - **Session Storage**: PostgreSQL-based.
 
 ### Admin Panel
-- **Access**: Restricted to 'judge' account (judge/judge1313 credentials). 'Campaign manager' role (campaign/campaign123) has access to campaigns and contact messages tabs.
+- **Access**: Restricted to 'judge' account (judge/judge1313 credentials) via dedicated /admin/login page. 'Campaign manager' role (campaign/campaign123) has access to campaigns and contact messages tabs.
+- **Login Pages**: 
+  - Regular users: /signin (blocks admin/campaign_manager roles)
+  - Admin users: /admin/login (Shield icon, darker purple theme, only allows admin/campaign_manager roles)
 - **Features**: Campaign approval, dynamic price management, contact management, user management (ban/unban, activity logs), website content editing (homepage GUI editor), bottle samples management (upload, live preview), payment account/transaction management, and visitor analytics.
-- **Authentication**: Secure session-based authentication with protected API routes and multi-step signup verification (email and phone OTP).
+- **Authentication**: Token-based authentication using localStorage for Replit iframe compatibility. Secure API routes with protected endpoints and multi-step signup verification (email and phone OTP).
 - **Navigation**: Desktop interface includes Dashboard and Home buttons (admin only), and Sign Out button (all users). Mobile interface shows Home icon (admin only) and Sign Out icon (all users). Campaign managers have full access to Campaigns and Contact Messages content including message details, sender information, and contact actions.
 - **In-stores Delivery**: Enhanced address input system for in-stores delivery with PIN code and contact phone validation.
 
