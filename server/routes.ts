@@ -123,26 +123,24 @@ const registerSchema = z.object({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Session setup - configured for Replit webview environment
-  const isProduction = process.env.NODE_ENV === 'production';
-  const isReplit = !!process.env.REPLIT_DEV_DOMAIN;
-  
+  // Session setup - simplified for development
   app.use(session({
     store: new PgSession({
       pool: pool,
       tableName: 'sessions'
     }),
     secret: 'iambillboard-secret-2025-consistent',
-    resave: false,
-    saveUninitialized: false,
-    name: 'connect.sid',
+    resave: true,
+    saveUninitialized: true,
+    name: 'iambillboard.sid',
     cookie: {
-      secure: isReplit || isProduction,
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
-      sameSite: isReplit ? 'none' : 'lax',
+      secure: false,
+      httpOnly: false,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      sameSite: 'lax',
       path: '/'
-    }
+    },
+    rolling: true
   }));
 
   // Serve uploaded images
