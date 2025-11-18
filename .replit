@@ -1,4 +1,4 @@
-modules = ["nodejs-20", "web", "postgresql-16"]
+modules = ["nodejs-20", "web"]
 run = "npm run dev"
 hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
@@ -18,6 +18,10 @@ externalPort = 80
 localPort = 38533
 externalPort = 3000
 
+[[ports]]
+localPort = 43265
+externalPort = 3001
+
 [env]
 PORT = "5000"
 
@@ -36,6 +40,9 @@ args = "Start application"
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
