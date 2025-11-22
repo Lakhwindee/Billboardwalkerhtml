@@ -878,6 +878,112 @@ class EmailService {
     return this.sendEmail({ to: email, subject, html });
   }
 
+  // Production Status Email (for production_started, shipped, delivered states)
+  async sendProductionStatusEmail(email: string, campaignData: any, status: string): Promise<boolean> {
+    const statusConfig = {
+      production_started: {
+        emoji: '🏭',
+        title: 'Production Started!',
+        subtitle: 'Your bottles are now being manufactured',
+        color: '#3b82f6',
+        message: 'Great news! Your campaign is now in production. Our manufacturing team has started creating your custom bottles.',
+        steps: [
+          '✅ Design approved and finalized',
+          '🏭 Production line set up',
+          '📦 Bottles being manufactured (3-5 days)',
+          '🚚 Shipping and delivery to follow'
+        ]
+      },
+      shipped: {
+        emoji: '🚚',
+        title: 'Order Shipped!',
+        subtitle: 'Your bottles are on the way',
+        color: '#8b5cf6',
+        message: 'Your custom bottles have been shipped and are on their way to you!',
+        steps: [
+          '✅ Production completed',
+          '✅ Quality check passed',
+          '🚚 Shipment in transit',
+          '📍 Delivery expected within 2-3 days'
+        ]
+      },
+      delivered: {
+        emoji: '🎉',
+        title: 'Order Delivered!',
+        subtitle: 'Your campaign is ready to go',
+        color: '#10b981',
+        message: `Congratulations! Your custom bottles for campaign "${campaignData.campaignId}" have been successfully delivered.`,
+        steps: [
+          '✅ Bottles delivered successfully',
+          '✅ Quality verified',
+          '🚀 Your marketing campaign can now begin',
+          '📊 Track your campaign performance in dashboard'
+        ]
+      }
+    };
+
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.production_started;
+    const subject = `${config.emoji} ${config.title} - Campaign ${campaignData.campaignId}`;
+    
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${config.title}</title>
+      </head>
+      <body style="margin: 0; padding: 0; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); font-family: 'Segoe UI', Arial, sans-serif;">
+        <div style="max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); overflow: hidden;">
+          
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, ${config.color} 0%, ${config.color}dd 100%); padding: 40px 40px 30px; text-align: center;">
+            <h1 style="color: #ffffff; font-size: 28px; font-weight: 700; margin: 0 0 8px;">${config.emoji} ${config.title}</h1>
+            <p style="color: rgba(255,255,255,0.9); font-size: 16px; margin: 0;">${config.subtitle}</p>
+          </div>
+          
+          <!-- Content -->
+          <div style="padding: 50px 40px;">
+            <p style="color: #64748b; font-size: 16px; line-height: 24px; margin: 0 0 30px;">${config.message}</p>
+            
+            <!-- Campaign Details -->
+            <div style="background: rgba(100,116,139,0.05); border-left: 4px solid ${config.color}; padding: 20px; border-radius: 8px; margin: 30px 0;">
+              <h3 style="color: #1e293b; font-size: 16px; font-weight: 600; margin: 0 0 12px;">Campaign Details:</h3>
+              <ul style="color: #64748b; font-size: 14px; line-height: 20px; margin: 0; padding-left: 0; list-style: none;">
+                <li style="margin-bottom: 8px;"><strong>Campaign ID:</strong> ${campaignData.campaignId}</li>
+                <li style="margin-bottom: 8px;"><strong>Bottle Type:</strong> ${campaignData.bottleType}</li>
+                <li style="margin-bottom: 8px;"><strong>Quantity:</strong> ${campaignData.quantity} bottles</li>
+              </ul>
+            </div>
+            
+            <!-- Progress Steps -->
+            <div style="margin: 30px 0;">
+              <h3 style="color: #1e293b; font-size: 16px; font-weight: 600; margin: 0 0 16px;">Progress:</h3>
+              <ul style="color: #64748b; font-size: 14px; line-height: 24px; margin: 0; padding-left: 20px;">
+                ${config.steps.map(step => `<li style="margin-bottom: 8px;">${step}</li>`).join('')}
+              </ul>
+            </div>
+            
+            <!-- CTA Button -->
+            <div style="text-align: center; margin: 40px 0;">
+              <a href="${process.env.FRONTEND_URL || 'http://localhost:5000'}/dashboard" style="display: inline-block; background: linear-gradient(135deg, ${config.color} 0%, ${config.color}dd 100%); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: 600; font-size: 16px;">
+                View Campaign Dashboard
+              </a>
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div style="background: #f8fafc; padding: 30px 40px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="color: #64748b; font-size: 12px; margin: 0;">© 2025 IamBillBoard. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    return this.sendEmail({ to: email, subject, html });
+  }
+
   // Password Change Confirmation Email
   async sendPasswordChangeConfirmationEmail(email: string, userName: string): Promise<boolean> {
     const subject = '🔐 Password Changed Successfully - IamBillBoard';

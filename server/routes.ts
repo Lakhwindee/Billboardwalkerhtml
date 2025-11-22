@@ -787,7 +787,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Send welcome email
       try {
-        await emailService.sendWelcomeEmail(email, firstName, username);
+        await emailService.sendWelcomeEmail(email, firstName, username, password);
         console.log(`Welcome email sent to ${email}`);
       } catch (emailError) {
         console.error('Failed to send welcome email:', emailError);
@@ -1405,7 +1405,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           try {
             const smsMessage = `🎨 IamBillBoard: Your campaign "${campaign.title}" needs design reupload. Check email for details. Upload new design at: ${process.env.FRONTEND_URL || 'https://iambillboard.com'}/dashboard`;
             
-            await smsService.sendSMS({ phone: user.phone, message: smsMessage });
+            await smsService.sendSMS({ to: user.phone, message: smsMessage });
             console.log(`📱 Design reupload SMS sent to ${user.phone}`);
           } catch (smsError) {
             console.error('Error sending reupload SMS:', smsError);
@@ -1768,7 +1768,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               case 'approved':
                 // Send both email and SMS
                 if (user.email) {
-                  await emailService.sendCampaignApprovalEmail(user.email, user.username, campaign.name || 'Your Campaign');
+                  await emailService.sendCampaignApprovalEmail(user.email, user.username, campaign.title || 'Your Campaign');
                   console.log(`Campaign approval email sent to ${user.email}`);
                 }
                 if (userPhone) {
@@ -1779,7 +1779,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               case 'rejected':
                 // Send both email and SMS
                 if (user.email) {
-                  await emailService.sendCampaignRejectionEmail(user.email, user.username, campaign.name || 'Your Campaign', rejectionReason || 'No specific reason provided');
+                  await emailService.sendCampaignRejectionEmail(user.email, user.username, campaign.title || 'Your Campaign', rejectionReason || 'No specific reason provided');
                   console.log(`Campaign rejection email sent to ${user.email}`);
                 }
                 if (userPhone) {
@@ -1788,33 +1788,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
                 break;
               case 'in_production':
-                // Send both email and SMS
-                if (user.email) {
-                  await emailService.sendProductionStatusEmail(user.email, campaignEmailData, 'production_started');
-                  console.log(`Production started email sent to ${user.email}`);
-                }
+                // Send SMS notification for production status
                 if (userPhone) {
                   await smsService.sendProductionStatusSMS(userPhone, campaignEmailData, 'production_started');
                   console.log(`Production started SMS sent to ${userPhone}`);
                 }
                 break;
               case 'shipped':
-                // Send both email and SMS
-                if (user.email) {
-                  await emailService.sendProductionStatusEmail(user.email, campaignEmailData, 'shipped');
-                  console.log(`Shipped status email sent to ${user.email}`);
-                }
+                // Send SMS notification for shipped status
                 if (userPhone) {
                   await smsService.sendProductionStatusSMS(userPhone, campaignEmailData, 'shipped');
                   console.log(`Shipped status SMS sent to ${userPhone}`);
                 }
                 break;
               case 'delivered':
-                // Send both email and SMS
-                if (user.email) {
-                  await emailService.sendProductionStatusEmail(user.email, campaignEmailData, 'delivered');
-                  console.log(`Delivery confirmation email sent to ${user.email}`);
-                }
+                // Send SMS notification for delivery
                 if (userPhone) {
                   await smsService.sendProductionStatusSMS(userPhone, campaignEmailData, 'delivered');
                   console.log(`Delivery confirmation SMS sent to ${userPhone}`);
@@ -2768,7 +2756,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const transaction = await storage.createTransaction({
         transactionRef,
         orderId: `ORDER_${Date.now()}`,
-        amount: parseFloat(amount),
+        amount: amount.toString(),
         currency: 'INR',
         paymentMethod: 'UPI',
         status: 'pending',
@@ -2783,7 +2771,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const paymentResult = await paymentGateway.createPaymentOrder({
         amount: parseFloat(amount),
         currency: 'INR',
-        receipt: transaction.orderId,
+        receipt: transaction.orderId || '',
         notes: {
           customerName: customerInfo?.fullName || '',
           phone: customerInfo?.phone || '',
@@ -2843,8 +2831,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Update transaction status
         const transaction = await storage.updateTransactionByRef(transactionRef, {
           status: 'completed',
-          completedAt: new Date(),
-          gatewayPaymentId: paymentId || null
+          completedAt: new Date()
         });
 
         // Create order campaign
@@ -2858,17 +2845,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           city: orderData.city || '',
           state: orderData.state || '',
           pincode: orderData.pincode || '',
-          companyName: orderData.companyName || '',
-          bottleSize: orderData.bottleSize || '750ml',
+          bottleType: orderData.bottleType || '750ml',
           quantity: orderData.quantity || 1,
-          useMixedSelection: orderData.useMixedSelection || false,
-          mixedBottles: JSON.stringify(orderData.mixedBottles || {}),
           totalAmount: transaction.amount,
-          designFile: orderData.designFile || '',
-          selectedOption: orderData.selectedOption || '',
-          selectedCity: orderData.selectedCity || '',
-          selectedArea: orderData.selectedArea || '',
-          status: 'pending'
+          designImageUrl: orderData.designFile || '',
+          paymentMethod: transaction.paymentMethod,
+          paymentStatus: 'paid',
+          status: 'pending_approval'
         });
 
         res.json({
@@ -2929,7 +2912,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const upiRegex = /^[\w\.-]+@[\w\.-]+$/;
       if (!upiRegex.test(existingTransaction.upiId || '')) {
         failureReason = 'Invalid UPI ID format';
-      } else if (!existingTransaction.amount || existingTransaction.amount <= 0) {
+      } else if (!existingTransaction.amount || parseFloat(existingTransaction.amount) <= 0) {
         failureReason = 'Invalid transaction amount';
       } else {
         // Simulate real banking scenarios (80% success rate)
@@ -3052,7 +3035,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create transaction record
       const transaction = await storage.createTransaction({
         transactionRef,
-        amount: parseFloat(amount),
+        amount: amount.toString(),
         paymentMethod: 'card',
         status: 'pending',
         customerName: customerInfo.fullName,
@@ -3069,7 +3052,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate card details
       const cardNumber = cardData.cardNumber.replace(/\s/g, '');
       const currentDate = new Date();
-      const [expMonth, expYear] = cardData.expiryDate.split('/').map(num => parseInt(num));
+      const [expMonth, expYear] = cardData.expiryDate.split('/').map((num: string) => parseInt(num));
       const expiryDate = new Date(2000 + expYear, expMonth - 1);
       
       if (cardNumber.length < 13 || cardNumber.length > 19) {

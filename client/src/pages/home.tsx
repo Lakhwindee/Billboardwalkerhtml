@@ -13,7 +13,7 @@ export default function Home() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   
   // Get current user data for session-based authentication
-  const { data: currentUserData } = useQuery({
+  const { data: currentUserData } = useQuery<{ username: string; role: string; id: number } | null>({
     queryKey: ['/api/current-user'],
     retry: false,
   });
@@ -227,7 +227,8 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Login error:', error);
-      alert(`Login failed: ${error.message || 'Please check your credentials and try again'}`);
+      const errorMessage = error instanceof Error ? error.message : 'Please check your credentials and try again';
+      alert(`Login failed: ${errorMessage}`);
     }
   };
 
