@@ -1788,21 +1788,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
                 break;
               case 'in_production':
-                // Send SMS notification for production status
+                // Send both email and SMS for production status
+                if (user.email) {
+                  await emailService.sendProductionStatusEmail(user.email, campaignEmailData, 'production_started');
+                  console.log(`Production started email sent to ${user.email}`);
+                }
                 if (userPhone) {
                   await smsService.sendProductionStatusSMS(userPhone, campaignEmailData, 'production_started');
                   console.log(`Production started SMS sent to ${userPhone}`);
                 }
                 break;
               case 'shipped':
-                // Send SMS notification for shipped status
+                // Send both email and SMS for shipped status
+                if (user.email) {
+                  await emailService.sendProductionStatusEmail(user.email, campaignEmailData, 'shipped');
+                  console.log(`Shipped email sent to ${user.email}`);
+                }
                 if (userPhone) {
                   await smsService.sendProductionStatusSMS(userPhone, campaignEmailData, 'shipped');
                   console.log(`Shipped status SMS sent to ${userPhone}`);
                 }
                 break;
               case 'delivered':
-                // Send SMS notification for delivery
+                // Send both email and SMS for delivery
+                if (user.email) {
+                  await emailService.sendProductionStatusEmail(user.email, campaignEmailData, 'delivered');
+                  console.log(`Delivery email sent to ${user.email}`);
+                }
                 if (userPhone) {
                   await smsService.sendProductionStatusSMS(userPhone, campaignEmailData, 'delivered');
                   console.log(`Delivery confirmation SMS sent to ${userPhone}`);
