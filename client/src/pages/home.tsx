@@ -102,7 +102,7 @@ export default function Home() {
 
   // Load website content from admin panel
   const [websiteContent, setWebsiteContent] = useState({
-    trustedBadge: "TRUSTED BY THOUSANDS",
+    trustedBadge: "NEW IN INDIA",
     heroTitle: {
       line1: "Custom Bottle",
       line2: "Advertising", 

@@ -29,7 +29,7 @@ function Admin() {
     discountPercentage: 0
   });
   const [websiteContent, setWebsiteContent] = useState({
-    trustedBadge: "TRUSTED BY THOUSANDS",
+    trustedBadge: "NEW IN INDIA",
     heroTitle: {
       line1: "Custom Bottle",
       line2: "Advertising", 
@@ -452,7 +452,7 @@ function Admin() {
     if (confirm('Are you sure you want to reset to default settings? This will lose all your changes.')) {
       setWebsiteContent({
         // Hero Section Content
-        trustedBadge: "TRUSTED BY THOUSANDS",
+        trustedBadge: "NEW IN INDIA",
         heroTitle: {
           line1: "Custom Bottle",
           line2: "Advertising", 
