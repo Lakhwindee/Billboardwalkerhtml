@@ -328,17 +328,6 @@ export default function SigninPage() {
           </CardContent>
         </Card>
 
-        {/* Admin Login Link */}
-        <div className="text-center mt-6">
-          <Link 
-            href="/admin/login" 
-            className="text-xs text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
-            data-testid="link-admin-login"
-          >
-            Admin Login →
-          </Link>
-        </div>
-
         {/* Footer */}
         <div className="text-center mt-8 text-sm text-gray-500 dark:text-gray-400">
           <p>© 2025 IamBillBoard. All rights reserved.</p>
