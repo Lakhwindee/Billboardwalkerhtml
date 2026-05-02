@@ -60,12 +60,6 @@ export default function Restrictions() {
               {isSignedIn && (
                 <a href="/dashboard" className="text-gray-600 hover:text-black transition-colors font-semibold">Dashboard</a>
               )}
-              {isJudgeUser && (
-                <a href="/admin" className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 py-2 rounded-full font-bold shadow-lg hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300">
-                  🛠️ Admin Panel
-                </a>
-              )}
-              
               {isSignedIn ? (
                 <div className="flex items-center space-x-4">
                   <span className="text-sm text-gray-600">Welcome, {currentUser}!</span>
@@ -108,10 +102,6 @@ export default function Restrictions() {
                   {isSignedIn && (
                     <a href="/dashboard" className="block px-4 py-2 text-gray-800 hover:text-red-500 font-semibold">Dashboard</a>
                   )}
-                  {isJudgeUser && (
-                    <a href="/admin" className="block px-4 py-2 text-purple-600 hover:text-purple-800 font-bold">🛠️ Admin Panel</a>
-                  )}
-                  
                   {isSignedIn ? (
                     <div className="pt-2 border-t border-gray-200">
                       <p className="text-sm text-gray-600 mb-2">Welcome, {currentUser}!</p>
@@ -339,9 +329,6 @@ export default function Restrictions() {
               <a href="/restrictions" className="hover:text-white transition-colors text-white">Restrictions</a>
               {isSignedIn && (
                 <a href="/dashboard" className="hover:text-white transition-colors">Dashboard</a>
-              )}
-              {isJudgeUser && (
-                <a href="/admin" className="hover:text-white transition-colors">Admin Panel</a>
               )}
             </div>
             
