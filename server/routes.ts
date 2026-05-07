@@ -3945,6 +3945,244 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============================================================
+  // QR CODE & ADVERTISER ANALYTICS ROUTES
+  // ============================================================
+
+  // Generate QR codes for a campaign
+  app.post("/api/campaigns/:id/generate-qr", async (req, res) => {
+    try {
+      const campaignId = parseInt(req.params.id);
+      const { quantity = 1, rewardId } = req.body;
+      const QRCode = await import('qrcode');
+      const { qrCodes } = await import('@shared/schema');
+      const crypto = await import('crypto');
+      const baseUrl = process.env.REPLIT_DEV_DOMAIN
+        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+        : (process.env.FRONTEND_URL || 'http://localhost:5000');
+
+      const generated = [];
+      for (let i = 0; i < Math.min(quantity, 500); i++) {
+        const token = crypto.default.randomBytes(12).toString('hex');
+        const landingUrl = `${baseUrl}/qr/${token}`;
+        const qrImageUrl = await QRCode.default.toDataURL(landingUrl, { width: 300, margin: 2 });
+        const [record] = await db.insert(qrCodes).values({
+          campaignId,
+          token,
+          landingUrl,
+          qrImageUrl,
+          bottleSerial: `BOTTLE-${campaignId}-${String(i + 1).padStart(4, '0')}`,
+          rewardId: rewardId || null,
+          isActive: true,
+          totalScans: 0,
+        }).returning();
+        generated.push(record);
+      }
+      res.json({ success: true, generated: generated.length, qrCodes: generated });
+    } catch (error: any) {
+      console.error('QR generate error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get QR codes for a campaign
+  app.get("/api/campaigns/:id/qr-codes", async (req, res) => {
+    try {
+      const campaignId = parseInt(req.params.id);
+      const { qrCodes } = await import('@shared/schema');
+      const { eq } = await import('drizzle-orm');
+      const codes = await db.select().from(qrCodes).where(eq(qrCodes.campaignId, campaignId));
+      res.json(codes);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Public: Get QR code info when consumer scans
+  app.get("/api/qr/:token", async (req, res) => {
+    try {
+      const { qrCodes, campaigns, rewards } = await import('@shared/schema');
+      const { eq } = await import('drizzle-orm');
+      const [qr] = await db.select().from(qrCodes).where(eq(qrCodes.token, req.params.token));
+      if (!qr) return res.status(404).json({ error: 'Invalid QR code' });
+      const [campaign] = await db.select().from(campaigns).where(eq(campaigns.id, qr.campaignId!));
+      let reward = null;
+      if (qr.rewardId) {
+        const [r] = await db.select().from(rewards).where(eq(rewards.id, qr.rewardId));
+        reward = r || null;
+      }
+      res.json({ qr, campaign: { title: campaign?.title, businessName: campaign?.businessName }, reward });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Public: Record a QR scan + claim reward
+  app.post("/api/qr/:token/scan", async (req, res) => {
+    try {
+      const { qrCodes, qrScans, rewards, userRewards } = await import('@shared/schema');
+      const { eq, sql } = await import('drizzle-orm');
+      const crypto = await import('crypto');
+      const [qr] = await db.select().from(qrCodes).where(eq(qrCodes.token, req.params.token));
+      if (!qr || !qr.isActive) return res.status(404).json({ error: 'Invalid or inactive QR code' });
+
+      const userAgent = req.headers['user-agent'] || '';
+      const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0] || req.socket.remoteAddress || '';
+      const { phone, email, name } = req.body;
+
+      // Record scan
+      const [scan] = await db.insert(qrScans).values({
+        qrCodeId: qr.id,
+        campaignId: qr.campaignId,
+        scannerIp: ip,
+        scannerDevice: userAgent.includes('Mobile') ? 'Mobile' : 'Desktop',
+        rewardClaimed: false,
+        claimedByPhone: phone || null,
+        claimedByEmail: email || null,
+      }).returning();
+
+      // Update scan count
+      await db.update(qrCodes).set({ totalScans: (qr.totalScans || 0) + 1 }).where(eq(qrCodes.id, qr.id));
+
+      // Claim reward if available
+      let userReward = null;
+      if (qr.rewardId && (phone || email)) {
+        const [reward] = await db.select().from(rewards).where(eq(rewards.id, qr.rewardId));
+        if (reward && reward.isActive && (reward.totalAvailable === 0 || (reward.totalClaimed || 0) < (reward.totalAvailable || 0))) {
+          const redemptionCode = 'RWD-' + crypto.default.randomBytes(4).toString('hex').toUpperCase();
+          const [ur] = await db.insert(userRewards).values({
+            rewardId: reward.id,
+            qrScanId: scan.id,
+            claimedByPhone: phone || null,
+            claimedByEmail: email || null,
+            claimedByName: name || null,
+            redemptionCode,
+            isRedeemed: false,
+            expiresAt: reward.expiresAt || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          }).returning();
+          await db.update(rewards).set({ totalClaimed: (reward.totalClaimed || 0) + 1 }).where(eq(rewards.id, reward.id));
+          await db.update(qrScans).set({ rewardClaimed: true }).where(eq(qrScans.id, scan.id));
+          userReward = { ...ur, reward };
+        }
+      }
+      res.json({ success: true, scan, userReward });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Advertiser analytics for a campaign
+  app.get("/api/campaigns/:id/analytics", async (req, res) => {
+    try {
+      const campaignId = parseInt(req.params.id);
+      const { qrCodes, qrScans, rewards, userRewards } = await import('@shared/schema');
+      const { eq, count, sql } = await import('drizzle-orm');
+
+      const codes = await db.select().from(qrCodes).where(eq(qrCodes.campaignId, campaignId));
+      const totalQrCodes = codes.length;
+      const totalScans = codes.reduce((sum, c) => sum + (c.totalScans || 0), 0);
+
+      const scans = await db.select().from(qrScans).where(eq(qrScans.campaignId, campaignId));
+      const mobileScans = scans.filter(s => s.scannerDevice === 'Mobile').length;
+      const desktopScans = scans.filter(s => s.scannerDevice === 'Desktop').length;
+      const rewardsClaimed = scans.filter(s => s.rewardClaimed).length;
+
+      // Scans by day (last 30 days)
+      const scansByDay: Record<string, number> = {};
+      scans.forEach(s => {
+        const day = s.scannedAt.toISOString().split('T')[0];
+        scansByDay[day] = (scansByDay[day] || 0) + 1;
+      });
+
+      const campaignRewards = await db.select().from(rewards).where(eq(rewards.campaignId, campaignId));
+
+      res.json({
+        totalQrCodes,
+        totalScans,
+        mobileScans,
+        desktopScans,
+        rewardsClaimed,
+        scansByDay,
+        rewards: campaignRewards,
+        recentScans: scans.slice(-20).reverse(),
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get all campaigns analytics (advertiser overview)
+  app.get("/api/advertiser/analytics", async (req, res) => {
+    try {
+      const user = (req as any).user;
+      if (!user) return res.status(401).json({ error: 'Not authenticated' });
+      const { campaigns, qrCodes, qrScans } = await import('@shared/schema');
+      const { eq } = await import('drizzle-orm');
+      const userCampaigns = await db.select().from(campaigns).where(eq(campaigns.userId, user.id));
+      const result = [];
+      for (const campaign of userCampaigns) {
+        const codes = await db.select().from(qrCodes).where(eq(qrCodes.campaignId, campaign.id));
+        const scans = await db.select().from(qrScans).where(eq(qrScans.campaignId, campaign.id));
+        result.push({
+          ...campaign,
+          totalQrCodes: codes.length,
+          totalScans: scans.reduce((s, _) => s + 1, 0),
+          rewardsClaimed: scans.filter(s => s.rewardClaimed).length,
+        });
+      }
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Create reward for a campaign
+  app.post("/api/campaigns/:id/rewards", async (req, res) => {
+    try {
+      const campaignId = parseInt(req.params.id);
+      const { rewards } = await import('@shared/schema');
+      const [reward] = await db.insert(rewards).values({ ...req.body, campaignId }).returning();
+      res.json(reward);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get rewards for a campaign
+  app.get("/api/campaigns/:id/rewards", async (req, res) => {
+    try {
+      const { rewards } = await import('@shared/schema');
+      const { eq } = await import('drizzle-orm');
+      const list = await db.select().from(rewards).where(eq(rewards.campaignId, parseInt(req.params.id)));
+      res.json(list);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Bottle assignments
+  app.get("/api/campaigns/:id/bottle-assignments", async (req, res) => {
+    try {
+      const { bottleAssignments } = await import('@shared/schema');
+      const { eq } = await import('drizzle-orm');
+      const list = await db.select().from(bottleAssignments).where(eq(bottleAssignments.campaignId, parseInt(req.params.id)));
+      res.json(list);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/bottle-assignments/:id", async (req, res) => {
+    try {
+      const { bottleAssignments } = await import('@shared/schema');
+      const { eq } = await import('drizzle-orm');
+      const [updated] = await db.update(bottleAssignments).set(req.body).where(eq(bottleAssignments.id, parseInt(req.params.id))).returning();
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

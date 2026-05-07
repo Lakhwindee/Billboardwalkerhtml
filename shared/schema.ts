@@ -589,4 +589,122 @@ export const insertNotificationSchema = createInsertSchema(notifications).omit({
 
 export const insertLogoSettingSchema = createInsertSchema(logoSettings).omit({ id: true, uploadedAt: true });
 export type LogoSetting = typeof logoSettings.$inferSelect;
+
+// QR Codes — one per bottle per campaign
+export const qrCodes = pgTable("qr_codes", {
+  id: serial("id").primaryKey(),
+  campaignId: integer("campaign_id").references(() => campaigns.id),
+  token: text("token").notNull().unique(), // unique scannable token
+  bottleSerial: text("bottle_serial"), // e.g. BOTTLE-001
+  qrImageUrl: text("qr_image_url"),
+  landingUrl: text("landing_url"), // full URL encoded in QR
+  rewardId: integer("reward_id"), // optional linked reward
+  isActive: boolean("is_active").default(true),
+  totalScans: integer("total_scans").default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// QR Scans — each time a QR code is scanned
+export const qrScans = pgTable("qr_scans", {
+  id: serial("id").primaryKey(),
+  qrCodeId: integer("qr_code_id").references(() => qrCodes.id),
+  campaignId: integer("campaign_id").references(() => campaigns.id),
+  scannerIp: text("scanner_ip"),
+  scannerDevice: text("scanner_device"),
+  scannerCity: text("scanner_city"),
+  scannerState: text("scanner_state"),
+  rewardClaimed: boolean("reward_claimed").default(false),
+  claimedByPhone: text("claimed_by_phone"),
+  claimedByEmail: text("claimed_by_email"),
+  scannedAt: timestamp("scanned_at").defaultNow().notNull(),
+});
+
+// Rewards — prizes/offers linked to QR scans
+export const rewards = pgTable("rewards", {
+  id: serial("id").primaryKey(),
+  campaignId: integer("campaign_id").references(() => campaigns.id),
+  title: text("title").notNull(),
+  description: text("description"),
+  rewardType: text("reward_type").notNull(), // "discount", "freebie", "cashback", "points"
+  rewardValue: text("reward_value"), // e.g. "10%", "Free bottle", "₹50"
+  totalAvailable: integer("total_available").default(0),
+  totalClaimed: integer("total_claimed").default(0),
+  expiresAt: timestamp("expires_at"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// User Rewards — rewards claimed by consumers
+export const userRewards = pgTable("user_rewards", {
+  id: serial("id").primaryKey(),
+  rewardId: integer("reward_id").references(() => rewards.id),
+  qrScanId: integer("qr_scan_id").references(() => qrScans.id),
+  claimedByPhone: text("claimed_by_phone"),
+  claimedByEmail: text("claimed_by_email"),
+  claimedByName: text("claimed_by_name"),
+  redemptionCode: text("redemption_code"), // unique code for claiming
+  isRedeemed: boolean("is_redeemed").default(false),
+  redeemedAt: timestamp("redeemed_at"),
+  expiresAt: timestamp("expires_at"),
+  claimedAt: timestamp("claimed_at").defaultNow().notNull(),
+});
+
+// Bottle Assignments — specific bottle to campaign mapping
+export const bottleAssignments = pgTable("bottle_assignments", {
+  id: serial("id").primaryKey(),
+  campaignId: integer("campaign_id").references(() => campaigns.id),
+  bottleSerial: text("bottle_serial").notNull(),
+  bottleType: text("bottle_type"), // "750ml", "1L", etc.
+  qrCodeId: integer("qr_code_id").references(() => qrCodes.id),
+  status: text("status").default("unassigned"), // unassigned, assigned, distributed, returned
+  distributionLocation: text("distribution_location"),
+  distributionEvent: text("distribution_event"),
+  assignedAt: timestamp("assigned_at").defaultNow().notNull(),
+  distributedAt: timestamp("distributed_at"),
+});
+
+// Relations
+export const qrCodesRelations = relations(qrCodes, ({ one, many }) => ({
+  campaign: one(campaigns, { fields: [qrCodes.campaignId], references: [campaigns.id] }),
+  scans: many(qrScans),
+  bottleAssignment: one(bottleAssignments, { fields: [qrCodes.id], references: [bottleAssignments.qrCodeId] }),
+}));
+
+export const qrScansRelations = relations(qrScans, ({ one }) => ({
+  qrCode: one(qrCodes, { fields: [qrScans.qrCodeId], references: [qrCodes.id] }),
+  campaign: one(campaigns, { fields: [qrScans.campaignId], references: [campaigns.id] }),
+}));
+
+export const rewardsRelations = relations(rewards, ({ one, many }) => ({
+  campaign: one(campaigns, { fields: [rewards.campaignId], references: [campaigns.id] }),
+  userRewards: many(userRewards),
+}));
+
+export const userRewardsRelations = relations(userRewards, ({ one }) => ({
+  reward: one(rewards, { fields: [userRewards.rewardId], references: [rewards.id] }),
+  qrScan: one(qrScans, { fields: [userRewards.qrScanId], references: [qrScans.id] }),
+}));
+
+export const bottleAssignmentsRelations = relations(bottleAssignments, ({ one }) => ({
+  campaign: one(campaigns, { fields: [bottleAssignments.campaignId], references: [campaigns.id] }),
+  qrCode: one(qrCodes, { fields: [bottleAssignments.qrCodeId], references: [qrCodes.id] }),
+}));
+
+// Type exports for new tables
+export type QrCode = typeof qrCodes.$inferSelect;
+export type InsertQrCode = typeof qrCodes.$inferInsert;
+export type QrScan = typeof qrScans.$inferSelect;
+export type InsertQrScan = typeof qrScans.$inferInsert;
+export type Reward = typeof rewards.$inferSelect;
+export type InsertReward = typeof rewards.$inferInsert;
+export type UserReward = typeof userRewards.$inferSelect;
+export type InsertUserReward = typeof userRewards.$inferInsert;
+export type BottleAssignment = typeof bottleAssignments.$inferSelect;
+export type InsertBottleAssignment = typeof bottleAssignments.$inferInsert;
+
+export const insertQrCodeSchema = createInsertSchema(qrCodes).omit({ id: true, createdAt: true });
+export const insertQrScanSchema = createInsertSchema(qrScans).omit({ id: true, scannedAt: true });
+export const insertRewardSchema = createInsertSchema(rewards).omit({ id: true, createdAt: true });
+export const insertUserRewardSchema = createInsertSchema(userRewards).omit({ id: true, claimedAt: true });
+export const insertBottleAssignmentSchema = createInsertSchema(bottleAssignments).omit({ id: true, assignedAt: true });
 export type InsertLogoSetting = z.infer<typeof insertLogoSettingSchema>;

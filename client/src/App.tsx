@@ -21,6 +21,8 @@ import Checkout from "@/pages/checkout";
 import OrderSuccess from "@/pages/order-success";
 import PaymentFailed from "@/pages/payment-failed";
 import NotFound from "@/pages/not-found";
+import QrScan from "@/pages/qr-scan";
+import AdvertiserAnalytics from "@/pages/advertiser-analytics";
 
 function Router() {
   // Initialize visitor tracking
@@ -44,6 +46,8 @@ function Router() {
       <Route path="/checkout" component={Checkout} />
       <Route path="/order-success" component={OrderSuccess} />
       <Route path="/payment-failed/:reason?" component={PaymentFailed} />
+      <Route path="/qr/:token" component={QrScan} />
+      <Route path="/advertiser-analytics" component={AdvertiserAnalytics} />
       <Route component={NotFound} />
     </Switch>
   );
