@@ -587,9 +587,7 @@ export default function SignupPage() {
           </Link>
           
           <div className="mb-4">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-              <User className="h-8 w-8 text-white" />
-            </div>
+            <img src="/logo.png" alt="IamBillBoard" className="w-32 h-32 object-contain mx-auto mb-2" />
           </div>
           
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">

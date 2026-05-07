@@ -229,6 +229,7 @@ export default function ForgotPasswordPage() {
         {/* Main Card */}
         <Card className="shadow-2xl border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg">
           <CardHeader className="space-y-1 text-center pb-6">
+            <img src="/logo.png" alt="IamBillBoard" className="w-24 h-24 object-contain mx-auto mb-2" />
             <CardTitle className="text-2xl font-semibold">
               {step === 1 && "Reset Password"}
               {step === 2 && "Verify OTP"}

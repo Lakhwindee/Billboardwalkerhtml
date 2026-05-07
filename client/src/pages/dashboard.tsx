@@ -756,12 +756,9 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <Link href="/">
               <div className="flex items-center space-x-1.5 sm:space-x-3 cursor-pointer group">
-                <div className="text-lg sm:text-2xl">📢</div>
-                <div className="min-w-0">
-                  <h1 className="text-sm sm:text-xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent group-hover:from-purple-600 group-hover:to-pink-600 transition-all truncate">
-                    IamBillBoard
-                  </h1>
-                  <p className="text-xs text-gray-500 hidden sm:block">Custom Bottle Advertising</p>
+                <img src="/logo.png" alt="IamBillBoard" className="w-10 h-10 sm:w-14 sm:h-14 object-contain" />
+                <div className="min-w-0 hidden sm:block">
+                  <p className="text-xs text-gray-500">Custom Bottle Advertising</p>
                 </div>
               </div>
             </Link>

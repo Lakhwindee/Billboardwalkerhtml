@@ -432,12 +432,11 @@ export default function Home() {
           <div className="flex items-center justify-between h-24">
             <div className="flex items-center space-x-4">
               <img 
-                src={activeLogo || "https://via.placeholder.com/80x80/ff6b6b/ffffff?text=IB"} 
+                src={activeLogo || "/logo.png"} 
                 alt="IamBillBoard Logo" 
                 className="w-20 h-20 object-contain filter drop-shadow-lg"
                 onError={(e) => {
-                  // Fallback to placeholder if custom logo fails to load
-                  e.currentTarget.src = "https://via.placeholder.com/80x80/ff6b6b/ffffff?text=IB";
+                  e.currentTarget.src = "/logo.png";
                 }}
               />
               <div className="flex flex-col">
@@ -891,8 +890,8 @@ export default function Home() {
         <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-black text-xl">BW</span>
+              <div className="w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <img src="/logo.png" alt="IamBillBoard" className="w-16 h-16 object-contain" />
               </div>
               <h3 className="text-xl font-black text-white mb-2">IamBillBoard</h3>
               <p className="text-gray-400 text-sm">Premium bottle advertising solutions</p>

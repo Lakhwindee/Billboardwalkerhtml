@@ -178,6 +178,7 @@ export default function SigninPage() {
             </div>
           </div>
           
+          <img src="/logo.png" alt="IamBillBoard" className="w-32 h-32 object-contain mx-auto mb-2" />
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             Welcome Back
           </h1>
